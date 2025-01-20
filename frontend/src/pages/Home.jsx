@@ -6,8 +6,9 @@ const Home = () => {
   return (
     <div>
       <h1>Welcome to Interview Scheduler</h1>
+      
       <Form />
-      <AdminDashboard />
+    
     </div>
   );
 };
