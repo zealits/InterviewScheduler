@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "api"; // Replace with your backend URL
+const API_BASE_URL = "http://localhost:5000/api"; // Replace with your backend URL
 
 export const registerUser = async (userData) => {
   const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
@@ -25,6 +25,6 @@ export const addInterviewer = async (interviewerData) => {
 
 // Fetch all interviewers
 export const fetchInterviewers = async () => {
-  const response = await axios.get(`api/interviewers`);
+  const response = await axios.get(`${API_BASE_URL}/interviewers`);
   return response.data;
 };
