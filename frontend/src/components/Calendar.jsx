@@ -11,7 +11,7 @@ const Calendar = () => {
   const [specializations, setSpecializations] = useState([]);
   const [filter, setFilter] = useState({ specialization: "", mode: "" });
 
-  // Fetch interviewers and populate filters
+  // Fetch interviewers and populate filters and sorting
   useEffect(() => {
     const fetchInterviewers = async () => {
       try {
