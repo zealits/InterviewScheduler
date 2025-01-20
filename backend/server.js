@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const app = require('./app');
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const app = require("./app");
 
-dotenv.config();
+dotenv.config({ path: "config/config.env" });
 
 // MongoDB Connection
 mongoose
@@ -10,8 +10,8 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log('MongoDB Connected'))
-  .catch((err) => console.error('MongoDB Connection Error:', err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Connection Error:", err));
 
 // Start Server
 const PORT = process.env.PORT || 5000;
