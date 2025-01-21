@@ -6,6 +6,7 @@ import AdminDashboard from './components/AdminDashboard';
 
 function App() {
   return (
+    //Routing stuff
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
