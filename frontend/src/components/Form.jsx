@@ -158,6 +158,31 @@ const Form = () => {
         )}
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium">Date</label>
+          <input
+            {...register("date", { required: "Date is required" })}
+            type="date"
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.date && (
+            <p className="text-red-500 text-sm">{errors.date.message}</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Time</label>
+          <input
+            {...register("time", { required: "Time is required" })}
+            type="time"
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.time && (
+            <p className="text-red-500 text-sm">{errors.time.message}</p>
+          )}
+        </div>
+      </div>
+
       <div>
         <label className="block text-sm font-medium">Mode</label>
         <Controller
