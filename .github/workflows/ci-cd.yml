@@ -52,8 +52,8 @@ jobs:
         run: |
           ssh admin@dev.zealits.com << 'EOF'
             # Backup the config.env file if it exists
-            if [ -f ~/InterviewScheduler/config/config.env ]; then
-              cp ~/InterviewScheduler/config/config.env ~/config.env.bak
+            if [ -f ~/InterviewScheduler/backend/config/config.env ]; then
+              cp ~/InterviewScheduler/backend/config/config.env ~/config.env.bak
             fi
 
             # Remove the ~/InterviewScheduler folder if it exists
@@ -64,11 +64,11 @@ jobs:
 
             # Restore the config.env file
             if [ -f ~/config.env.bak ]; then
-              mv ~/config.env.bak ~/InterviewScheduler/config/config.env
+              mv ~/config.env.bak ~/InterviewScheduler/backend/config/config.env
             fi
 
             # Navigate to the directory
-            cd ~/InterviewScheduler/backend
+            cd ~/InterviewScheduler/backend/
 
             # Install backend dependencies
             npm install
@@ -79,6 +79,7 @@ jobs:
             npm install --force
             npm run build
             cd ..
+            cd backend
 
             # Restart the application using PM2
             if pm2 list | grep -q "InterviewScheduler"; then
