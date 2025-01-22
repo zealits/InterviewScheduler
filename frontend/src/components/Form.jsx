@@ -34,7 +34,7 @@ const Form = () => {
         mode: data.mode, // Should match 'online' or 'offline'
       },
     ];
-  
+
     const payload = {
       name: data.name,
       email: data.email,
@@ -43,9 +43,9 @@ const Form = () => {
       availability,
       remarks: data.remarks,
     };
-  
+
     console.log("Payload to be sent:", payload);
-  
+
     try {
       const response = await addInterviewer(payload);
       console.log("Interviewer added successfully:", response);
@@ -55,40 +55,37 @@ const Form = () => {
       alert("Failed to add interviewer. Please try again.");
     }
   };
-  
-  
-  
 
-//   const onFormSubmit = async (data) => {
-//     const availability = [
-//       {
-//         date: data.date,
-//         time: data.time,
-//         timezone: timezone.value,
-//         mode: data.mode,
-//       },
-//     ];
+  //   const onFormSubmit = async (data) => {
+  //     const availability = [
+  //       {
+  //         date: data.date,
+  //         time: data.time,
+  //         timezone: timezone.value,
+  //         mode: data.mode,
+  //       },
+  //     ];
 
-//     const payload = {
-//       name: data.name,
-//       email: data.email,
-//       contactNumber: data.contactNumber,
-//       specialization: data.specialization,
-//       availability,
-//       remarks: data.remarks,
-//     };
+  //     const payload = {
+  //       name: data.name,
+  //       email: data.email,
+  //       contactNumber: data.contactNumber,
+  //       specialization: data.specialization,
+  //       availability,
+  //       remarks: data.remarks,
+  //     };
 
-//     console.log("Form data payload:", payload);
+  //     console.log("Form data payload:", payload);
 
-//     try {
-//       const response = await addInterviewer(payload);
-//       console.log("Interviewer added successfully:", response);
-//       alert("Interviewer added successfully!");
-//     } catch (error) {
-//       console.error("Error adding interviewer:", error);
-//       alert("Failed to add interviewer. Please try again.");
-//     }
-//   };
+  //     try {
+  //       const response = await addInterviewer(payload);
+  //       console.log("Interviewer added successfully:", response);
+  //       alert("Interviewer added successfully!");
+  //     } catch (error) {
+  //       console.error("Error adding interviewer:", error);
+  //       alert("Failed to add interviewer. Please try again.");
+  //     }
+  //   };
 
   return (
     <form
@@ -124,7 +121,9 @@ const Form = () => {
       <div>
         <label className="block text-sm font-medium">Contact Number</label>
         <input
-          {...register("contactNumber", { required: "Contact number is required" })}
+          {...register("contactNumber", {
+            required: "Contact number is required",
+          })}
           placeholder="Enter your contact number"
           className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -143,6 +142,9 @@ const Form = () => {
             <Select
               {...field}
               options={specializationOptions}
+              value={specializationOptions.find(
+                (option) => option.value === field.value
+              )}
               onChange={(selectedOption) =>
                 field.onChange(selectedOption?.value)
               }
@@ -191,6 +193,9 @@ const Form = () => {
             <Select
               {...field}
               options={modeOptions}
+              value={modeOptions.find(
+                (option) => option.value === field.value
+              )}
               onChange={(selectedOption) =>
                 field.onChange(selectedOption?.value)
               }
