@@ -16,7 +16,7 @@ app.use('/api/interviewers', interviewerRoutes);
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 // Catch-all route to serve React's index.html
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
-// });
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+});
 module.exports = app;
