@@ -3,15 +3,11 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import AdminDashboard from './components/AdminDashboard';
-<<<<<<<<< Temporary merge branch 1
 import LoginUser from './pages/UserLogin/Login';
 import RegisterUser from './pages/UserLogin/Register';
 import Form from './components/Form';
-
-=========
 import SlotDetail from './components/SlotDetails';
 import InterviwerDetails from './components/InterviewerDetails';
->>>>>>>>> Temporary merge branch 2
 
 
 function App() {
