@@ -19,7 +19,7 @@ function App() {
     //Routing stuff
     <Router>
       <Routes>
-<<<<<<<<< Temporary merge branch 1
+
         <Route path="/" element={<Home />} />
         <Route path="/user/login" element={ < LoginUser/> } />
         <Route path="/user/register" element={ <RegisterUser/> } />
@@ -27,16 +27,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<AdminDashboard />} />
-=========
-        <Route path="/form" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<AdminDashboard />} />
         <Route path="/slot" element={<SlotDetail/>}></Route>
         <Route path="/detail" element={<InterviwerDetails/>}></Route>
         
          
->>>>>>>>> Temporary merge branch 2
+
       </Routes>
     </Router>
   );
