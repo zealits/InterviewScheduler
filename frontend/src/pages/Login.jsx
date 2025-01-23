@@ -1,19 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../utils/api";
 
 const Login = () => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Replace this with your actual authentication logic
-    if (email === "admin@example.com" && password === "password123") {
-      // Redirect to /admin upon successful login
-      navigate("/admin");
-    } else {
-      alert("Invalid credentials. Please try again.");
+    try {
+      const response = await loginUser({ email, password });
+
+      if (response) {
+        // Store token or user data if needed
+        const { token } = response;
+        localStorage.setItem("authToken", token);
+        navigate("/admin"); // Redirect to /admin on successful login
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
     }
   };
 
@@ -21,15 +28,17 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-6 bg-white rounded-md shadow-md">
         <h2 className="text-2xl font-semibold text-center">Login</h2>
+        {error && <p className="text-red-500 text-center">{error}</p>}
         <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium">Email</label>
             <input
               type="email"
               placeholder="Enter your email"
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
           <div>
@@ -37,9 +46,10 @@ const Login = () => {
             <input
               type="password"
               placeholder="Enter your password"
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
           <button
