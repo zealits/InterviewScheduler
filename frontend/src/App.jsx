@@ -6,6 +6,7 @@ import AdminDashboard from './components/AdminDashboard';
 import SlotDetail from './components/SlotDetails';
 import InterviwerDetails from './components/InterviewerDetails';
 
+
 function App() {
   return (
     //Routing stuff
@@ -17,6 +18,8 @@ function App() {
         <Route path="/" element={<AdminDashboard />} />
         <Route path="/slot" element={<SlotDetail/>}></Route>
         <Route path="/detail" element={<InterviwerDetails/>}></Route>
+        
+         
       </Routes>
     </Router>
   );
