@@ -4,6 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { Link } from "react-router-dom";
 
 const Calendar = () => {
   const [events, setEvents] = useState([]);
@@ -30,7 +31,10 @@ const Calendar = () => {
               }
               if (!filter.mode || mode === filter.mode) {
                 map[date].count += 1;
-                map[date].interviewers.push(interviewer.name);
+                map[date].interviewers.push({
+                  name: interviewer.name,
+                  specialization: interviewer.specialization,
+                });
               }
             }
           });
@@ -105,26 +109,39 @@ const Calendar = () => {
           eventClick={(info) => {
             const interviewers = info.event.extendedProps.interviewers;
             setSelectedDateInterviewers(interviewers);
-           
           }}
         />
 
-        {/* Selected Date Interviewers */}
-        {selectedDateInterviewers.length > 0 && (
-          <div className="mt-8 bg-gray-50 border-t border-gray-200 pt-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Interviewers on Selected Date:</h3>
-            <ul className="space-y-2">
-              {selectedDateInterviewers.map((name, index) => (
-                <li key={index} className="bg-blue-50 text-blue-800 px-4 py-2 rounded-md shadow-sm">
-                  {name}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+{/* Selected Date Interviewers */}
+{selectedDateInterviewers.length > 0 && (
+  <div className="mt-8 bg-gray-50 border-t border-gray-200 pt-4">
+    <h3 className="text-lg font-semibold text-gray-800 mb-3">Interviewers on Selected Date:</h3>
+    <ul className="space-y-2">
+      {selectedDateInterviewers.map(({ name, specialization }, index) => (
+        <li
+          key={index}
+          className="flex justify-between items-center text-black  px-5 py-5 rounded-md shadow-md  transition-all"
+        >
+          {/* Name Section */}
+          
+          <Link to = '/detail' ><span className="font-semibold">{name}</span></Link>
+
+          {/* Specialization Section */}
+          <span className="bg-green-700 text-blue-100 px-2 py-1 rounded text-sm">
+            {specialization}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+
+
       </div>
     </div>
   );
 };
 
 export default Calendar;
+
