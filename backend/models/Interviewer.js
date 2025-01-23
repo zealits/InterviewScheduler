@@ -1,25 +1,3 @@
-// const mongoose = require('mongoose');
-
-// const interviewerSchema = new mongoose.Schema({
-//   name: { type: String, required: true },
-//   email: { type: String, required: true, unique: true },
-//   contactNumber: { type: String, required: true },
-//   specialization: { type: String },
-//   availability: [
-//     {
-//       date: { type: Date, required: true },
-//       time: { type: String, required: true },
-//       timezone: { type: String, required: true },
-//       mode: { type: String, enum: ['online', 'offline'], default: 'online' },
-//     },
-//   ],
-//   remarks: { type: String },
-// });
-
-// module.exports = mongoose.model('Interviewer', interviewerSchema);
-
-
-
 const mongoose = require('mongoose');
 
 const availabilitySchema = new mongoose.Schema({
@@ -43,7 +21,8 @@ const availabilitySchema = new mongoose.Schema({
     type: String,
     required: [true, 'Timezone is required'],
     validate: {
-      validator: (value) => Intl.DateTimeFormat().resolvedOptions().timeZone === value || value.includes('/'),
+      validator: (value) =>
+        Intl.DateTimeFormat().resolvedOptions().timeZone === value || value.includes('/'),
       message: 'Invalid timezone format',
     },
   },
@@ -55,39 +34,51 @@ const availabilitySchema = new mongoose.Schema({
   },
 });
 
-const interviewerSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Name is required'],
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    match: [/.+@.+\..+/, 'Invalid email address'],
-  },
-  contactNumber: {
-    type: String,
-    required: [true, 'Contact number is required'],
-    match: [/^\d{10}$/, 'Contact number must be 10 digits'],
-  },
-  specialization: {
-    type: String,
-    required: [true, 'Specialization is required'],
-    trim: true,
-  },
-  availability: {
-    type: [availabilitySchema],
-    validate: {
-      validator: (value) => value.length > 0,
-      message: 'At least one availability slot is required',
+const interviewerSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Name is required'],
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true,
+      match: [/.+@.+\..+/, 'Invalid email address'],
+    },
+    contactNumber: {
+      type: String,
+      required: [true, 'Contact number is required'],
+      match: [/^\d{10}$/, 'Contact number must be 10 digits'],
+    },
+    specialization: {
+      type: String,
+      required: [true, 'Specialization is required'],
+      trim: true,
+    },
+    experience: {
+      type: Number,
+      required: [true, 'Experience in years is required'],
+      min: [0, 'Experience cannot be negative'],
+      validate: {
+        validator: (value) => Number.isInteger(value),
+        message: 'Experience must be a whole number',
+      },
+    },
+    availability: {
+      type: [availabilitySchema],
+      validate: {
+        validator: (value) => value.length > 0,
+        message: 'At least one availability slot is required',
+      },
+    },
+    remarks: {
+      type: String,
+      trim: true,
     },
   },
-  remarks: {
-    type: String,
-    trim: true,
-  },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 module.exports = mongoose.model('Interviewer', interviewerSchema);
