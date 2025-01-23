@@ -4,8 +4,8 @@ const { registeruser, loginuser } = require('../controllers/UserauthController')
 
 const router = express.Router();
 
-router.post('/admin/register', register);
-router.post('/admin/login', login);
+router.post('/register', register);
+router.post('/login', login);
 router.post('/user/register', registeruser);
 router.post('/user/login', loginuser);
 

@@ -14,13 +14,13 @@ function App() {
     //Routing stuff
     <Router>
       <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
+        <Route path="/" element={<Home />} />
         <Route path="/user/login" element={ < LoginUser/> } />
         <Route path="/user/register" element={ <RegisterUser/> } />
         <Route path="/form" element={<Form />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </Router>
   );
