@@ -7,6 +7,8 @@ import LoginUser from './pages/UserLogin/Login';
 import RegisterUser from './pages/UserLogin/Register';
 import Form from './components/Form';
 
+import SlotDetail from './components/SlotDetails';
+import InterviwerDetails from './components/InterviewerDetails';
 
 
 function App() {
@@ -18,9 +20,17 @@ function App() {
         <Route path="/user/login" element={ < LoginUser/> } />
         <Route path="/user/register" element={ <RegisterUser/> } />
         <Route path="/form" element={<Form />} />
+        {/* <Route path="/login" element={<Login />} /> */}
+        {/* <Route path="/register" element={<Register />} /> */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/form" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        {/* <Route path="/" element={<AdminDashboard />} /> */}
+        <Route path="/slot" element={<SlotDetail/>}></Route>
+        <Route path="/detail" element={<InterviwerDetails/>}></Route>
+        
+         
       </Routes>
     </Router>
   );

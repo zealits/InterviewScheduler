@@ -40,6 +40,7 @@ const Form = () => {
       email: data.email,
       contactNumber: data.contactNumber,
       specialization: data.specialization,
+      experience:data.experience,
       availability,
       remarks: data.remarks,
     };
@@ -157,6 +158,25 @@ const Form = () => {
           </p>
         )}
       </div>
+
+      <div>
+    <label className="block text-sm font-medium">Experience (in years)</label>
+    <input
+      {...register("experience", {
+        required: "Experience is required",
+        pattern: {
+          value: /^[0-9]+$/,
+          message: "Experience must be a valid number",
+        },
+      })}
+      placeholder="Enter years of experience"
+      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+    {errors.experience && (
+      <p className="text-red-500 text-sm">{errors.experience.message}</p>
+    )}
+  </div>
+
 
       <div className="grid grid-cols-2 gap-4">
         <div>

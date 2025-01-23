@@ -1,20 +1,35 @@
 import React from "react";
 import Calendar from "./Calendar";
-
+import { 
+  Download, 
+  FileSpreadsheet, 
+  ChevronDown, 
+  BarChart, 
+  Users, 
+  UserCheck 
+} from "lucide-react";
 const AdminDashboard = () => {
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto p-6">
-        {/* Header Section */}
-        <h1 className="text-3xl font-extrabold text-center mb-8 text-blue-600">
-          Admin Dashboard
-        </h1>
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100">
+      <div className="max-w-5xl mx-auto p-6 mx-auto p-6">
+         {/* Animated Header */}
+         <div className="text-center mb-8 animate-fade-in-down">
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 mb-2">
+            Admin Dashboard
+          </h1>
+          <p className="text-sm text-gray-600 max-w-xl mx-auto">
+            Manage interviews, track schedules, and optimize recruitment
+          </p>
+        </div>
 
         {/* Calendar Section */}
         <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Calendar Overview
-          </h2>
+        <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl  font-semibold text-blue-700 flex items-center">
+                <UserCheck className="w-6 h-6 mr-2 text-blue-500 flex items-center" />
+                Interview Calendar
+              </h2>
+            </div>
           <Calendar />
         </div>
 
