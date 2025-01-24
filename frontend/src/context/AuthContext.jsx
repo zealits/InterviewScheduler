@@ -1,24 +1,29 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     isAuthenticated: false,
-    role: null,
     token: null,
   });
 
-  const login = (token, role) => {
-    setAuth({ isAuthenticated: true, role, token });
-    localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
+  // Restore token from localStorage on load
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setAuth({ isAuthenticated: true, token });
+    }
+  }, []);
+
+  const login = (token) => {
+    setAuth({ isAuthenticated: true, token });
+    localStorage.setItem("token", token); // Save token to localStorage
   };
 
   const logout = () => {
-    setAuth({ isAuthenticated: false, role: null, token: null });
-    localStorage.clear();
+    setAuth({ isAuthenticated: false, token: null });
+    localStorage.removeItem("token"); // Clear token from localStorage
   };
 
   return (

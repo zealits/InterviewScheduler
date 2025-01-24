@@ -1,6 +1,10 @@
 import { registerUser } from "../utils/api";
+import React, { useState } from "react";
+import Modal from "../model/PopupForLogin"
 
 const Register = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+    const [modalData, setModalData] = useState({ title: "", message: "" });
   const handleRegister = async (e) => {
     e.preventDefault();
     const userData = {
@@ -11,11 +15,16 @@ const Register = () => {
 
     try {
       const response = await registerUser(userData);
-      alert("Registration successful!");
+      // alert("Registration successful!");
       console.log(response);
+      setModalData({ title: "Success", message: "Registration successful!" });
+      setModalOpen(true);
+
     } catch (error) {
       console.error("Registration failed:", error);
-      alert("Error during registration.");
+      // alert("Error during registration.");
+      setModalData({ title: "Error", message: `${error}` });
+      setModalOpen(true);
     }
   };
 
@@ -58,6 +67,12 @@ const Register = () => {
             Register
           </button>
         </form>
+        <Modal
+        isOpen={modalOpen}
+        title={modalData.title}
+        message={modalData.message}
+        onClose={() => setModalOpen(false)}
+      />
       </div>
     </div>
   );
