@@ -1,6 +1,10 @@
+import React, { useState } from "react";
 import { loginUser2 } from "../../utils/api";
+import Modal from "../../model/PopupForLogin";
 
 const LoginUser = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({ title: "", message: "" });
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -11,11 +15,15 @@ const LoginUser = () => {
 
     try {
       const response = await loginUser2(userData);
-      alert("Login successful!");
+      setModalData({ title: "Success", message: "Login successful!" });
+      setModalOpen(true);
+      // alert("Login successful!");
       console.log(response);
     } catch (error) {
       console.error("Login failed:", error);
-      alert("Invalid email or password.");
+      setModalData({ title: "Error", message: "Invalid email or password." });
+      setModalOpen(true);
+      // alert("Invalid email or password.");
     }
   };
 
@@ -52,8 +60,17 @@ const LoginUser = () => {
           </button>
         </form>
       </div>
+      <Modal
+      isOpen={modalOpen}
+      title={modalData.title}
+      message={modalData.message}
+      onClose={() => setModalOpen(false)}
+    />
     </div>
   );
 };
 
 export default LoginUser;
+
+
+

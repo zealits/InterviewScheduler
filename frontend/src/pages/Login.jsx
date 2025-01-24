@@ -1,33 +1,42 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { loginUser } from "../utils/api";
+import Modal from "../model/PopupForLogin";
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { login } = useAuth();
   const navigate = useNavigate();
+   const [modalOpen, setModalOpen] = useState(false);
+    const [modalData, setModalData] = useState({ title: "", message: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await loginUser({ email, password });
-
       if (response) {
-        // Store token or user data if needed
         const { token } = response;
-        localStorage.setItem("authToken", token);
-        navigate("/admin"); // Redirect to /admin on successful login
+        login(token); // Save the token
+        // setModalData({ title: "Success", message: "Login successful!" });
+        // setModalOpen(true);
+        navigate("/admin"); // Redirect to admin page
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong. Please try again.");
+      // setModalData({ title: "Error", message: `${err}` });
+      // setModalOpen(true);
+      setError(err.response?.data?.message || "Login failed. Please try again.");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div>
+     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-6 bg-white rounded-md shadow-md">
-        <h2 className="text-2xl font-semibold text-center">Login</h2>
+        <h2 className="text-2xl font-semibold text-center">Admin Login</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
           <div>
@@ -60,6 +69,8 @@ const Login = () => {
           </button>
         </form>
       </div>
+    
+    </div>
     </div>
   );
 };

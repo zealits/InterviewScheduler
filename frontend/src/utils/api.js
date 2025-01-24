@@ -66,5 +66,21 @@ export const addInterviewer = async (interviewerData) => {
   const response = await axios.post(`${API_BASE_URL}/interviewers/add`, interviewerData);
   return response.data;
 };
+// Example API utility
+// export const fetchAdminData = async (token) => {
+//   const response = await fetch("/api/admin/dashboard", {
+//     method: "GET",
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       "Content-Type": "application/json",
+//     },
+//   });
+
+//   if (!response.ok) {
+//     throw new Error("Failed to fetch admin data");
+//   }
+
+//   return response.json();
+// };
 
 // Fetch all interviewers
