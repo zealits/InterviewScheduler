@@ -6,28 +6,20 @@ import AdminDashboard from './components/AdminDashboard';
 import LoginUser from './pages/UserLogin/Login';
 import RegisterUser from './pages/UserLogin/Register';
 import Form from './components/Form';
-import SlotDetail from './components/SlotDetails';
-import InterviwerDetails from './components/InterviewerDetails';
-
+import InterviewerDetails from './components/InterviewerCard';
 
 function App() {
   return (
-    //Routing stuff
     <Router>
       <Routes>
-
         <Route path="/" element={<Home />} />
-        <Route path="/user/login" element={ < LoginUser/> } />
-        <Route path="/user/register" element={ <RegisterUser/> } />
+        <Route path="/user/login" element={<LoginUser />} />
+        <Route path="/user/register" element={<RegisterUser />} />
         <Route path="/form" element={<Form />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/slot" element={<SlotDetail/>}></Route>
-        <Route path="/detail" element={<InterviwerDetails/>}></Route>
-        
-         
-
+        <Route path="/interviewer/:name" element={<InterviewerDetails />} />
       </Routes>
     </Router>
   );
