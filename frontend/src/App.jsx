@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import AdminDashboard from "./components/AdminDashboard";
 import Form from "./components/Form";
 import SlotDetail from "./components/SlotDetails";
-import InterviwerDetails from "./components/InterviewerDetails";
+import InterviwerDetails from "./components/InterviewerCard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Register";
