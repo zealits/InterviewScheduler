@@ -1,10 +1,11 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import AdminDashboard from "./components/AdminDashboard";
 import Form from "./components/Form";
 import SlotDetail from "./components/SlotDetails";
-import InterviwerDetails from "./components/InterviewerDetails";
+import InterviwerDetails from "./components/InterviewerCard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Register";
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/user/register" element={ <RegisterUser /> } />
           <Route path="/user/login" element={<LoginUser />} />
+          <Route path="/interviewer/:name" element={<InterviwerDetails />} />
 
           {/* Protected Routes */}
           <Route
