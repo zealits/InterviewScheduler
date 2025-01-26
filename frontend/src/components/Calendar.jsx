@@ -44,7 +44,7 @@ const Calendar = () => {
         }, {});
 
         const eventData = Object.entries(availabilityMap).map(([date, { count, interviewers }]) => ({
-          title: `${count}`,
+          title: `${count} Available`,
           start: date,
           extendedProps: { interviewers },
         }));

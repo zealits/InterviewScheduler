@@ -34,6 +34,7 @@ const availabilitySchema = new mongoose.Schema({
   },
 });
 
+
 const interviewerSchema = new mongoose.Schema(
   {
     name: {
