@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:5000/api/interviewers";
+const API_BASE_URL = "api/interviewers";
  // Replace with your actual backend URL
 
 const SlotDetails = ({ selectedInterviewer, handleCloseAll }) => {
