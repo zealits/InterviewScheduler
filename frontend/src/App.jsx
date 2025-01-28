@@ -5,7 +5,8 @@ import AdminDashboard from "./components/AdminDashboard";
 import Form from "./components/Form";
 import SlotDetail from "./components/SlotDetails";
 import InterviwerDetails from "./components/InterviewerDetails";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import {ProtectedRoute,ProtectedRouteUser} from "./routes/ProtectedRoute";
+
 import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Register";
 import RegisterUser from "./pages/UserLogin/Register";
@@ -27,9 +28,9 @@ function App() {
           <Route
             path="/user/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRouteUser>
                 <UserDashboard />
-              </ProtectedRoute>
+              </ProtectedRouteUser>
             }
           />
           {/* Protected Routes */}

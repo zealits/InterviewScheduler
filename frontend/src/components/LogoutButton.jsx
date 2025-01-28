@@ -9,7 +9,7 @@ const LogoutButton = () => {
     // Optionally, navigate to login or home page
   };
 
-  return <button onClick={handleLogout}>Logout</button>;
+  return <button className="bg-red-200 p-3 rounded-2xl" onClick={handleLogout}>Logout</button>;
 };
 
 export default LogoutButton;
