@@ -1,11 +1,17 @@
 const express = require('express');
 const { addInterviewer, getAllInterviewers } = require('../controllers/interviewerController');
-const authMiddleware = require('../middleware/authMiddleware');
+const {addCandidateDetails} =require('../controllers/candidateDetails')
 
 const router = express.Router();
-// Route to add a new interviewer
+
+// Add Interviewer
 router.post('/add', addInterviewer);
-// Route to get all interviewers
+
+// Add Candidate to Interviewer
+router.post('/addcandidate', addCandidateDetails);
+
+
+// Get All Interviewers
 router.get('/getallinterviewer', getAllInterviewers);
 
 module.exports = router;

@@ -1,49 +1,59 @@
-const Interviewer = require('../models/Interviewer');
+const Interviewer = require("../models/Interviewer");
 
 // Add Interviewer
 exports.addInterviewer = async (req, res) => {
-    console.log(req.body);
   try {
-    const interviewer = await Interviewer.create(req.body);
-    console.log(req.body);
-    res.status(201).json(interviewer);
+    const { name, email, contactNumber, specialization, experience, availability, remarks } = req.body;
+
+    // Validate required fields
+    // if (!name || !email || !contactNumber || !specialization || !experience || !availability) {
+    //   return res.status(400).json({ message: "All fields are required" });
+    // }
+
+    // Create new interviewer
+    const interviewer = new Interviewer({
+      name,
+      email,
+      contactNumber,
+      specialization,
+      experience,
+      availability,
+      remarks: remarks || "",
+    });
+
+    await interviewer.save();
+    res.status(201).json({ message: "Interviewer added successfully", interviewer });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error adding interviewer:", err);
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
   }
 };
 
+// Add Candidate Details
+
+
+
 // Get All Interviewers
-// exports.getAllInterviewers = async (req, res) => {
-//   console.log("get all interviewers");
-//   try {
-//     const interviewers = await Interviewer.find();
-//     res.status(200).json(interviewers);
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// };
-
-
-
-// Get All Interviewers with optional filters
 exports.getAllInterviewers = async (req, res) => {
-  console.log("Get all interviewers with filters");
   try {
-    // Extract query parameters
     const { specialization, mode } = req.query;
 
-    // Build query object
-    const query = {};
-    if (specialization) query.specialization = specialization;
-    if (mode) query["availability.mode"] = mode;
+    const filter = {};
+    if (specialization) {
+      filter.specialization = { $regex: specialization, $options: "i" };
+    }
+    if (mode) {
+      filter["availability.mode"] = mode;
+    }
 
-    // Fetch filtered interviewers from the database
-    const interviewers = await Interviewer.find(query);
+    const interviewers = await Interviewer.find(filter);
+    if (!interviewers.length) {
+      return res.status(404).json({ message: "No interviewers found" });
+    }
 
-    // Respond with filtered or all interviewers
     res.status(200).json(interviewers);
   } catch (err) {
     console.error("Error fetching interviewers:", err);
-    res.status(500).json({ message: "An error occurred while fetching interviewers" });
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
   }
 };
