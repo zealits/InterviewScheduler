@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Navbar from "./Navbar";
 
 const App = () => {
   const [availabilityType, setAvailabilityType] = useState("range");
@@ -111,7 +112,7 @@ const App = () => {
       // Debugging: Log the payload to ensure it's correct
       console.log("Payload being sent to server:", payload);
 
-      const token = localStorage.getItem("userAuthToken");
+      const token = localStorage.getItem("authToken");
       console.log(token);
       const response = await axios.put("/api/auth/profile", payload, {
         headers: {
@@ -131,7 +132,9 @@ const App = () => {
   };
 
   return (
+
     <div className="p-8 space-y-8 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+    <Navbar />
       <h1 className="text-3xl font-bold text-gray-800 text-center">
         Interviewer Availability & Upcoming Interviews
       </h1>

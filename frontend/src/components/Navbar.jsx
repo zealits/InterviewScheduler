@@ -20,12 +20,12 @@ const Navbar = () => {
 
       {/* Navigation Links */}
       <div className="flex items-center space-x-6">
-        <Link
+        {/* <Link
           to="/admin"
           className="text-lg text-gray-800 hover:text-blue-600 transition duration-300"
         >
           Admin Dashboard
-        </Link>
+        </Link> */}
         <LogoutButton />
       </div>
     </nav>
