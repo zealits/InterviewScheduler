@@ -14,18 +14,24 @@ import UserDashboard from "./components/UserDashboard";
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-
+    <Router>
+      <AuthProvider>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={ < Register /> } />
+          <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/user/register" element={ <RegisterUser /> } />
+          <Route path="/user/register" element={<RegisterUser />} />
           <Route path="/user/login" element={<LoginUser />} />
-          <Route path="/user/dashboard" element={<UserDashboard/>} />
-
+          {/* <Route path="/user/dashboard" element={<UserDashboard />} /> */}
+          <Route
+            path="/user/dashboard"
+            element={
+              <ProtectedRoute>
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
           {/* Protected Routes */}
           <Route
             path="/admin"
@@ -60,8 +66,8 @@ function App() {
             }
           />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
