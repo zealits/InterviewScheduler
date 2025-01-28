@@ -44,14 +44,16 @@ exports.registeruser = async (req, res) => {
 // Login User
 exports.loginuser = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
 
   try {
     const user = await User.findOne({ email });
+    // console.log(user);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
     const isMatch = await bcrypt.compare(password, user.password);
+    // console.log(isMatch);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
-
+    //  console.log(generateToken(user._id));
     res.status(200).json({ token: generateToken(user._id) });
   } catch (err) {
     res.status(500).json({ message: err.message });

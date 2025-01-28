@@ -21,6 +21,9 @@ const Login = () => {
       if (response) {
         const { token } = response;
         login(token); // Save the token
+        localStorage.setItem("adminAuthToken", token);
+        console.log(response);
+        console.log("Token", token);
         // setModalData({ title: "Success", message: "Login successful!" });
         // setModalOpen(true);
         navigate("/admin"); 

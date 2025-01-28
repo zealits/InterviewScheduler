@@ -11,6 +11,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Register";
 import RegisterUser from "./pages/UserLogin/Register";
 import LoginUser from "./pages/UserLogin/Login";
+import UserDashboard from "./components/UserDashboard";
 
 function App() {
   return (
@@ -24,7 +25,11 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/user/register" element={ <RegisterUser /> } />
           <Route path="/user/login" element={<LoginUser />} />
+
+          <Route path="/user/dashboard" element={<UserDashboard/>} />
+
           <Route path="/interviewer/:name" element={<InterviwerDetails />} />
+
 
           {/* Protected Routes */}
           <Route
