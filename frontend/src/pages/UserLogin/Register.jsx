@@ -2,9 +2,11 @@ import { registerUsers } from "../../utils/api";
 import React, { useState } from "react";
 // import { registerUsers } from "../../utils/api";
 import Modal from "../../model/PopupForLogin";
+import { useNavigate } from "react-router-dom";
 
 const RegisterUser = () => {
   const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [modalData, setModalData] = useState({ title: "", message: "" });
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -26,6 +28,8 @@ const RegisterUser = () => {
       console.log(response);
       setModalData({ title: "Success", message: "Registration successful!" });
       setModalOpen(true);
+      localStorage.setItem("userAuthToken", response.token);
+      navigate("/user/dashboard"); 
 
 
     } catch (error) {

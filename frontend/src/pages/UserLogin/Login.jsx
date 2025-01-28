@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { loginUser2 } from "../../utils/api";
 import Modal from "../../model/PopupForLogin";
+import { useNavigate } from "react-router-dom";
 
 const LoginUser = () => {
   const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [modalData, setModalData] = useState({ title: "", message: "" });
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -12,13 +14,16 @@ const LoginUser = () => {
       email: e.target.email.value,
       password: e.target.password.value,
     };
-
+    // console.log(userData);
     try {
       const response = await loginUser2(userData);
+      // console.log(response);
       setModalData({ title: "Success", message: "Login successful!" });
       setModalOpen(true);
       // alert("Login successful!");
       console.log(response);
+      // localStorage.setItem("userAuthToken", response.token);
+      navigate("/user/dashboard"); 
     } catch (error) {
       console.error("Login failed:", error);
       setModalData({ title: "Error", message: "Invalid email or password." });

@@ -45,6 +45,8 @@ export const loginUser2 = async (userData) => {
         "Content-Type": "application/json",
       },
     });
+    localStorage.setItem("userAuthToken", response.data.token); // Save the token properly
+    console.log(response.data);
     return response.data; // Return the response data if login is successful
   } catch (error) {
     // Handle error and rethrow to handle it in the calling function
@@ -60,6 +62,7 @@ export const loginUser2 = async (userData) => {
     }
   }
 };
+
 
 // Add a new interviewer
 export const addInterviewer = async (interviewerData) => {

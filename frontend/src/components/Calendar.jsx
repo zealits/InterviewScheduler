@@ -1,92 +1,129 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Link } from "react-router-dom";
-import { Calendar as CalendarIcon, Filter, UserCheck, ChevronDown } from "lucide-react";
+import { Filter } from "lucide-react";
 
 const Calendar = () => {
   const [events, setEvents] = useState([]);
-  const [selectedDateInterviewers, setSelectedDateInterviewers] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [specializations, setSpecializations] = useState([]);
   const [filter, setFilter] = useState({ specialization: "", mode: "" });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedDateCount, setSelectedDateCount] = useState(0);
 
   useEffect(() => {
-    const fetchInterviewers = async () => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("adminAuthToken");
       try {
-        const response = await axios.get("api/interviewers/getallinterviewer", { params: filter });
-        const interviewers = response.data;
+        const response = await axios.get("/api/user/availability", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        setSpecializations([...new Set(interviewers.map((int) => int.specialization))]);
+        const data = response.data?.data || [];
+        const availabilityEvents = data.flatMap((user) =>
+          user.availabilityEvents.map((event) => ({
+            ...event,
+            title: user.name,
+            specialization: user.specialization,
+            backgroundColor: "lightgreen",
+            borderColor: "green",
+          }))
+        );
 
-        const availabilityMap = interviewers.reduce((map, interviewer) => {
-          interviewer.availability.forEach(({ date, mode }) => {
-            if (date) {
-              if (!map[date]) {
-                map[date] = { count: 0, interviewers: [] };
-              }
-              if (!filter.mode || mode === filter.mode) {
-                map[date].count += 1;
-                map[date].interviewers.push({
-                  name: interviewer.name,
-                  specialization: interviewer.specialization,
-                });
-              }
-            }
-          });
-          return map;
-        }, {});
+        const customAvailability = data.flatMap((user) =>
+          user.customAvailability.map((entry) => ({
+            title: "Custom Availability",
+            start: entry.start,
+            end: entry.end,
+            backgroundColor: "lightblue",
+            borderColor: "blue",
+            specialization: user.specialization,
+          }))
+        );
 
-        const eventData = Object.entries(availabilityMap).map(([date, { count, interviewers }]) => ({
-          title: `${count}`,
-          start: date,
-          extendedProps: { interviewers },
-        }));
+        const combinedEvents = [...availabilityEvents, ...customAvailability];
+        setEvents(combinedEvents);
+        setFilteredEvents(combinedEvents);
 
-        setEvents(eventData);
-      } catch (err) {
-        console.error("Error fetching interviewers:", err);
+        const uniqueSpecializations = [
+          ...new Set(data.map((user) => user.specialization)),
+        ];
+        setSpecializations(uniqueSpecializations);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        alert("Failed to fetch calendar data. Please try again.");
       }
     };
 
-    fetchInterviewers();
-  }, [filter]);
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // Filter events based on the selected specialization
+    if (filter.specialization) {
+      const filtered = events.filter(
+        (event) => event.specialization === filter.specialization
+      );
+      setFilteredEvents(filtered);
+    } else {
+      setFilteredEvents(events);
+    }
+  }, [filter.specialization, events]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
   };
 
+  // const handleDateSelect = (selectionInfo) => {
+  //   const { start, end } = selectionInfo;
+  //   const newEvent = {
+  //     title: "New Availability",
+  //     start,
+  //     end,
+  //     backgroundColor: "lightcoral",
+  //     borderColor: "red",
+  //   };
+
+  //   setEvents((prevEvents) => [...prevEvents, newEvent]);
+  //   setFilteredEvents((prevFiltered) => [...prevFiltered, newEvent]);
+
+  //   console.log("Selected range:", { start, end });
+  // };
+
+  const handleDateClick = (info) => {
+    // Count events for the selected date
+    const count = filteredEvents.filter(
+      (event) =>
+        new Date(event.start).toDateString() ===
+        new Date(info.date).toDateString()
+    ).length;
+    setSelectedDateCount(count);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-4 sm:py-8 px-2 sm:px-4">
-      <div className="max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
-        {/* Header */}
-        <div className=" bg-gray-100  sm:p-6 flex items-center justify-between">
-          
-          
-          {/* Mobile Filter Toggle */}
-          <button 
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-4 px-4">
+      <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg">
+        <div className="bg-gray-100 px-6 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-blue-800">Interviewer Calendar</h1>
+          <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="md:hidden p-1 sm:p-2 bg-blue-500 rounded-full"
+            className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600"
           >
-            <Filter className="w-4 h-4 sm:w-6 sm:h-6" />
+            <Filter className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Filters */}
-        <div className={`
-          ${isFilterOpen ? 'block' : 'hidden'} 
-          md:block bg-gray-100 sm:p-4 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4
-        `}>
-          <div className="relative">
+        {isFilterOpen && (
+          <div className="bg-gray-100 px-6 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <select
               name="specialization"
-              className="w-full p-2 mb-2 sm:p-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 transition-all appearance-none"
               value={filter.specialization}
               onChange={handleFilterChange}
+              className="w-full border-2 border-blue-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Specializations</option>
               {specializations.map((spec) => (
@@ -95,74 +132,28 @@ const Calendar = () => {
                 </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 pointer-events-none" />
           </div>
+        )}
 
-          <div className="relative">
-            <select 
-              name="mode" 
-              className="w-full p-2 sm:p-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 transition-all appearance-none"
-              value={filter.mode} 
-              onChange={handleFilterChange}
-            >
-              <option value="">All Modes</option>
-              <option value="online">Online</option>
-              <option value="offline">Offline</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 pointer-events-none" />
-          </div>
-        </div>
-
-        {/* Calendar */}
-        <div className="p-3 sm:p-6">
+        <div className="p-6">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
-            events={events}
-            eventContent={(eventInfo) => (
-              <div className="relative bg-blue-200 text-blue-800 px-2 sm:px-3 py-1 rounded-full text-xs flex items-center">
-                <UserCheck className="w-3 h-3 mr-1" />
-                {eventInfo.event.title}
-              </div>
-            )}
+            selectable={true}
+            // select={handleDateSelect}
+            events={filteredEvents}
+            dateClick={handleDateClick}
             headerToolbar={{
               left: "prev,next today",
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay",
             }}
-            className="border-2 border-blue-100 rounded-2xl"
-            eventClick={(info) => {
-              const interviewers = info.event.extendedProps.interviewers;
-              setSelectedDateInterviewers(interviewers);
-            }}
           />
-        </div>
 
-        {/* Selected Date Interviewers */}
-        {selectedDateInterviewers.length > 0 && (
-          <div className="bg-gray-50 p-4 sm:p-6">
-            <h3 className="text-lg sm:text-xl font-semibold text-blue-800 mb-3 sm:mb-4 flex items-center">
-              <UserCheck className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" />
-              Interviewers on Selected Date
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {selectedDateInterviewers.map(({ name, specialization }, index) => (
-                <div 
-                  key={index} 
-                  className="bg-white shadow-md rounded-lg p-3 sm:p-4 hover:shadow-xl transition-all flex justify-between items-center"
-                >
-                  <Link to='/detail' className="flex items-center space-x-2">
-                    <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-                    <span className="text-sm sm:text-base font-semibold text-gray-700">{name}</span>
-                  </Link>
-                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                    {specialization}
-                  </span>
-                </div>
-              ))}
-            </div>
+          <div className="mt-4 text-lg text-blue-800">
+            Total interviewers on selected date: {selectedDateCount}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
