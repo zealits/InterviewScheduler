@@ -26,7 +26,8 @@ const Login = () => {
         console.log("Token", token);
         // setModalData({ title: "Success", message: "Login successful!" });
         // setModalOpen(true);
-        navigate("/admin"); // Redirect to admin page
+        navigate("/admin"); 
+        console.log(response)// Redirect to admin page
       }
     } catch (err) {
       // setModalData({ title: "Error", message: `${err}` });

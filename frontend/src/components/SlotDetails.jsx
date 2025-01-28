@@ -1,126 +1,164 @@
 import React, { useState } from "react";
-import Popup from "../model/Popup";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { X } from "lucide-react";
 
-function SlotDetail() {
-  const [showCandidateForm, setShowCandidateForm] = useState(false);
-  const [showJobDescriptionForm, setShowJobDescriptionForm] = useState(false);
-  const [isPopupVisible, setPopupVisible] = useState(false);
+const API_BASE_URL = "api/interviewers";
+ // Replace with your actual backend URL
 
-  const toggleCandidateForm = () => setShowCandidateForm(!showCandidateForm);
-  const toggleJobDescriptionForm = () =>
-    setShowJobDescriptionForm(!showJobDescriptionForm);
+const SlotDetails = ({ selectedInterviewer, handleCloseAll }) => {
+  const [candidateDetails, setCandidateDetails] = useState({
+    name: "",
+    email: "",
+    linkedin: "",
+    jobDescription: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  if (!selectedInterviewer) {
+    return null;
+  }
 
-  const handleSendInvite = () => {
-    setPopupVisible(true);
-    
-    setTimeout(() => {
-      setPopupVisible(false);
-      navigate("/");
-    }, 3000); // Auto-hide popup after 3 seconds
-    
+  const { name, availability, specialization, email } = selectedInterviewer;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCandidateDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const response = await axios.post(`${API_BASE_URL}/addcandidate`, candidateDetails);
+      console.log("Response:", response.data);
+      alert("Candidate details submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting candidate details:", error);
+      alert("Failed to submit candidate details. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <>
-      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 ">
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md animate-fade-in">
-          <h2 className="text-2xl font-bold text-zinc-800 mb-4">Slot Details</h2>
-          <form>
-            {/* Basic Details */}
-            <div className="mb-4">
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-zinc-700"
-              >
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white w-10/12 sm:w-2/3 lg:w-1/2 xl:w-1/3 rounded-xl shadow-lg overflow-hidden">
+        {/* Header */}
+        <div className="bg-blue-500 text-white p-4 flex justify-between items-center">
+          <h2 className="text-lg sm:text-xl font-semibold">
+            Slots for {name} ({specialization})
+            <h3 className="text-sm font-medium">{email}</h3>
+          </h2>
+          <button
+            onClick={handleCloseAll}
+            className="p-2 bg-white text-blue-500 rounded-full hover:bg-gray-200 transition-all"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Candidate Details Form */}
+        <div className="p-4">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Candidate Details</h3>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Name
               </label>
               <input
                 type="text"
                 id="name"
-                value="John Doe"
-                readOnly
-                className="w-full mt-1 p-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                name="name"
+                value={candidateDetails.name}
+                onChange={handleChange}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter candidate's name"
+                required
               />
             </div>
-
-            {/* Forms Toggles */}
-            <button
-              type="button"
-              onClick={toggleJobDescriptionForm}
-              className="bg-black text-white py-2 px-4 rounded-md hover:bg-slate-500 hover:text-black transition duration-200 ease-in-out mb-4 w-full"
-            >
-              Job Description for Interviewer
-            </button>
-            {showJobDescriptionForm && (
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={candidateDetails.email}
+                onChange={handleChange}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter candidate's email"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700">
+                LinkedIn Profile
+              </label>
+              <input
+                type="url"
+                id="linkedin"
+                name="linkedin"
+                value={candidateDetails.linkedin}
+                onChange={handleChange}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter LinkedIn profile URL"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700">
+                Job Description
+              </label>
               <textarea
                 id="jobDescription"
-                className="w-full mt-2 p-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                rows="4"
-                placeholder="Enter job description..."
+                name="jobDescription"
+                value={candidateDetails.jobDescription}
+                onChange={handleChange}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter job description"
+                required
               />
-            )}
-
-            <button
-              type="button"
-              onClick={toggleCandidateForm}
-              className="bg-black text-white py-2 px-4 rounded-md hover:bg-slate-500 hover:text-black transition duration-200 ease-in-out mb-4 w-full"
-            >
-              Enter Candidate Details for Inviting
-            </button>
-            {showCandidateForm && (
-              <>
-                <input
-                  type="text"
-                  id="candidateName"
-                  placeholder="Candidate Name"
-                  className="w-full mt-2 p-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <input
-                  type="email"
-                  id="candidateEmail"
-                  placeholder="Candidate Email"
-                  className="w-full mt-2 p-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <input
-                  type="url"
-                  id="linkedin"
-                  placeholder="LinkedIn Profile"
-                  className="w-full mt-2 p-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </>
-            )}
-
-            {/* Send Invite */}
-            <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                onClick={handleSendInvite}
-                className="bg-black text-white py-2 px-4 rounded-md hover:bg-slate-500 hover:text-black transition duration-200 ease-in-out"
-              >
-                Send Invitation
-              </button>
             </div>
+            <button
+              type="submit"
+              className={`px-4 py-2 w-full bg-blue-500 text-white rounded-lg shadow ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
+              } transition-all`}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </button>
           </form>
         </div>
+
+        {/* Slot Details */}
+        <div className="p-4 space-y-3">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Available Slots</h3>
+          {availability && availability.length > 0 ? (
+            availability.map((slot, index) => (
+              <div
+                key={index}
+                className="p-3 border border-gray-200 rounded-lg shadow-sm bg-gray-50 hover:shadow-md transition-all"
+              >
+                <p className="text-sm sm:text-base font-medium text-gray-800">
+                  <span className="font-semibold">Date:</span> {slot.date}
+                </p>
+                <p className="text-sm sm:text-base text-gray-600">
+                  <span className="font-semibold">Time:</span> {slot.time}
+                </p>
+                <p className="text-sm sm:text-base text-gray-600">
+                  <span className="font-semibold">Mode:</span> {slot.mode.charAt(0).toUpperCase() + slot.mode.slice(1)}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-600 text-center">No slots available for this interviewer.</p>
+          )}
+        </div>
       </div>
-
-      {/* Popup */}
-      {isPopupVisible && (
-  <Popup
-    message="Invite Sent Successfully!"
-    onClose={() => {
-      setPopupVisible(false);
-      navigate('/');
-    }}
-    className="z-60 fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border border-black rounded-md shadow-lg p-4 animate-popup"
-  />
-)}
-
-    </>
+    </div>
   );
-}
+};
 
-export default SlotDetail;
+export default SlotDetails;

@@ -1,31 +1,60 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
+import { User, UserPlus, LayoutDashboard, Settings } from "lucide-react";
 
 const Home = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-      <div className="p-6 text-center">
-        <h1 className="text-4xl font-bold mb-6 drop-shadow-lg">
-          Welcome to <span className="text-yellow-300">Interview Scheduler</span>
-        </h1>
-        <p className="mb-8 text-lg">
-          Simplify and streamline your interview process with our scheduling tool.
-        </p>
-        <div className="space-y-4">
+    <div className="flex items-center justify-center min-h-screen bg-white p-4">
+      <div className="w-full max-w-2xl shadow-2xl border border-gray-300 bg-white/10 backdrop-blur-sm rounded-xl p-6">
+        <div className="text-center pb-6">
+          <h1 className="text-4xl font-extrabold text-black drop-shadow-lg">
+            Interview <span className="text-black">Scheduler</span>
+          </h1>
+          <p className="text-sm text-black mt-2">
+            Streamline Your Hiring Process with Precision and Ease
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link
             to="/user/login"
-            className="block w-full max-w-xs px-6 py-3 text-lg font-medium text-center bg-yellow-400 text-gray-800 rounded-lg shadow-md hover:bg-yellow-500 transition duration-300"
+            className="flex items-center justify-start w-full p-4 bg-yellow-500 text-gray-800 rounded-lg shadow-md transition duration-300 hover:bg-yellow-600 space-x-4"
           >
-            Interviewer Login
+            <User className="w-8 h-8" />
+            <div>
+              <h3 className="font-semibold text-lg">Interviewer Login</h3>
+              <p className="text-sm opacity-70">Access your interview dashboard</p>
+            </div>
           </Link>
           <Link
             to="/user/register"
-            className="block w-full max-w-xs px-6 py-3 text-lg font-medium text-center bg-green-400 text-gray-800 rounded-lg shadow-md hover:bg-green-500 transition duration-300"
+            className="flex items-center justify-start w-full p-4 bg-green-500 text-gray-800 rounded-lg shadow-md transition duration-300 hover:bg-green-600 space-x-4"
           >
-            Interviewer Register
+            <UserPlus className="w-8 h-8" />
+            <div>
+              <h3 className="font-semibold text-lg">Interviewer Register</h3>
+              <p className="text-sm opacity-70">Create your interviewer account</p>
+            </div>
           </Link>
-          <Link to="/login" className="block w-full max-w-xs px-6 py-3 text-lg font-medium text-center bg-blue-400 text-gray-800 rounded-lg shadow-md hover:bg-blue-500 transition duration-300"> Admin Login </Link> 
-          <Link to="/register" className="block w-full max-w-xs px-6 py-3 text-lg font-medium text-center bg-red-400 text-gray-800 rounded-lg shadow-md hover:bg-red-500 transition duration-300"> Admin Register </Link>
+          <Link
+            to="/login"
+            className="flex items-center justify-start w-full p-4 bg-blue-500 text-white rounded-lg shadow-md transition duration-300 hover:bg-blue-600 space-x-4"
+          >
+            <LayoutDashboard className="w-8 h-8" />
+            <div>
+              <h3 className="font-semibold text-lg">Admin Login</h3>
+              <p className="text-sm opacity-70">Manage system settings</p>
+            </div>
+          </Link>
+          <Link
+            to="/register"
+            className="flex items-center justify-start w-full p-4 bg-red-500 text-white rounded-lg shadow-md transition duration-300 hover:bg-red-600 space-x-4"
+          >
+            <Settings className="w-8 h-8" />
+            <div>
+              <h3 className="font-semibold text-lg">Admin Register</h3>
+              <p className="text-sm opacity-70">Set up admin access</p>
+            </div>
+          </Link>
         </div>
       </div>
     </div>
