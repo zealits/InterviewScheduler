@@ -27,7 +27,7 @@ const LoginUser = () => {
       setModalOpen(true);
       // alert("Login successful!");
       console.log(response);
-      // localStorage.setItem("userAuthToken", response.token);
+      localStorage.setItem("authToken", response.token);
       navigate("/user/dashboard"); 
     } catch (error) {
       console.error("Login failed:", error);
