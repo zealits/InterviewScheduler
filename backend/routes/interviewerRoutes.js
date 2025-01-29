@@ -1,17 +1,10 @@
-const express = require('express');
-const { addInterviewer, getAllInterviewers } = require('../controllers/interviewerController');
-const {addCandidateDetails} =require('../controllers/candidateDetails')
+const express = require("express");
+const { getAllUpcoming, postAllUpcoming } = require("../controllers/upcomingInterviews");
 
 const router = express.Router();
 
-// Add Interviewer
-router.post('/add', addInterviewer);
-
-// Add Candidate to Interviewer
-router.post('/addcandidate', addCandidateDetails);
-
-
-// Get All Interviewers
-router.get('/getallinterviewer', getAllInterviewers);
+// Routes for upcoming interviews
+router.get("/:email/upcoming-interviews", getAllUpcoming);
+router.post("/:email/upcoming-interviews", postAllUpcoming);
 
 module.exports = router;
