@@ -37,9 +37,22 @@ const userSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Scheduled Date is required"],
       },
+      name: {
+        type: String,
+        required: true,
+      },
+      linkedin: {
+        type: String,
+        required: true,
+      },
+      resume: {
+        type: String, // Use String for file URL or path
+        required: true,
+      },
       details: { type: String },
     },
   ],
+  
 });
 
 // Hash password before saving

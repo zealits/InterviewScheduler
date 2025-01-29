@@ -16,6 +16,7 @@ const LoginUser = () => {
       email: e.target.email.value,
       password: e.target.password.value,
     };
+      localStorage.setItem("userEmail", userData.email);
     // console.log(userData);
     try {
       const response = await loginUser2(userData);
