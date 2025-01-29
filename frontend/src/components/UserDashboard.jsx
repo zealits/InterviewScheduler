@@ -232,7 +232,12 @@ const App = () => {
         <h2 className="text-2xl font-semibold text-gray-700">Upcoming Interviews</h2>
 
         <UpcomingInterviews email={userEmail} />
-
+        <button
+        onClick={handleSubmit}
+        className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        Submit
+      </button>
          </div>
     </div>
   );
