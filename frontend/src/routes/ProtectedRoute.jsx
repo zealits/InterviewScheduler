@@ -1,15 +1,33 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React, { useContext } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-  const { auth } = useAuth();
+  const { user, loading } = useContext(AuthContext);
+  const location = useLocation();
 
-  if (!auth.isAuthenticated) {
-    return <Navigate to="/login" />;
+  if (loading) return <div>Loading...</div>;
+
+  if (!user) {
+    // Redirect to login with a `from` state to redirect back after login
+    return <Navigate to="/login" state={{ from: location }} />;
   }
 
   return children;
 };
+const ProtectedRouteUser = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+  const location = useLocation();
 
-export default ProtectedRoute;
+  if (loading) return <div>Loading...</div>;
+
+  if (!user) {
+    // Redirect to login with a `from` state to redirect back after login
+    return <Navigate to="/user/login" state={{ from: location }} />;
+  }
+
+  return children;
+}
+
+
+export { ProtectedRoute, ProtectedRouteUser };

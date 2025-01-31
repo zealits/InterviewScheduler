@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { loginUser2 } from "../../utils/api";
 import Modal from "../../model/PopupForLogin";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const LoginUser = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [modalData, setModalData] = useState({ title: "", message: "" });
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -14,10 +16,13 @@ const LoginUser = () => {
       email: e.target.email.value,
       password: e.target.password.value,
     };
+      localStorage.setItem("userEmail", userData.email);
     // console.log(userData);
     try {
       const response = await loginUser2(userData);
       // console.log(response);
+      const { token } = response;
+      login(token);
       setModalData({ title: "Success", message: "Login successful!" });
       setModalOpen(true);
       // alert("Login successful!");

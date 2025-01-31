@@ -5,32 +5,37 @@ import Home from "./pages/Home";
 import AdminDashboard from "./components/AdminDashboard";
 import Form from "./components/Form";
 import SlotDetail from "./components/SlotDetails";
-import InterviwerDetails from "./components/InterviewerCard";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import InterviwerDetails from "./components/InterviewerDetails";
+import {ProtectedRoute,ProtectedRouteUser} from "./routes/ProtectedRoute";
+
 import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Register";
 import RegisterUser from "./pages/UserLogin/Register";
 import LoginUser from "./pages/UserLogin/Login";
 import UserDashboard from "./components/UserDashboard";
+import SlotDetails from "./components/SlotDetails";
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-
+    <Router>
+      <AuthProvider>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={ < Register /> } />
+          <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/user/register" element={ <RegisterUser /> } />
+          <Route path="/user/register" element={<RegisterUser />} />
+          <Route path="/slot-details/:name" element={<SlotDetails />} />
           <Route path="/user/login" element={<LoginUser />} />
-
-          <Route path="/user/dashboard" element={<UserDashboard/>} />
-
-          <Route path="/interviewer/:name" element={<InterviwerDetails />} />
-
-
+          {/* <Route path="/user/dashboard" element={<UserDashboard />} /> */}
+          <Route
+            path="/user/dashboard"
+            element={
+              <ProtectedRouteUser>
+                <UserDashboard />
+              </ProtectedRouteUser>
+            }
+          />
           {/* Protected Routes */}
           <Route
             path="/admin"
@@ -65,8 +70,8 @@ function App() {
             }
           />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

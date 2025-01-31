@@ -1,36 +1,42 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+// import { useAuth } from "../context/AuthContext";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState({
-    isAuthenticated: false,
-    token: null,
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Restore token from localStorage on load
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken");
     if (token) {
-      setAuth({ isAuthenticated: true, token });
+      const userData = JSON.parse(atob(token.split(".")[1])); // Decode payload
+      setUser(userData); // Assume decoded user object
     }
+    setLoading(false);
   }, []);
 
-  const login = (token) => {
-    setAuth({ isAuthenticated: true, token });
-    localStorage.setItem("token", token); // Save token to localStorage
+  const login = (userData) => {
+    setUser(userData);
+    localStorage.setItem("authToken", JSON.stringify(userData));
   };
 
   const logout = () => {
-    setAuth({ isAuthenticated: false, token: null });
-    localStorage.removeItem("token"); // Clear token from localStorage
+    setUser(null);
+    localStorage.removeItem("authToken");
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// Custom hook to use the AuthContext
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+
+export default AuthContext;
+  

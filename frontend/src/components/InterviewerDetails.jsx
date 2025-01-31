@@ -23,7 +23,7 @@ const InterviewerDetails = ({ selectedInterviewer, setShowSlotDetails, handleClo
         >
           Next
         </button>
-      </div>
+      </div>k
     </div>
   );
 };

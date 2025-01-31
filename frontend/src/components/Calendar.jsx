@@ -14,6 +14,7 @@ const Calendar = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false); // Filter modal toggle
   const [selectedDateInterviewers, setSelectedDateInterviewers] = useState([]); // Selected date's interviewers
   const [selectedDate, setSelectedDate] = useState(null); // Currently selected date
+  const [eventCounts, setEventCounts] = useState({}); // Event counts per date
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,18 +42,25 @@ const Calendar = () => {
             return rangeDatesArray;
           }) || [];
 
-          const eventsArray = [...customDates, ...rangeDates].map((date) => ({
+          return [...customDates, ...rangeDates].map((date) => ({
             title: `${user.name} (${user.specialization})`,
             start: date,
             specialization: user.specialization,
             extendedProps: { user },
           }));
-
-          return eventsArray;
         });
 
         setEvents(allEvents);
         setFilteredEvents(allEvents);
+
+        // Count events per date
+        const counts = allEvents.reduce((acc, event) => {
+          const date = event.start;
+          acc[date] = (acc[date] || 0) + 1;
+          return acc;
+        }, {});
+
+        setEventCounts(counts);
 
         const uniqueSpecializations = [...new Set(data.map((user) => user.specialization))];
         setSpecializations(uniqueSpecializations);
@@ -164,6 +172,16 @@ const Calendar = () => {
               left: "prev,next today",
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay",
+            }}
+            dayCellContent={(cellInfo) => {
+              const dateStr = cellInfo.date.toISOString().slice(0, 10);
+              const count = eventCounts[dateStr] || 0;
+              return (
+                <div>
+                  <div>{cellInfo.dayNumberText}</div>
+                  {count > 0 && <div className="text-blue-600">{count} available</div>}
+                </div>
+              );
             }}
           />
 

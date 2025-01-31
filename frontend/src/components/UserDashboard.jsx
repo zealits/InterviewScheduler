@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Navbar from "./Navbar";
+import UpcomingInterviews from "./UpcomingInterviews";
 
 const App = () => {
+  const userEmail= localStorage.getItem("userEmail");
   const [availabilityType, setAvailabilityType] = useState("range");
   const [availabilityRange, setAvailabilityRange] = useState({
     startDate: null,
@@ -18,54 +21,9 @@ const App = () => {
     details: "",
   });
 
-  
-  //   const fetchData = async () => {
-  //     const token = localStorage.getItem("authToken");
-  //     try {
-  //       const response = await axios.get("/api/user/availability", {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
 
-  //       const data = response.data.data;
 
-  //       if (data) {
-  //         if (data.availabilityRange && data.availabilityRange.length > 0) {
-  //           const range = data.availabilityRange[0];
-  //           setAvailabilityRange({
-  //             startDate: new Date(range.startDate),
-  //             endDate: new Date(range.endDate),
-  //             startTime: range.startTime,
-  //             endTime: range.endTime,
-  //           });
-  //         }
 
-  //         if (data.customAvailability && data.customAvailability.length > 0) {
-  //           setCustomDates(
-  //             data.customAvailability.flatMap((entry) =>
-  //               entry.dates.map((customDate) => new Date(customDate))
-  //             )
-  //           );
-  //         }
-
-  //         if (data.upcomingInterviews && data.upcomingInterviews.length > 0) {
-  //           const interview = data.upcomingInterviews[0];
-  //           setUpcomingInterview({
-  //             email: interview.email,
-  //             scheduledDate: new Date(interview.scheduledDate),
-  //             details: interview.details,
-  //           });
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //       alert("Failed to fetch profile data.");
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
 
   const handleAddCustomDate = (date) => {
     if (date) {
@@ -111,7 +69,7 @@ const App = () => {
       // Debugging: Log the payload to ensure it's correct
       console.log("Payload being sent to server:", payload);
 
-      const token = localStorage.getItem("userAuthToken");
+      const token = localStorage.getItem("authToken");
       console.log(token);
       const response = await axios.put("/api/auth/profile", payload, {
         headers: {
@@ -131,7 +89,9 @@ const App = () => {
   };
 
   return (
+
     <div className="p-8 space-y-8 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+    <Navbar />
       <h1 className="text-3xl font-bold text-gray-800 text-center">
         Interviewer Availability & Upcoming Interviews
       </h1>
@@ -269,60 +229,20 @@ const App = () => {
 
       {/* Upcoming Interviews Section */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-gray-700">
-          Upcoming Interviews
-        </h2>
-        <div className="grid grid-cols-1 gap-4">
-          <div className="flex flex-col space-y-1">
-            <label className="text-gray-600">Email:</label>
-            <input
-              type="email"
-              value={upcomingInterview.email}
-              onChange={(e) =>
-                setUpcomingInterview({
-                  ...upcomingInterview,
-                  email: e.target.value,
-                })
-              }
-              className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex flex-col space-y-1">
-            <label className="text-gray-600">Scheduled Date:</label>
-            <DatePicker
-              selected={upcomingInterview.scheduledDate}
-              onChange={(date) =>
-                setUpcomingInterview({
-                  ...upcomingInterview,
-                  scheduledDate: date,
-                })
-              }
-              className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex flex-col space-y-1">
-            <label className="text-gray-600">Details:</label>
-            <textarea
-              value={upcomingInterview.details}
-              onChange={(e) =>
-                setUpcomingInterview({
-                  ...upcomingInterview,
-                  details: e.target.value,
-                })
-              }
-              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-      </div>
+        <h2 className="text-2xl font-semibold text-gray-700">Upcoming Interviews</h2>
 
-      <button
+        <UpcomingInterviews email={userEmail} />
+
+         </div>
+         <button
         onClick={handleSubmit}
         className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
       >
         Submit
       </button>
     </div>
+
+    
   );
 };
 
