@@ -17,7 +17,7 @@ const AdminDashboard = () => {
  
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100">
-      <div className=" mx-auto p-6">
+      <div className="max-w-5xl mx-auto p-6">
          {/* Animated Header */}
          <Navbar/>
          <div className="text-center mb-8 animate-fade-in-down">

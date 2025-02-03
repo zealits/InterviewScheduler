@@ -3,13 +3,10 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "./Navbar";
-import UpcomingInterviews from "../components/UpcomingInterviews";
+import UpcomingInterviews from "./UpcomingInterviews";
 
 const App = () => {
-  const userEmail = localStorage.getItem("userEmail");
-  // if (!userEmail) {
-  //   return <p>Error: No email found in localStorage.</p>;
-  // }
+  const userEmail= localStorage.getItem("userEmail");
   const [availabilityType, setAvailabilityType] = useState("range");
   const [availabilityRange, setAvailabilityRange] = useState({
     startDate: null,
@@ -23,6 +20,10 @@ const App = () => {
     scheduledDate: null,
     details: "",
   });
+
+
+
+
 
   const handleAddCustomDate = (date) => {
     if (date) {
@@ -88,8 +89,9 @@ const App = () => {
   };
 
   return (
+
     <div className="p-8 space-y-8 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
-      <Navbar />
+    <Navbar />
       <h1 className="text-3xl font-bold text-gray-800 text-center">
         Interviewer Availability & Upcoming Interviews
       </h1>
@@ -227,19 +229,25 @@ const App = () => {
 
       {/* Upcoming Interviews Section */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-gray-700">
-          Upcoming Interviews
-        </h2>
+        <h2 className="text-2xl font-semibold text-gray-700">Upcoming Interviews</h2>
 
         <UpcomingInterviews email={userEmail} />
         <button
-          onClick={handleSubmit}
-          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          Submit
-        </button>
-      </div>
+        onClick={handleSubmit}
+        className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        Submit
+      </button>
+         </div>
+         <button
+        onClick={handleSubmit}
+        className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        Submit
+      </button>
     </div>
+
+    
   );
 };
 

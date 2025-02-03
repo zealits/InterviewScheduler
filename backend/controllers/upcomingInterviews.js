@@ -1,6 +1,6 @@
 const User = require("../models/User");
-const sendEmail = require("../utils/sendEmail");
 
+// Get upcoming interviews for a specific user using email
 exports.getAllUpcoming = async (req, res) => {
   try {
     const { email } = req.params;
@@ -16,6 +16,7 @@ exports.getAllUpcoming = async (req, res) => {
   }
 };
 
+// Add upcoming interviews to a specific user using email
 exports.postAllUpcoming = async (req, res) => {
   try {
     const { email } = req.params;
@@ -30,29 +31,18 @@ exports.postAllUpcoming = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Validate required fields for each interview entry
     for (const interview of upcomingInterviews) {
       if (!interview.email || !interview.scheduledDate || !interview.name || !interview.linkedin || !interview.resume) {
         return res.status(400).json({ message: "Missing required fields in one or more interview entries" });
       }
     }
 
+    // Add the new interviews to the user's upcomingInterviews array
     user.upcomingInterviews.push(...upcomingInterviews);
     await user.save();
 
-    for (const interview of upcomingInterviews) {
-      const candidateEmail = interview.email;
-      const interviewerEmail = interview.interviewerEmail;
-      const scheduledDate = interview.scheduledDate;
-      const message = `Interview scheduled for ${interview.name} on ${scheduledDate}.`;
-
-      await sendEmail({
-        to: [candidateEmail, interviewerEmail, "admin@example.com"],
-        subject: "Upcoming Interview Details",
-        text: message,
-      });
-    }
-
-    res.status(201).json({ message: "Interviews added successfully and emails sent", user });
+    res.status(201).json({ message: "Interviews added successfully", user });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
