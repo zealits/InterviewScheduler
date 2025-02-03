@@ -1,11 +1,15 @@
 import {
   Box,
   Typography,
-  TextField,
   Button,
   Paper,
   Grid,
-  Divider
+  Divider,
+  TextField,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -14,7 +18,25 @@ import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const localizer = momentLocalizer(moment);
+const formatTime = (time) => {
+  const [hours, minutes] = time.split(":").map(Number);
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 || 12; // Convert 0 to 12
+  return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+};
 
+// Predefined time slots in 24-hour format (HH:MM)
+const timeSlots = [
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+];
 const CustomBigCalendar = () => {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
@@ -22,14 +44,17 @@ const CustomBigCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [filter, setFilter] = useState({ name: "", specialization: "" });
+  const [timezone] = useState("EST");
   const [formData, setFormData] = useState({
     candidateName: "",
     candidateEmail: "",
     interviewerEmail: "",
     candidateLinkedIn: "",
     jobDescription: "",
+
     resume: "",
     scheduledDate: "",
+    scheduledTime: "",
   });
 
   useEffect(() => {
@@ -43,16 +68,22 @@ const CustomBigCalendar = () => {
         const eventMap = new Map();
 
         data.forEach((user) => {
-          const dates = user.customAvailability?.flatMap((entry) => entry.dates) || [];
-          const rangeDates = user.availabilityRange?.flatMap((range) => {
-            const startDate = new Date(range.startDate);
-            const endDate = new Date(range.endDate);
-            const rangeDatesArray = [];
-            for (let d = new Date(startDate); d <= endDate; d.setUTCDate(d.getUTCDate() + 1)) {
-              rangeDatesArray.push(new Date(d).toISOString().slice(0, 10));
-            }
-            return rangeDatesArray;
-          }) || [];
+          const dates =
+            user.customAvailability?.flatMap((entry) => entry.dates) || [];
+          const rangeDates =
+            user.availabilityRange?.flatMap((range) => {
+              const startDate = new Date(range.startDate);
+              const endDate = new Date(range.endDate);
+              const rangeDatesArray = [];
+              for (
+                let d = new Date(startDate);
+                d <= endDate;
+                d.setUTCDate(d.getUTCDate() + 1)
+              ) {
+                rangeDatesArray.push(new Date(d).toISOString().slice(0, 10));
+              }
+              return rangeDatesArray;
+            }) || [];
 
           [...dates, ...rangeDates].forEach((date) => {
             if (!eventMap.has(date)) {
@@ -62,17 +93,19 @@ const CustomBigCalendar = () => {
           });
         });
 
-        const allEvents = Array.from(eventMap.entries()).map(([date, users]) => {
-          const start = new Date(date);
-          const end = new Date(date);
-          end.setHours(end.getHours() + 1);
-          return {
-            title: `${users.length} available`,
-            start,
-            end,
-            users,
-          };
-        });
+        const allEvents = Array.from(eventMap.entries()).map(
+          ([date, users]) => {
+            const start = new Date(date);
+            const end = new Date(date);
+            end.setHours(end.getHours() + 1);
+            return {
+              title: `${users.length}`,
+              start,
+              end,
+              users,
+            };
+          }
+        );
 
         setEvents(allEvents);
         setFilteredEvents(allEvents);
@@ -111,7 +144,9 @@ const CustomBigCalendar = () => {
     setFormData((prev) => ({
       ...prev,
       interviewerEmail: candidate?.user?.email || "",
-      scheduledDate: selectedDate ? moment(selectedDate).format("YYYY-MM-DD") : "",
+      scheduledDate: selectedDate
+        ? moment(selectedDate).format("YYYY-MM-DD")
+        : "",
     }));
   };
 
@@ -146,6 +181,7 @@ const CustomBigCalendar = () => {
     const {
       candidateEmail,
       candidateName,
+      // scheduledTime,
       interviewerEmail,
       candidateLinkedIn,
       jobDescription,
@@ -181,18 +217,20 @@ const CustomBigCalendar = () => {
           resume,
           jobDescription,
           scheduledDate,
+          // scheduledTime,
         },
       ],
     };
 
     const encodedEmail = encodeURIComponent(interviewerEmail);
-
+    // console.log(payload);
     try {
       await axios.post(
         `/api/interviewers/${encodedEmail}/upcoming-interviews`,
         payload,
         { headers: { "Content-Type": "application/json" } }
       );
+      // console.log(data);
       alert("Candidate details submitted successfully!");
     } catch (error) {
       console.error("Error submitting details:", error);
@@ -260,7 +298,11 @@ const CustomBigCalendar = () => {
                   <Box
                     key={index}
                     component="li"
-                    sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 1,
+                    }}
                   >
                     <Typography variant="body1">{interviewer.name}</Typography>
                     <Button
@@ -284,7 +326,12 @@ const CustomBigCalendar = () => {
             <Typography variant="h4" color="primary" gutterBottom>
               Candidate Details
             </Typography>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              noValidate
+              sx={{ mt: 2 }}
+            >
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -310,6 +357,22 @@ const CustomBigCalendar = () => {
                     disabled
                   />
                 </Grid>
+                {/* <Grid item xs={12}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Schedule Time ({timezone})</InputLabel>
+                    <Select
+                      name="scheduledTime"
+                      value={formData.scheduledTime}
+                      onChange={handleChange}
+                    >
+                      {timeSlots.map((time) => (
+                        <MenuItem key={time} value={time}>
+                          {formatTime(time)} ({timezone})
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid> */}
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -361,7 +424,12 @@ const CustomBigCalendar = () => {
                   />
                 </Grid>
               </Grid>
-              <Button type="submit" fullWidth variant="contained" sx={{ mt: 3 }}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3 }}
+              >
                 Submit
               </Button>
             </Box>

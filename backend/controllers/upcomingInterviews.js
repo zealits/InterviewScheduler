@@ -17,6 +17,7 @@ exports.getAllUpcoming = async (req, res) => {
 };
 
 exports.postAllUpcoming = async (req, res) => {
+  console.log("hello")
   try {
     const { email } = req.params;
     const { upcomingInterviews } = req.body;
@@ -39,18 +40,18 @@ exports.postAllUpcoming = async (req, res) => {
     user.upcomingInterviews.push(...upcomingInterviews);
     await user.save();
 
-    for (const interview of upcomingInterviews) {
-      const candidateEmail = interview.email;
-      const interviewerEmail = interview.interviewerEmail;
-      const scheduledDate = interview.scheduledDate;
-      const message = `Interview scheduled for ${interview.name} on ${scheduledDate}.`;
+    // for (const interview of upcomingInterviews) {
+    //   const candidateEmail = interview.email;
+    //   const interviewerEmail = interview.interviewerEmail;
+    //   const scheduledDate = interview.scheduledDate;
+    //   const message = `Interview scheduled for ${interview.name} on ${scheduledDate}.`;
 
-      await sendEmail({
-        to: [candidateEmail, interviewerEmail, "admin@example.com"],
-        subject: "Upcoming Interview Details",
-        text: message,
-      });
-    }
+    //   await sendEmail({
+    //     to: [candidateEmail, interviewerEmail, "admin@example.com"],
+    //     subject: "Upcoming Interview Details",
+    //     text: message,
+    //   });
+    // }
 
     res.status(201).json({ message: "Interviews added successfully and emails sent", user });
   } catch (error) {
