@@ -7,10 +7,19 @@ const UpcomingInterviews = ({ email }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!email) {
+      setError("Email is required to fetch upcoming interviews.");
+      setLoading(false);
+      return;
+    }
+
     const fetchInterviews = async () => {
       try {
-        const response = await axios.get(`/api/interviewers/${email}/upcoming-interviews`);
+        const response = await axios.get(
+          `/api/interviewers/${email}/upcoming-interviews`
+        );
         setInterviews(response.data.upcomingInterviews);
+        console.log("upcoming interviews", response.data.upcomingInterviews);
       } catch (err) {
         setError("Failed to fetch interviews");
       } finally {
@@ -25,7 +34,14 @@ const UpcomingInterviews = ({ email }) => {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem", padding: "1rem" }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr",
+        gap: "1rem",
+        padding: "1rem",
+      }}
+    >
       {interviews.length > 0 ? (
         interviews.map((interview, index) => (
           <div

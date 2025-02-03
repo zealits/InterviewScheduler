@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Scheduled Date is required"],
       },
+      // scheduledTime: {
+      //   type: String, // Store time separately in HH:MM format
+      //   required: [true, "Scheduled Time is required"],
+      // },
       name: {
         type: String,
         required: true,
@@ -51,7 +55,8 @@ const userSchema = new mongoose.Schema({
       },
       details: { type: String },
     },
-  ],
+  ]
+  
   
 });
 
