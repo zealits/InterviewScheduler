@@ -3,7 +3,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const interviewerRoutes = require("./routes/interviewerRoutes");
 const getavailable = require("./routes/getavailable");
-
+const emailRoutes = require("./routes/emailRoutes");
 
 const path = require("path");
 const app = express();
@@ -15,7 +15,8 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/interviewers", interviewerRoutes);
-app.use("/api/user",getavailable );
+app.use("/api/user", getavailable);
+// app.use("/api", emailRoutes);
 
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
