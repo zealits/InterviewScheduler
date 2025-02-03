@@ -1,20 +1,36 @@
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  Grid,
+  Divider
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import { UserCheck, Filter } from "lucide-react";
+import moment from "moment";
+import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
-const Calendar = () => {
-  const [events, setEvents] = useState([]); // All events
-  const [filteredEvents, setFilteredEvents] = useState([]); // Filtered events
-  const [specializations, setSpecializations] = useState([]); // Specialization options
-  const [filter, setFilter] = useState({ specialization: "", mode: "" }); // Filter state
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // Filter modal toggle
-  const [selectedDateInterviewers, setSelectedDateInterviewers] = useState([]); // Selected date's interviewers
-  const [selectedDate, setSelectedDate] = useState(null); // Currently selected date
-  const [eventCounts, setEventCounts] = useState({}); // Event counts per date
+const localizer = momentLocalizer(moment);
+
+const CustomBigCalendar = () => {
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [selectedDateInterviewers, setSelectedDateInterviewers] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [filter, setFilter] = useState({ name: "", specialization: "" });
+  const [formData, setFormData] = useState({
+    candidateName: "",
+    candidateEmail: "",
+    interviewerEmail: "",
+    candidateLinkedIn: "",
+    jobDescription: "",
+    resume: "",
+    scheduledDate: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,197 +39,337 @@ const Calendar = () => {
         const response = await axios.get("/api/user/availability", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         const data = response.data?.data || [];
-        const allEvents = data.flatMap((user) => {
-          const customDates =
-            user.customAvailability?.flatMap((entry) => entry.dates) || []; // Flatten custom dates
+        const eventMap = new Map();
 
+        data.forEach((user) => {
+          const dates = user.customAvailability?.flatMap((entry) => entry.dates) || [];
           const rangeDates = user.availabilityRange?.flatMap((range) => {
             const startDate = new Date(range.startDate);
             const endDate = new Date(range.endDate);
             const rangeDatesArray = [];
-
-            // Generate all dates within the range
             for (let d = new Date(startDate); d <= endDate; d.setUTCDate(d.getUTCDate() + 1)) {
               rangeDatesArray.push(new Date(d).toISOString().slice(0, 10));
             }
-
             return rangeDatesArray;
           }) || [];
 
-          return [...customDates, ...rangeDates].map((date) => ({
-            title: `${user.name} (${user.specialization})`,
-            start: date,
-            specialization: user.specialization,
-            extendedProps: { user },
-          }));
+          [...dates, ...rangeDates].forEach((date) => {
+            if (!eventMap.has(date)) {
+              eventMap.set(date, []);
+            }
+            eventMap.get(date).push(user);
+          });
+        });
+
+        const allEvents = Array.from(eventMap.entries()).map(([date, users]) => {
+          const start = new Date(date);
+          const end = new Date(date);
+          end.setHours(end.getHours() + 1);
+          return {
+            title: `${users.length} available`,
+            start,
+            end,
+            users,
+          };
         });
 
         setEvents(allEvents);
         setFilteredEvents(allEvents);
-
-        // Count events per date
-        const counts = allEvents.reduce((acc, event) => {
-          const date = event.start;
-          acc[date] = (acc[date] || 0) + 1;
-          return acc;
-        }, {});
-
-        setEventCounts(counts);
-
-        const uniqueSpecializations = [...new Set(data.map((user) => user.specialization))];
-        setSpecializations(uniqueSpecializations);
       } catch (error) {
         console.error("Error fetching data:", error);
-        alert("Failed to fetch calendar data. Please try again.");
+        alert("Failed to fetch calendar data.");
       }
     };
 
     fetchData();
   }, []);
 
-  useEffect(() => {
-    let filtered = events;
+  const handleSelectSlot = (slotInfo) => {
+    const clickedDate = slotInfo.start;
+    setSelectedDate(clickedDate);
 
-    if (filter.specialization) {
-      filtered = filtered.filter(
-        (event) => event.specialization === filter.specialization
-      );
-    }
+    const eventsOnDate = events.filter(
+      (event) =>
+        event.start.toISOString().slice(0, 10) ===
+        clickedDate.toISOString().slice(0, 10)
+    );
 
-    if (filter.mode) {
-      filtered = filtered.filter((event) => event.mode === filter.mode);
-    }
+    const interviewersOnDate = eventsOnDate.flatMap((event) =>
+      event.users.map((user) => ({
+        name: `${user.name} (${user.specialization})`,
+        specialization: user.specialization,
+        user,
+      }))
+    );
+    setSelectedDateInterviewers(interviewersOnDate);
+    setSelectedCandidate(null);
+  };
 
-    setFilteredEvents(filtered);
-  }, [filter, events]);
+  const handleViewDetails = (candidate) => {
+    setSelectedCandidate(candidate);
+    setFormData((prev) => ({
+      ...prev,
+      interviewerEmail: candidate?.user?.email || "",
+      scheduledDate: selectedDate ? moment(selectedDate).format("YYYY-MM-DD") : "",
+    }));
+  };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
+
+    const filtered = events.filter((event) => {
+      return (
+        (name === "name"
+          ? event.users.some((user) =>
+              user.name.toLowerCase().includes(value.toLowerCase())
+            )
+          : true) &&
+        (name === "specialization"
+          ? event.users.some((user) =>
+              user.specialization.toLowerCase().includes(value.toLowerCase())
+            )
+          : true)
+      );
+    });
+    setFilteredEvents(filtered);
   };
 
-  const handleDateClick = (info) => {
-    const date = new Date(info.date);
-    setSelectedDate(date.toDateString());
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const interviewersOnDate = events
-      .filter(
-        (event) => new Date(event.start).toDateString() === date.toDateString()
-      )
-      .map((event) => ({
-        name: event.title,
-        specialization: event.specialization,
-        user: event.extendedProps.user,
-      }));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const {
+      candidateEmail,
+      candidateName,
+      interviewerEmail,
+      candidateLinkedIn,
+      jobDescription,
+      resume,
+      scheduledDate,
+    } = formData;
 
-    setSelectedDateInterviewers(interviewersOnDate);
+    if (
+      !candidateEmail ||
+      !candidateName ||
+      !jobDescription ||
+      !candidateLinkedIn ||
+      !resume ||
+      !scheduledDate
+    ) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    const pdfRegex = /^(https?:\/\/.*\.(pdf))$/i;
+    if (!pdfRegex.test(resume)) {
+      alert("Resume must be a valid PDF link ending in .pdf.");
+      return;
+    }
+
+    const payload = {
+      upcomingInterviews: [
+        {
+          email: candidateEmail,
+          interviewerEmail,
+          name: candidateName,
+          linkedin: candidateLinkedIn,
+          resume,
+          jobDescription,
+          scheduledDate,
+        },
+      ],
+    };
+
+    const encodedEmail = encodeURIComponent(interviewerEmail);
+
+    try {
+      await axios.post(
+        `/api/interviewers/${encodedEmail}/upcoming-interviews`,
+        payload,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      alert("Candidate details submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting details:", error);
+      alert(
+        "Failed to submit candidate details. " +
+          (error.response?.data?.message || "Please check the console.")
+      );
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-6 px-4">
-      <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg">
-        <div className="bg-gray-100 px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-blue-800">Interviewer Calendar</h1>
-          <button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            <Filter className="w-6 h-6" />
-          </button>
-        </div>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f5f5", py: 4, px: 2 }}>
+      <Paper sx={{ maxWidth: 1200, mx: "auto", p: 3, mb: 4 }}>
+        <Typography variant="h3" align="center" color="primary" gutterBottom>
+          Interviewer Availability Calendar
+        </Typography>
+        <Divider sx={{ mb: 3 }} />
 
-        {isFilterOpen && (
-          <div className="bg-gray-100 px-6 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <select
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Filter by Name"
+              name="name"
+              value={filter.name}
+              onChange={handleFilterChange}
+              variant="outlined"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Filter by Specialization"
               name="specialization"
               value={filter.specialization}
               onChange={handleFilterChange}
-              className="w-full border-2 border-blue-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Specializations</option>
-              {specializations.map((spec) => (
-                <option key={spec} value={spec}>
-                  {spec}
-                </option>
-              ))}
-            </select>
-            <select
-              name="mode"
-              value={filter.mode}
-              onChange={handleFilterChange}
-              className="w-full border-2 border-blue-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Modes</option>
-              <option value="online">Online</option>
-              <option value="offline">Offline</option>
-            </select>
-          </div>
-        )}
+              variant="outlined"
+            />
+          </Grid>
+        </Grid>
 
-        <div className="p-6">
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            selectable={true}
-            events={filteredEvents.map((event) => ({
-              ...event,
-              title: `${event.extendedProps.user.name}`,
-            }))}
-            dateClick={handleDateClick}
-            eventContent={(eventInfo) => (
-              <div className="bg-blue-200 text-blue-800 px-2 py-1 rounded-lg flex items-center">
-                <UserCheck className="w-4 h-4 mr-2" />
-                {eventInfo.event.title}
-              </div>
-            )}
-            headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay",
-            }}
-            dayCellContent={(cellInfo) => {
-              const dateStr = cellInfo.date.toISOString().slice(0, 10);
-              const count = eventCounts[dateStr] || 0;
-              return (
-                <div>
-                  <div>{cellInfo.dayNumberText}</div>
-                  {count > 0 && <div className="text-blue-600">{count} available</div>}
-                </div>
-              );
-            }}
+        <Box sx={{ height: 500, mb: 3 }}>
+          <BigCalendar
+            localizer={localizer}
+            events={filteredEvents}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: "100%" }}
+            selectable
+            onSelectSlot={handleSelectSlot}
+            eventPropGetter={() => ({
+              style: { backgroundColor: "#1976d2", color: "white" },
+            })}
           />
+        </Box>
 
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold text-blue-800">
-              {selectedDate ? `Details for ${selectedDate}` : "Select a date to view details"}
-            </h2>
+        {selectedDate && (
+          <Paper sx={{ p: 3, mb: 3, bgcolor: "#e3f2fd" }}>
+            <Typography variant="h5" color="primary" gutterBottom>
+              Available Interviewers on {selectedDate.toDateString()}
+            </Typography>
             {selectedDateInterviewers.length > 0 ? (
-              <ul className="mt-4 space-y-2">
-                {selectedDateInterviewers.map((user, index) => (
-                  <li
+              <Box component="ul" sx={{ pl: 2 }}>
+                {selectedDateInterviewers.map((interviewer, index) => (
+                  <Box
                     key={index}
-                    className="bg-white p-4 shadow-md rounded-lg flex justify-between items-center"
+                    component="li"
+                    sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
                   >
-                    <span className="text-blue-800 font-medium">{user.name}</span>
-                    <button
-                      className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      onClick={() => alert(`Details for ${user.name}`)}
+                    <Typography variant="body1">{interviewer.name}</Typography>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleViewDetails(interviewer)}
                     >
                       View Details
-                    </button>
-                  </li>
+                    </Button>
+                  </Box>
                 ))}
-              </ul>
+              </Box>
             ) : (
-              <p className="text-gray-600 mt-2">No interviewers available on this date.</p>
+              <Typography>No interviewers available.</Typography>
             )}
-          </div>
-        </div>
-      </div>
-    </div>
+          </Paper>
+        )}
+
+        {selectedCandidate && (
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h4" color="primary" gutterBottom>
+              Candidate Details
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Interviewer Email"
+                    name="interviewerEmail"
+                    value={formData.interviewerEmail}
+                    onChange={handleChange}
+                    required
+                    disabled
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    type="date"
+                    label="Schedule Date"
+                    name="scheduledDate"
+                    InputLabelProps={{ shrink: true }}
+                    value={formData.scheduledDate}
+                    onChange={handleChange}
+                    required
+                    disabled
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Candidate Name"
+                    name="candidateName"
+                    value={formData.candidateName}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Candidate Email"
+                    name="candidateEmail"
+                    value={formData.candidateEmail}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="LinkedIn Profile"
+                    name="candidateLinkedIn"
+                    value={formData.candidateLinkedIn}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Job Description"
+                    name="jobDescription"
+                    value={formData.jobDescription}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Resume (PDF link ending with .pdf)"
+                    name="resume"
+                    value={formData.resume}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+              </Grid>
+              <Button type="submit" fullWidth variant="contained" sx={{ mt: 3 }}>
+                Submit
+              </Button>
+            </Box>
+          </Paper>
+        )}
+      </Paper>
+    </Box>
   );
 };
 
-export default Calendar;
+export default CustomBigCalendar;
