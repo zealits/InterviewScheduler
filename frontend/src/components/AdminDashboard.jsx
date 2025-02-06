@@ -21,7 +21,7 @@ const AdminDashboard = () => {
          {/* Animated Header */}
          <Navbar/>
          <div className="text-center mb-8 animate-fade-in-down">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 mb-2">
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 mb-2 mt-10">
             Admin Dashboard
           </h1>
           <p className="text-sm text-gray-600 max-w-xl mx-auto">
