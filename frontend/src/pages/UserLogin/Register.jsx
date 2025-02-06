@@ -86,7 +86,7 @@ const RegisterUser = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">Years of Experience</label>
+            <label className="block text-sm font-medium">Total Years of Experience</label>
             <input
               type="number"
               name="yearOfExperience"
@@ -95,15 +95,18 @@ const RegisterUser = () => {
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          
           <div>
-            <label className="block text-sm font-medium">Experience as Interviewer</label>
+            <label className="block text-sm font-medium">Experience as a Interviewer</label>
             <input
-              type="checkbox"
+              type="number"
               name="experienceAsInterviewer"
-              className="w-4 h-4 focus:ring-blue-500"
+              placeholder="Total experience as a Interviewer (in years)"
+              required
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <span className="ml-2 text-sm">Yes</span>
           </div>
+
           <div>
             <label className="block text-sm font-medium">Candidates Interviewed</label>
             <input
