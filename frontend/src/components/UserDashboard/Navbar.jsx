@@ -48,7 +48,7 @@ const Navbar = () => {
             className="flex items-center space-x-2 text-xl font-bold text-gray-800 hover:text-blue-600 transition"
           >
             <Home className="text-blue-500" size={24} />
-            <span className="hidden md:block">InterviewEase</span>
+            <span className="hidden md:block">Interviewer Dashboard</span>
           </Link>
 
           {/* Mobile Menu Toggle */}
