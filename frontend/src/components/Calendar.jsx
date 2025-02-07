@@ -85,7 +85,7 @@ const CustomBigCalendar = () => {
     const clickedDate = slotInfo.start;
     setSelectedDate(clickedDate);
   
-    const eventsOnDate = events.filter(
+    const eventsOnDate = filteredEvents.filter(
       (event) => event.start.toISOString().slice(0, 10) === clickedDate.toISOString().slice(0, 10)
     );
   
@@ -101,10 +101,10 @@ const CustomBigCalendar = () => {
       }))
     );
     
-  
     setSelectedDateInterviewers(interviewersOnDate);
     setSelectedCandidate(null);
   };
+
   
 
   const handleViewDetails = (candidate) => {
@@ -309,11 +309,12 @@ const CustomBigCalendar = () => {
             gap: 1,
             px: 1.5,
             py: 0.8,
-
             fontWeight: "bold",
             boxShadow: 2,
             justifyContent: "center",
+            cursor: "pointer",
           }}
+          onClick={() => handleSelectSlot({ start: event.start })}
         >
           <UserCheck size={18} />
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
