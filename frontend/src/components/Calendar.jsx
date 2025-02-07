@@ -100,10 +100,11 @@ const CustomBigCalendar = () => {
         user,
       }))
     );
-    
+  
     setSelectedDateInterviewers(interviewersOnDate);
     setSelectedCandidate(null);
   };
+  
 
   
 
@@ -328,73 +329,81 @@ const CustomBigCalendar = () => {
 
   
       {/* Interviewers Available Section */}
-      {selectedDateInterviewers.length === 0 ? (
-        <Box
+    {/* Display selected date title */}
+{selectedDate && (
+  <Typography variant="h5" fontWeight="bold" sx={{ mt: 3, mb: 2 }}>
+    Schedule of {moment(selectedDate).format("DD MMM YYYY")}
+  </Typography>
+)}
+
+{selectedDateInterviewers.length === 0 ? (
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      py: 4,
+      bgcolor: "#f9f9f9",
+      borderRadius: 2,
+      boxShadow: 2,
+      mt: 2,
+    }}
+  >
+    <UserCheck size={50} color="#9e9e9e" />
+    <Typography variant="h6" color="textSecondary" sx={{ mt: 2 }}>
+      No Interviewers available on this date
+    </Typography>
+  </Box>
+) : (
+  <Grid container spacing={2} sx={{ mt: 2 }}>
+    {selectedDateInterviewers.map((interviewer, index) => (
+      <Grid item xs={12} sm={6} md={4} key={index}>
+        <Paper
           sx={{
+            p: 3,
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            textAlign: "center",
-            py: 4,
-            bgcolor: "#f9f9f9",
+            gap: 1.5,
             borderRadius: 2,
-            boxShadow: 2,
-            mt: 2,
+            boxShadow: 3,
+            bgcolor: "white",
           }}
         >
-          <UserCheck size={50} color="#9e9e9e" />
-          <Typography variant="h6" color="textSecondary" sx={{ mt: 2 }}>
-            No Interviewers available on this date
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <UserCheck size={20} color="#1976d2" />
+            <Typography variant="body1" fontWeight="bold">
+              {interviewer.name}
+            </Typography>
+          </Box>
+
+          <Typography variant="body2" color="textSecondary">
+            <strong>Specialization:</strong> {interviewer.specialization}
           </Typography>
-        </Box>
-      ) : (
-        <Grid container spacing={2} sx={{ mt: 2 }}>
-          {selectedDateInterviewers.map((interviewer, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Paper
-                sx={{
-                  p: 3,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 1.5,
-                  borderRadius: 2,
-                  boxShadow: 3,
-                  bgcolor: "white",
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <UserCheck size={20} color="#1976d2" />
-                  <Typography variant="body1" fontWeight="bold">
-                    {interviewer.name}
-                  </Typography>
-                </Box>
-  
-                <Typography variant="body2" color="textSecondary">
-                  <strong>Specialization:</strong> {interviewer.specialization}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  <strong>Experience:</strong> {interviewer.experience}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  <strong>Availability:</strong> {interviewer.availableTime}
-                </Typography>
-  
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  sx={{ mt: 2, alignSelf: "flex-start" }}
-                  startIcon={<CheckCircle size={18} />}
-                  onClick={() => handleViewDetails(interviewer)}
-                >
-                  Schedule
-                </Button>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      )}
+          <Typography variant="body2" color="textSecondary">
+            <strong>Experience:</strong> {interviewer.experience}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            <strong>Availability:</strong> {interviewer.availableTime}
+          </Typography>
+
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            sx={{ mt: 2, alignSelf: "flex-start" }}
+            startIcon={<CheckCircle size={18} />}
+            onClick={() => handleViewDetails(interviewer)}
+          >
+            Schedule
+          </Button>
+        </Paper>
+      </Grid>
+    ))}
+  </Grid>
+)}
+
   
       {/* Interviewer Details Modal (Centered Card) */}
       <InterviewerDetails
