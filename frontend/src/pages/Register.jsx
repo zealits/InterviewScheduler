@@ -1,10 +1,11 @@
-import { registerUser } from "../utils/api";
 import React, { useState } from "react";
-import Modal from "../model/PopupForLogin"
+import Modal from "../model/PopupForLogin";
+import { registerUser } from "../utils/api";
 
 const Register = () => {
   const [modalOpen, setModalOpen] = useState(false);
-    const [modalData, setModalData] = useState({ title: "", message: "" });
+  const [modalData, setModalData] = useState({ title: "", message: "" });
+
   const handleRegister = async (e) => {
     e.preventDefault();
     const userData = {
@@ -15,65 +16,91 @@ const Register = () => {
 
     try {
       const response = await registerUser(userData);
-      // alert("Registration successful!");
       console.log(response);
       setModalData({ title: "Success", message: "Registration successful!" });
       setModalOpen(true);
-
     } catch (error) {
       console.error("Registration failed:", error);
-      // alert("Error during registration.");
       setModalData({ title: "Error", message: `${error}` });
       setModalOpen(true);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white rounded-md shadow-md">
-        <h2 className="text-2xl font-semibold text-center">Register</h2>
-        <form onSubmit={handleRegister} className="mt-4 space-y-4">
-          <div>
-            <label className="block text-sm font-medium">Name</label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Enter your name"
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <div className="max-w-md w-full">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 py-6 px-8">
+            <h2 className="text-3xl font-bold text-center text-white">
+              Create Account
+            </h2>
+            <p className="text-center text-blue-100 mt-2">
+              Join our platform today
+            </p>
           </div>
-          <div>
-            <label className="block text-sm font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Password</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
-          >
-            Register
-          </button>
-        </form>
-        <Modal
+
+          <form onSubmit={handleRegister} className="p-8 space-y-6">
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 block">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="John Doe"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 block">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 block">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-300 transition duration-200"
+            >
+              Sign Up
+            </button>
+
+            <p className="text-center text-sm text-gray-500 mt-4">
+              Already have an account?{" "}
+              <a href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+                Sign in
+              </a>
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <Modal
         isOpen={modalOpen}
         title={modalData.title}
         message={modalData.message}
         onClose={() => setModalOpen(false)}
       />
-      </div>
     </div>
   );
 };
