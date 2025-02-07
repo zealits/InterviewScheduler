@@ -17,6 +17,7 @@ const UpdateProfile = () => {
         const response = await axios.get(`/api/user?email=${email}`);
         setUserData(response.data);
         setIsLoading(false);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
         alert("Failed to fetch user details.");
@@ -72,7 +73,7 @@ const UpdateProfile = () => {
         />
       </div>
       <div>
-        <label className="block text-sm font-semibold text-gray-600">Password</label>
+        <label className="block text-sm font-semibold text-gray-600">New Password</label>
         <input
           type="password"
           value={userData.password}

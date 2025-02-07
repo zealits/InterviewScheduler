@@ -109,15 +109,19 @@ const LoginUser = () => {
                 </div>
               </div>
               
-              <a 
-                href="/register" 
+              {/* <a 
+                href="/user/register" 
                 className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm"
               >
                 Create a free account
-              </a>
+              </a> */}
+              <button onClick={() => navigate("/user/register")} className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm">
+                Create a free account
+              </button>
             </div>
           </form>
         </div>
+
       </div>
 
       <Modal

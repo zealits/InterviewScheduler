@@ -152,9 +152,21 @@ const RegisterUser = () => {
               >
                 Create Account
               </button>
+          
+            <div className="text-center">
+              {/* <a navigate="/user/login" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                Already have an account? Login here
+              </a> */}
+              {/* use navigate instead of href */}
+              <button onClick={() => navigate("/user/login")} className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                Already have an account? Login here
+              </button>
+            </div>
             </div>
           </form>
+
         </div>
+
       </div>
       
       <Modal
