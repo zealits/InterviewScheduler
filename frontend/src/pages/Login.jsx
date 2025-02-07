@@ -44,9 +44,9 @@ const Login = () => {
       <div className="max-w-md w-full mx-auto">
         <div className="text-center mb-8">
           <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold text-gray-900">Admin Portal</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Recruiter Portal</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Secure access to administration dashboard
+            Secure access to recruiter dashboard
           </p>
         </div>
 
@@ -55,7 +55,7 @@ const Login = () => {
             <div className="flex items-center justify-center space-x-2">
               <Lock className="h-6 w-6 text-gray-100" />
               <h3 className="text-xl font-semibold text-white">
-                Administrative Login
+                Recruiter Login
               </h3>
             </div>
           </div>
