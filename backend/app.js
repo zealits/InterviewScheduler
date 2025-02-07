@@ -4,7 +4,7 @@ const authRoutes = require("./routes/authRoutes");
 const interviewerRoutes = require("./routes/interviewerRoutes");
 const getavailable = require("./routes/getavailable");
 const emailRoutes = require("./routes/emailRoutes");
-
+const updateProfile = require("./routes/UpdateProfile");
 const path = require("path");
 const app = express();
 
@@ -16,6 +16,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/interviewers", interviewerRoutes);
 app.use("/api/user", getavailable);
+app.use("/api", updateProfile);
 // app.use("/api", emailRoutes);
 
 app.use(express.static(path.join(__dirname, "../frontend/dist")));

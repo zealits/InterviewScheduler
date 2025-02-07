@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { User, Mail, Linkedin, FileText, Calendar } from "lucide-react";
 
-const UpcomingInterviews = ({ email }) => {
+const UpcomingInterviews = () => {
   const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const userEmail = localStorage.getItem("userEmail");
+  const email = userEmail;
 
   useEffect(() => {
     if (!email) {
@@ -12,88 +15,93 @@ const UpcomingInterviews = ({ email }) => {
       setLoading(false);
       return;
     }
-
     const fetchInterviews = async () => {
       try {
         const response = await axios.get(
           `/api/interviewers/${email}/upcoming-interviews`
         );
         setInterviews(response.data.upcomingInterviews);
-        console.log("upcoming interviews", response.data.upcomingInterviews);
       } catch (err) {
-        setError("Failed to fetch interviews");
+        setError("Failed to fetch interviews.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchInterviews();
   }, [email]);
 
-  if (loading) return <p>Loading interviews...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-48 text-gray-500">
+        Loading interviews...
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="bg-red-100 text-red-700 border border-red-400 p-4 rounded-md text-center">
+        {error}
+      </div>
+    );
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr",
-        gap: "1rem",
-        padding: "1rem",
-      }}
-    >
+    <div className="p-6 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        Upcoming Interviews
+      </h2>
       {interviews.length > 0 ? (
-        interviews.map((interview, index) => (
-          <div
-            key={index}
-            style={{
-              padding: "1rem",
-              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-              borderRadius: "8px",
-              backgroundColor: "#fff",
-            }}
-          >
-            <p>
-              <strong>Name:</strong> {interview.name}
-            </p>
-            <p>
-              <strong>Email:</strong> {interview.email}
-            </p>
-            <p>
-              <strong>Scheduled Date:</strong>{" "}
-              {new Date(interview.scheduledDate).toLocaleString()}
-            </p>
-            <p>
-              <strong>LinkedIn:</strong>{" "}
-              <a
-                href={interview.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "blue" }}
-              >
-                Profile
-              </a>
-            </p>
-            <p>
-              <strong>Resume:</strong>{" "}
-              <a
-                href={interview.resume}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "blue" }}
-              >
-                Download
-              </a>
-            </p>
-            {interview.details && (
-              <p>
-                <strong>Details:</strong> {interview.details}
-              </p>
-            )}
-          </div>
-        ))
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {interviews.map((interview, index) => (
+            <div
+              key={index}
+              className="bg-white shadow-md rounded-lg p-4 border border-gray-200 hover:shadow-lg transform hover:scale-105 transition-transform"
+            >
+              <div className="flex items-center mb-4 border-b pb-2">
+                <User className="text-blue-500 mr-3" size={24} />
+                <span className="font-semibold text-lg text-gray-700">
+                  {interview.name}
+                </span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center text-sm text-gray-600">
+                  <Mail className="mr-2 text-blue-400" size={16} />
+                  {interview.email}
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Calendar className="mr-2 text-blue-400" size={16} />
+                  {new Date(interview.scheduledDate).toLocaleString()}
+                </div>
+                {interview.details && (
+                  <p className="text-gray-500 italic text-sm">
+                    {interview.details}
+                  </p>
+                )}
+              </div>
+              <div className="flex justify-between mt-4 pt-2 border-t">
+                <a
+                  href={interview.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 transition"
+                >
+                  <Linkedin size={20} />
+                </a>
+                <a
+                  href={interview.resume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-green-600 hover:text-green-800 transition"
+                >
+                  <FileText size={20} />
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
-        <p>No upcoming interviews.</p>
+        <div className="text-gray-600 bg-gray-100 p-6 rounded-md text-center">
+          No upcoming interviews.
+        </div>
       )}
     </div>
   );
