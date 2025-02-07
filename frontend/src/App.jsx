@@ -1,19 +1,18 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import AdminDashboard from "./components/AdminDashboard";
-import Form from "./components/Form";
-import SlotDetail from "./components/SlotDetails";
-import InterviwerDetails from "./components/InterviewerDetails";
-import {ProtectedRoute,ProtectedRouteUser} from "./routes/ProtectedRoute";
+import InterviewerDetails from "./components/InterviewerDetails";
+import { ProtectedRoute, ProtectedRouteUser } from "./routes/ProtectedRoute";
 
 import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Register";
 import RegisterUser from "./pages/UserLogin/Register";
 import LoginUser from "./pages/UserLogin/Login";
 import UserDashboard from "./components/UserDashboard";
-import SlotDetails from "./components/SlotDetails";
+import Availibility from "./components/Availibility";
+import UpcomingInterviews from "./components/UpcomingInterviews";
+import ProfileUpdate from "./components/UserDashboard/ProfileUpdate";
 
 function App() {
   return (
@@ -25,9 +24,9 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/user/register" element={<RegisterUser />} />
-          <Route path="/slot-details/:name" element={<SlotDetails />} />
           <Route path="/user/login" element={<LoginUser />} />
-          {/* <Route path="/user/dashboard" element={<UserDashboard />} /> */}
+
+          {/* Protected Routes */}
           <Route
             path="/user/dashboard"
             element={
@@ -35,8 +34,17 @@ function App() {
                 <UserDashboard />
               </ProtectedRouteUser>
             }
-          />
-          {/* Protected Routes */}
+          >
+            {/* Nested Routes for User Dashboard */}
+            <Route path="availability" element={<Availibility />} />
+            <Route path="upcoming-interviews" element={<UpcomingInterviews />} />
+            <Route path="profile-update" element={<ProfileUpdate />} />
+            <Route
+              path="logout"
+              element={<div>You have been logged out. Redirecting...</div>}
+            />
+          </Route>
+
           <Route
             path="/admin"
             element={
@@ -46,26 +54,10 @@ function App() {
             }
           />
           <Route
-            path="/form"
-            element={
-              <ProtectedRoute>
-                <Form />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/slot"
-            element={
-              <ProtectedRoute>
-                <SlotDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/detail"
             element={
               <ProtectedRoute>
-                <InterviwerDetails />
+                <InterviewerDetails />
               </ProtectedRoute>
             }
           />
