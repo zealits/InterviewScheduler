@@ -28,12 +28,13 @@ const LoginUser = () => {
       setModalOpen(true);
       console.log(response);
       localStorage.setItem("authToken", response.token);
-      navigate("/user/dashboard");
+      navigate("/user/dashboard/home");
     } catch (error) {
       console.error("Login failed:", error);
       setModalData({ title: "Error", message: "Invalid email or password." });
       setModalOpen(true);
     }
+
   };
 
   return (
