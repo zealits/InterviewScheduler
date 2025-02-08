@@ -19,7 +19,7 @@ const LoginUser = () => {
     };
     localStorage.setItem("userEmail", userData.email);
     console.log(userData);
-    
+
     try {
       const response = await loginUser2(userData);
       const { token } = response;
@@ -71,12 +71,12 @@ const LoginUser = () => {
                   <label className="text-sm font-medium text-gray-700">
                     Password
                   </label>
-                  <a 
-                    href="/forgot-password" 
+                  {/* <a
+                    href="/forgot-password"
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     Forgot password?
-                  </a>
+                  </a> */}
                 </div>
                 <div className="relative">
                   <input
@@ -106,22 +106,17 @@ const LoginUser = () => {
                   <span className="px-4 bg-white text-sm text-gray-500">
                     Don't have an account?
                   </span>
+                  <button
+                    onClick={() => navigate("/user/register")}
+                    className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  >
+                    Create account
+                  </button>
                 </div>
               </div>
-              
-              {/* <a 
-                href="/user/register" 
-                className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm"
-              >
-                Create a free account
-              </a> */}
-              <button onClick={() => navigate("/user/register")} className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm">
-                Create a free account
-              </button>
             </div>
           </form>
         </div>
-
       </div>
 
       <Modal

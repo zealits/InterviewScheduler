@@ -46,11 +46,13 @@ const RegisterUser = () => {
               Join our community of expert interviewers
             </p>
           </div>
-          
+
           <form onSubmit={handleRegister} className="p-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Name</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Name
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -61,7 +63,9 @@ const RegisterUser = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Email</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Email
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -72,7 +76,9 @@ const RegisterUser = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Password</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Password
+                </label>
                 <input
                   type="password"
                   name="password"
@@ -83,7 +89,9 @@ const RegisterUser = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">LinkedIn Profile</label>
+                <label className="text-sm font-medium text-gray-700">
+                  LinkedIn Profile
+                </label>
                 <input
                   type="url"
                   name="linkedinProfile"
@@ -94,7 +102,9 @@ const RegisterUser = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Years of Experience</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Years of Experience
+                </label>
                 <input
                   type="number"
                   name="yearOfExperience"
@@ -106,7 +116,9 @@ const RegisterUser = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Experience as Interviewer (Years)</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Experience as Interviewer (Years)
+                </label>
                 <input
                   type="number"
                   name="experienceAsInterviewer"
@@ -118,7 +130,9 @@ const RegisterUser = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Candidates Interviewed</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Candidates Interviewed
+                </label>
                 <input
                   type="number"
                   name="candidatesInterviewed"
@@ -130,7 +144,9 @@ const RegisterUser = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Specialization</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Specialization
+                </label>
                 <select
                   name="specialization"
                   required
@@ -152,23 +168,29 @@ const RegisterUser = () => {
               >
                 Create Account
               </button>
-          
-            <div className="text-center">
-              {/* <a navigate="/user/login" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+
+              <div className="text-center">
+                {/* <a navigate="/user/login" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                 Already have an account? Login here
               </a> */}
-              {/* use navigate instead of href */}
-              <button onClick={() => navigate("/user/login")} className="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                Already have an account? Login here
-              </button>
-            </div>
+                {/* use navigate instead of href */}
+                <div className="relative flex justify-center">
+                  <span className="py-4 bg-white text-sm text-gray-500">
+                    Already have account ?
+                  </span>
+                  <button
+                    onClick={() => navigate("/user/login")}
+                    className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  >
+                    Login
+                  </button>
+                </div>
+              </div>
             </div>
           </form>
-
         </div>
-
       </div>
-      
+
       <Modal
         isOpen={modalOpen}
         title={modalData.title}
