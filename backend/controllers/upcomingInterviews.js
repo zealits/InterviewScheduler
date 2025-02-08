@@ -3,6 +3,7 @@ const sendEmail = require("../utils/sendEmail");
 
 exports.getAllUpcoming = async (req, res) => {
   try {
+    
     const { email } = req.params;
     const user = await User.findOne({ email });
 
@@ -32,7 +33,7 @@ exports.postAllUpcoming = async (req, res) => {
     }
 
     for (const interview of upcomingInterviews) {
-      if (!interview.email || !interview.scheduledDate || !interview.name || !interview.linkedin || !interview.resume) {
+      if (!interview.email || !interview.scheduledDate || !interview.name || !interview.jobTitle) {
         return res.status(400).json({ message: "Missing required fields in one or more interview entries" });
       }
     }

@@ -42,7 +42,17 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             </li>
             <li>
               <Link
+                to="/user/dashboard/pending-approvals"
+                className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:text-blue-300 group"
+              >
+                <ProfileIcon size={20} className="text-gray-400 group-hover:text-blue-300" />
+                <span className="font-medium">Pending Approvals</span>
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/user/dashboard/upcoming-interviews"
+
                 className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:text-blue-300 group"
               >
                 <CalendarIcon size={20} className="text-gray-400 group-hover:text-blue-300" />

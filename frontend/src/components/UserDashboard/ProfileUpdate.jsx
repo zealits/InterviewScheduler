@@ -47,8 +47,8 @@ const UpdateProfile = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
-  <div className="w-full max-w-4xl p-8 bg-white rounded-2xl">
+    <div className="flex justify-center min-h-screen">
+  <div className="w-full max-w-4xl bg-white rounded-2xl">
     <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">
       Update Profile
     </h2>

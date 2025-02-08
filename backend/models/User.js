@@ -41,25 +41,25 @@ const userSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Scheduled Date is required"],
       },
-      // scheduledTime: {
-      //   type: String, // Store time separately in HH:MM format
-      //   required: [true, "Scheduled Time is required"],
-      // },
+      
       name: {
         type: String,
         required: true,
       },
       linkedin: {
         type: String,
-        required: true,
+        
       },
       resume: {
         type: String, // Use String for file URL or path
-        required: true,
+        
       },
+      jobTitle: { type: String },
       details: { type: String },
       confirmation: { type: Boolean, default: false   },
+
     },
+
   ]
   
   

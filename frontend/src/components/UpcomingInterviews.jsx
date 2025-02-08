@@ -21,6 +21,7 @@ const UpcomingInterviews = () => {
           `/api/interviewers/${email}/upcoming-interviews`
         );
         setInterviews(response.data.upcomingInterviews);
+        console.log(response.data.upcomingInterviews);
       } catch (err) {
         setError("Failed to fetch interviews.");
       } finally {
@@ -44,14 +45,18 @@ const UpcomingInterviews = () => {
       </div>
     );
 
+  const confirmedInterviews = interviews.filter(
+    (interview) => interview.confirmation === true
+  );
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
         Upcoming Interviews
       </h2>
-      {interviews.length > 0 ? (
+      {confirmedInterviews.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {interviews.map((interview, index) => (
+          {confirmedInterviews.map((interview, index) => (
             <div
               key={index}
               className="bg-white shadow-md rounded-lg p-4 border border-gray-200 hover:shadow-lg transform hover:scale-105 transition-transform"
@@ -59,13 +64,13 @@ const UpcomingInterviews = () => {
               <div className="flex items-center mb-4 border-b pb-2">
                 <User className="text-blue-500 mr-3" size={24} />
                 <span className="font-semibold text-lg text-gray-700">
-                  {interview.name}
+                  {interview.jobTitle}
                 </span>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center text-sm text-gray-600">
                   <Mail className="mr-2 text-blue-400" size={16} />
-                  {interview.email}
+                  {interview.name.charAt(0).toUpperCase() + interview.name.slice(1)}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar className="mr-2 text-blue-400" size={16} />

@@ -13,7 +13,7 @@ import UserDashboard from "./components/UserDashboard";
 import Availibility from "./components/Availibility";
 import UpcomingInterviews from "./components/UpcomingInterviews";
 import ProfileUpdate from "./components/UserDashboard/ProfileUpdate";
-
+import PendingApprovals from "./components/UserDashboard/PendingApprovals";
 function App() {
   return (
     <Router>
@@ -39,9 +39,11 @@ function App() {
             <Route path="availability" element={<Availibility />} />
             <Route path="upcoming-interviews" element={<UpcomingInterviews />} />
             <Route path="profile-update" element={<ProfileUpdate />} />
+            <Route path="pending-approvals" element={<PendingApprovals />} />
             <Route
               path="logout"
               element={<div>You have been logged out. Redirecting...</div>}
+
             />
           </Route>
 
