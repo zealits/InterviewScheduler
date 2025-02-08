@@ -6,13 +6,15 @@ const PendingApprovals = () => {
   const [pendingInterviews, setPendingInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sortOrder, setSortOrder] = useState("newest"); // Default sort order
+  const [filterDate, setFilterDate] = useState(""); // For date filtering
+
   const userEmail = localStorage.getItem("userEmail");
   const email = userEmail;
+
   useEffect(() => {
     const fetchPendingApprovals = async () => {
       try {
-
-
         const response = await axios.get(`/api/interviewers/${email}/upcoming-interviews`);
         setPendingInterviews(
           response.data.upcomingInterviews.filter((interview) => !interview.confirmation)
@@ -25,13 +27,12 @@ const PendingApprovals = () => {
     };
 
     fetchPendingApprovals();
-  }, [email]);  
+  }, [email]);
 
   const handleApproval = async (interviewId) => {
     try {
       await axios.post(`/api/interviewers/${email}/pending-interviews`, {
-
-                    email,
+        email,
         interviewId,
       });
 
@@ -41,9 +42,29 @@ const PendingApprovals = () => {
       alert("Interview confirmed successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to confirm the interview.");            
+      alert("Failed to confirm the interview.");
     }
   };
+
+  const handleSortChange = (order) => {
+    setSortOrder(order);
+  };
+
+  const handleDateFilter = (event) => {
+    setFilterDate(event.target.value);
+  };
+
+  const sortedInterviews = [...pendingInterviews]
+    .filter((interview) => {
+      if (!filterDate) return true;
+      const interviewDate = new Date(interview.scheduledDate).toISOString().split("T")[0];
+      return interviewDate === filterDate;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.scheduledDate);
+      const dateB = new Date(b.scheduledDate);
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
 
   if (loading)
     return (
@@ -62,9 +83,41 @@ const PendingApprovals = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Pending Approvals</h2>
-      {pendingInterviews.length > 0 ? (
+
+      {/* Sorting and Filtering Controls */}
+      <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
+        <div>
+          <label htmlFor="dateFilter" className="block text-sm font-medium text-gray-700">
+            Filter by Date
+          </label>
+          <input
+            type="date"
+            id="dateFilter"
+            value={filterDate}
+            onChange={handleDateFilter}
+            className="border border-gray-300 rounded-md p-2 mt-1"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="sortOrder" className="block text-sm font-medium text-gray-700">
+            Sort by Date
+          </label>
+          <select
+            id="sortOrder"
+            value={sortOrder}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="border border-gray-300 rounded-md p-2 mt-1"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+      </div>
+
+      {sortedInterviews.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pendingInterviews.map((interview) => (
+          {sortedInterviews.map((interview) => (
             <div
               key={interview._id}
               className="bg-white shadow-md rounded-lg p-4 border border-gray-200 hover:shadow-lg transition"
