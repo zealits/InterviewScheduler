@@ -182,6 +182,7 @@ const Availibility = () => {
                                         endDate: range[1] || null,   // Synchronize endDate
                                     });
                                 }}
+                                minDate={new Date()} // Disable past dates
                                 className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
                                 placeholderText="Select date range"
                             />
@@ -243,6 +244,7 @@ const Availibility = () => {
                     }
                     handleAddCustomDate(date);
                 }}
+                minDate={new Date()} // Disable past dates
                 className="w-full focus:ring-2 focus:ring-blue-500"
                 inline
             />
