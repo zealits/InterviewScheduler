@@ -1,206 +1,373 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Calendar, X, CheckCircle } from "lucide-react";
 
-const Availability = () => {
-  const userEmail = localStorage.getItem("userEmail");
-  const [availabilityType, setAvailabilityType] = useState("range");
+const Availibility = () => {
+    const [availabilityType, setAvailabilityType] = useState("range");
+    const [availabilityRange, setAvailabilityRange] = useState({
+        startDate: null,
+        endDate: null,
+        startTime: "",
+        endTime: "",
+        range: [],
+    });
+    const [customDates, setCustomDates] = useState([]);
+    const [customAvailability, setCustomAvailability] = useState({
+        startTime: "",
+        endTime: "",
+    });
 
-  const [availabilityRange, setAvailabilityRange] = useState({
-    startDate: null,
-    endDate: null,
-    startTime: "",
-    endTime: "",
-  });
-  const [customDates, setCustomDates] = useState([]);
+    const handleAddCustomDate = (date) => {
+        if (date) {
+            setCustomDates((prevDates) => [...prevDates, date]);
+        }
+    };
 
-  const handleAddCustomDate = (date) => {
-    if (date && !customDates.some(d => d.toDateString() === date.toDateString())) {
-      setCustomDates((prevDates) => [...prevDates, date]);
-    }
-  };
+    const handleRemoveCustomDate = (index) => {
+        setCustomDates((prevDates) => prevDates.filter((_, i) => i !== index));
+    };
 
-  const handleRemoveCustomDate = (index) => {
-    setCustomDates((prevDates) => prevDates.filter((_, i) => i !== index));
-  };
+    const validateRange = () => {
+        const { range, startTime, endTime } = availabilityRange;
 
-  const handleSubmit = async () => {
-    try {
-      const payload = {
-        availabilityRange:
-          availabilityType === "range"
-            ? [
-                {
-                  startDate: availabilityRange.startDate?.toISOString(),
-                  endDate: availabilityRange.endDate?.toISOString(),
-                  startTime: availabilityRange.startTime,
-                  endTime: availabilityRange.endTime,
+        if (!range || !range[0] || !range[1]) {
+            alert("Please select a valid date range.");
+            return false;
+        }
+
+        const [startDate, endDate] = range;
+
+        if (startDate > endDate) {
+            alert("Start date must be earlier than end date.");
+            return false;
+        }
+
+        if (!startTime || !endTime) {
+            alert("Please provide both start and end times.");
+            return false;
+        }
+
+        if (startTime >= endTime) {
+            alert("Start time must be earlier than end time.");
+            return false;
+        }
+
+        return true;
+    };
+
+
+    const validateCustom = () => {
+        if (customDates.length === 0) {
+            alert("Please select at least one date.");
+            return false;
+        }
+        if (!customAvailability.startTime || !customAvailability.endTime) {
+            alert("Please provide start and end times for custom availability.");
+            return false;
+        }
+        return true;
+    };
+
+    const handleSubmit = async () => {
+        try {
+            let payload = {};
+            if (availabilityType === "range" && validateRange()) {
+                payload = {
+                    availabilityRange: [
+                        {
+                            startDate: availabilityRange.startDate?.toISOString(),
+                            endDate: availabilityRange.endDate?.toISOString(),
+                            startTime: availabilityRange.startTime,
+                            endTime: availabilityRange.endTime,
+                        },
+                    ],
+                    customAvailability: [],
+                };
+            } else if (availabilityType === "custom" && validateCustom()) {
+                payload = {
+                    availabilityRange: [],
+                    customAvailability: customDates.map((date) => ({
+                        dates: [date.toISOString()],
+                        startTime: customAvailability.startTime,
+                        endTime: customAvailability.endTime,
+                    })),
+                };
+            } else {
+                return;
+            }
+    
+            const token = localStorage.getItem("authToken");
+            const response = await axios.put("/api/auth/profile", payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
                 },
-              ]
-            : [],
-        customAvailability:
-          availabilityType === "custom"
-            ? customDates.map((date) => ({
-                dates: [date.toISOString()],
-              }))
-            : [],
-      };
+            });
+    
+            alert("Availability updated successfully!");
+            console.log(response.data);
+    
+            // Reset fields after successful submission
+            setAvailabilityType("range");
+            setAvailabilityRange({
+                startDate: null,
+                endDate: null,
+                startTime: "",
+                endTime: "",
+                range: [],
+            });
+            setCustomDates([]);
+            setCustomAvailability({
+                startTime: "",
+                endTime: "",
+            });
+        } catch (error) {
+            console.error(
+                "Error updating availability:",
+                error.response?.data || error.message
+            );
+            alert("Failed to update availability. Please try again.");
+        }
+    };
+    
 
-      const token = localStorage.getItem("authToken");
-      const response = await axios.put("/api/auth/profile", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    return (
+        <div className="p-8 space-y-8 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+            <h1 className="text-3xl font-bold text-gray-800 text-center">
+                Interviewer Availability
+            </h1>
 
-      alert("Profile updated successfully!");
-    } catch (error) {
-      console.error(
-        "Error updating profile:",
-        error.response?.data || error.message
-      );
-      alert("Failed to update profile. Please try again.");
-    }
-  };
-
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
-          <h1 className="text-4xl font-bold text-white flex items-center">
-            <Calendar className="mr-4" size={36} />
-            Interviewer Availability
-          </h1>
-        </div>
-
-        <div className="p-8 space-y-8">
-          {/* Availability Type Selection */}
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Select Availability Type
-            </h2>
-            <div className="flex space-x-6">
-              {["range", "custom"].map((type) => (
-                <label 
-                  key={type} 
-                  className={`flex items-center space-x-3 cursor-pointer px-4 py-2 rounded-lg transition-all ${
-                    availabilityType === type 
-                    ? "bg-blue-100 text-blue-800" 
-                    : "hover:bg-gray-100"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="availabilityType"
-                    value={type}
-                    checked={availabilityType === type}
-                    onChange={() => setAvailabilityType(type)}
-                    className="accent-blue-500"
-                  />
-                  <span className="text-lg font-medium capitalize">
-                    {type} Selection
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Range Selection */}
-          {availabilityType === "range" && (
-            <div className="grid md:grid-cols-2 gap-6 ">
-              {[
-                { label: "Start Date", key: "startDate" },
-                { label: "End Date", key: "endDate" },
-                { label: "Start Time", key: "startTime", type: "time" },
-                { label: "End Time", key: "endTime", type: "time" }
-              ].map(({ label, key, type = "date" }) => (
-                <div key={key} className="space-y-2 flex flex-col">
-                  <label className="text-gray-700 font-medium">{label}:</label>
-                  {type === "date" ? (
-                    <DatePicker
-                      selected={availabilityRange[key]}
-                      onChange={(date) =>
-                        setAvailabilityRange({
-                          ...availabilityRange,
-                          [key]: date,
-                        })
-                      }
-                      className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    />
-                  ) : (
-                    <input
-                      type="time"
-                      value={availabilityRange[key]}
-                      onChange={(e) =>
-                        setAvailabilityRange({
-                          ...availabilityRange,
-                          [key]: e.target.value,
-                        })
-                      }
-                      className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Custom Dates */}
-          {availabilityType === "custom" && (
+            {/* Availability Type Selection */}
             <div className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                <label className="text-gray-800 font-semibold text-lg mb-4 block">
-                  Select Dates
-                </label>
-                <DatePicker
-                  selected={null}
-                  onChange={handleAddCustomDate}
-                  inline
-                  className="w-full"
-                />
-              </div>
+                <h2 className="text-2xl font-semibold text-gray-700">Availability</h2>
+                <div className="flex space-x-4">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                            type="radio"
+                            name="availabilityType"
+                            value="range"
+                            checked={availabilityType === "range"}
+                            onChange={() => setAvailabilityType("range")}
+                            className="accent-blue-500"
+                        />
+                        <span className="text-gray-700">Range Selection</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                            type="radio"
+                            name="availabilityType"
+                            value="custom"
+                            checked={availabilityType === "custom"}
+                            onChange={() => setAvailabilityType("custom")}
+                            className="accent-blue-500"
+                        />
+                        <span className="text-gray-700">Custom Dates</span>
+                    </label>
+                </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                  Selected Dates
-                </h3>
-                {customDates.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {customDates.map((date, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full shadow-sm"
-                      >
-                        <span>{date.toLocaleDateString()}</span>
-                        <button
-                          onClick={() => handleRemoveCustomDate(index)}
-                          className="ml-2 text-red-600 hover:text-red-800"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 italic">No dates selected yet.</p>
+                {/* Range Selection */}
+                {availabilityType === "range" && (
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Date Range:</label>
+                            <DatePicker
+                                selectsRange
+                                startDate={availabilityRange.range[0]}
+                                endDate={availabilityRange.range[1]}
+                                onChange={(range) => {
+                                    setAvailabilityRange({
+                                        ...availabilityRange,
+                                        range,
+                                        startDate: range[0] || null, // Synchronize startDate
+                                        endDate: range[1] || null,   // Synchronize endDate
+                                    });
+                                }}
+                                className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                                placeholderText="Select date range"
+                            />
+                        </div>
+                        <label className="block text-sm font-medium text-gray-700">Timezone:</label>
+    <select
+        value={customAvailability.timezone || "UTC+00:00"}
+        onChange={(e) =>
+            setCustomAvailability({ ...customAvailability, timezone: e.target.value })
+        }
+        className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+    >
+        <option value="UTC+00:00">UTC+00:00 (Default)</option>
+        <option value="UTC-05:00">UTC-05:00 (Eastern Time)</option>
+        <option value="UTC+05:30">UTC+05:30 (India Standard Time)</option>
+        <option value="UTC+08:00">UTC+08:00 (China Standard Time)</option>
+        {/* Add more as needed */}
+    </select>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Start Time:</label>
+                                <input
+                                    type="time"
+                                    value={availabilityRange.startTime}
+                                    onChange={(e) => setAvailabilityRange({ ...availabilityRange, startTime: e.target.value })}
+                                    className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">End Time:</label>
+                                <input
+                                    type="time"
+                                    value={availabilityRange.endTime}
+                                    onChange={(e) => setAvailabilityRange({ ...availabilityRange, endTime: e.target.value })}
+                                    className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+                        </div>
+                        {availabilityRange.startTime && availabilityRange.endTime && availabilityRange.startTime >= availabilityRange.endTime && (
+                            <p className="text-red-500 text-sm">Start time must be earlier than end time.</p>
+                        )}
+                    </div>
                 )}
-              </div>
-            </div>
-          )}
 
-          <button
-            onClick={handleSubmit}
-            className="w-full flex items-center justify-center bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors shadow-lg group"
-          >
-            <CheckCircle className="mr-2 group-hover:animate-pulse" size={24} />
-            Submit Availability
-          </button>
+
+                {/* Custom Dates */}
+                {availabilityType === "custom" && (
+    <div className="space-y-4">
+        <label className="text-sm font-medium text-gray-700 block">
+            Select Custom Dates:
+        </label>
+        <div className="border border-gray-300 rounded p-2">
+            <DatePicker
+                selected={null}
+                onChange={(date) => {
+                    if (customDates.some((d) => d.toDateString() === date.toDateString())) {
+                        alert("This date is already selected.");
+                        return;
+                    }
+                    handleAddCustomDate(date);
+                }}
+                className="w-full focus:ring-2 focus:ring-blue-500"
+                inline
+            />
         </div>
-      </div>
+        {customDates.length > 0 ? (
+            <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Selected Dates:</h3>
+                <ul className="space-y-2">
+                    {customDates.map((date, index) => (
+                        <li
+                            key={index}
+                            className="flex items-center justify-between bg-gray-100 p-2 rounded"
+                        >
+                            <span className="text-gray-700">
+                                {date.toLocaleDateString()}
+                            </span>
+                            <button
+                                onClick={() => handleRemoveCustomDate(index)}
+                                className="text-red-500 text-sm hover:underline"
+                            >
+                                Remove
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        ) : (
+            <p className="text-sm text-gray-500">No dates selected yet.</p>
+        )}
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Select Timezone:</label>
+            <select
+                className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                value={customAvailability.timezone || ""}
+                onChange={(e) =>
+                    setCustomAvailability({
+                        ...customAvailability,
+                        timezone: e.target.value,
+                    })
+                }
+            >
+                <option value="" disabled>
+                    Choose a timezone
+                </option>
+                <option value="UTC-12:00">UTC-12:00</option>
+                <option value="UTC-11:00">UTC-11:00</option>
+                <option value="UTC-10:00">UTC-10:00</option>
+                <option value="UTC-09:00">UTC-09:00</option>
+                <option value="UTC-08:00">UTC-08:00</option>
+                <option value="UTC-07:00">UTC-07:00</option>
+                <option value="UTC-06:00">UTC-06:00</option>
+                <option value="UTC-05:00">UTC-05:00</option>
+                <option value="UTC-04:00">UTC-04:00</option>
+                <option value="UTC-03:00">UTC-03:00</option>
+                <option value="UTC-02:00">UTC-02:00</option>
+                <option value="UTC-01:00">UTC-01:00</option>
+                <option value="UTC+00:00">UTC+00:00</option>
+                <option value="UTC+01:00">UTC+01:00</option>
+                <option value="UTC+02:00">UTC+02:00</option>
+                <option value="UTC+03:00">UTC+03:00</option>
+                <option value="UTC+04:00">UTC+04:00</option>
+                <option value="UTC+05:00">UTC+05:00</option>
+                <option value="UTC+06:00">UTC+06:00</option>
+                <option value="UTC+07:00">UTC+07:00</option>
+                <option value="UTC+08:00">UTC+08:00</option>
+                <option value="UTC+09:00">UTC+09:00</option>
+                <option value="UTC+10:00">UTC+10:00</option>
+                <option value="UTC+11:00">UTC+11:00</option>
+                <option value="UTC+12:00">UTC+12:00</option>
+            </select>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+            <div>
+                <label className="block text-sm font-medium text-gray-700">
+                    Start Time:
+                </label>
+                <input
+                    type="time"
+                    value={customAvailability.startTime}
+                    onChange={(e) =>
+                        setCustomAvailability({
+                            ...customAvailability,
+                            startTime: e.target.value,
+                        })
+                    }
+                    className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700">
+                    End Time:
+                </label>
+                <input
+                    type="time"
+                    value={customAvailability.endTime}
+                    onChange={(e) =>
+                        setCustomAvailability({
+                            ...customAvailability,
+                            endTime: e.target.value,
+                        })
+                    }
+                    className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+        </div>
+        {customAvailability.startTime &&
+            customAvailability.endTime &&
+            customAvailability.startTime >= customAvailability.endTime && (
+                <p className="text-red-500 text-sm mt-2">
+                    Start time must be earlier than end time.
+                </p>
+            )}
     </div>
-  );
+)}
+
+            </div>
+
+            <button
+                onClick={handleSubmit}
+                className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600"
+            >
+                Submit
+            </button>
+        </div>
+    );
 };
 
-export default Availability;
+export default Availibility;
