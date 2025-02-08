@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
       dates: [{ type: Date,required:true }], // List of manually selected dates
       startTime: { type: String, required: true }, // Starting time (e.g., "09:00 AM")    
       endTime: { type: String, required: true },   // Ending time (e.g., "05:00 PM")
-      
+
     },
 
   ],
@@ -58,10 +58,12 @@ const userSchema = new mongoose.Schema({
         required: true,
       },
       details: { type: String },
+      confirmation: { type: Boolean, default: false   },
     },
   ]
   
   
+
 });
 
 // Hash password before saving

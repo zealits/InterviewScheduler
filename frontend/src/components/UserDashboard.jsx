@@ -36,9 +36,7 @@ const UserDashboard = () => {
          
           
           <div className="bg-white shadow-md rounded-lg p-6 mt-6">
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-6">
-              Welcome, <span className="text-blue-600">{userEmail || "User"}</span>
-            </h1>
+            
             
 
             {/* Render Nested Routes */}
