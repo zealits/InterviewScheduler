@@ -33,13 +33,12 @@ const UserDashboard = () => {
         } overflow-y-auto`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Navbar />
+         
           
           <div className="bg-white shadow-md rounded-lg p-6 mt-6">
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-6">
-              Welcome, <span className="text-blue-600">{userEmail || "User"}</span>
-            </h1>
             
+            
+
             {/* Render Nested Routes */}
             <div className="mt-4">
               <Outlet />

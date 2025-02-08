@@ -25,7 +25,11 @@ const userSchema = new mongoose.Schema({
   customAvailability:[
     {
       dates: [{ type: Date,required:true }], // List of manually selected dates
+      startTime: { type: String, required: true }, // Starting time (e.g., "09:00 AM")    
+      endTime: { type: String, required: true },   // Ending time (e.g., "05:00 PM")
+
     },
+
   ],
   upcomingInterviews: [
     {
@@ -37,28 +41,29 @@ const userSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Scheduled Date is required"],
       },
-      // scheduledTime: {
-      //   type: String, // Store time separately in HH:MM format
-      //   required: [true, "Scheduled Time is required"],
-      // },
+      
       name: {
         type: String,
         required: true,
       },
       linkedin: {
         type: String,
-        required: true,
+        
       },
       resume: {
         type: String, // Use String for file URL or path
-        required: true,
+        
       },
+      jobTitle: { type: String },
       details: { type: String },
-      
+      confirmation: { type: Boolean, default: false   },
+
     },
+
   ]
   
   
+
 });
 
 // Hash password before saving

@@ -1,4 +1,5 @@
 import {
+  
   Box,
   Typography,
   Button,
@@ -33,6 +34,7 @@ const CustomBigCalendar = () => {
     candidateEmail: "",
     interviewerEmail: "",
     candidateLinkedIn: "",
+    jobTitle: "",
     jobDescription: "",
     resume: "",
     scheduledDate: "",
@@ -162,6 +164,7 @@ const CustomBigCalendar = () => {
 
     setFilteredEvents(filtered);
 
+
     // Update the interviewers list based on selected date and filter
     if (selectedDate) {
       const eventsOnDate = filtered.filter(
@@ -169,6 +172,7 @@ const CustomBigCalendar = () => {
           event.start.toISOString().slice(0, 10) ===
           selectedDate.toISOString().slice(0, 10)
       );
+
 
       const interviewersOnDate = eventsOnDate.flatMap((event) =>
         event.users
@@ -187,6 +191,7 @@ const CustomBigCalendar = () => {
           }))
       );
 
+
       setSelectedDateInterviewers(interviewersOnDate);
     } else {
       setSelectedDateInterviewers([]);
@@ -201,12 +206,14 @@ const CustomBigCalendar = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+
     const {
       candidateEmail,
       candidateName,
       // scheduledTime,
       interviewerEmail,
       candidateLinkedIn,
+      jobTitle,
       jobDescription,
       resume,
       scheduledDate,
@@ -216,13 +223,16 @@ const CustomBigCalendar = () => {
       !candidateEmail ||
       !candidateName ||
       !jobDescription ||
-      !candidateLinkedIn ||
-      !resume ||
+      
+      !jobTitle ||
+      
       !scheduledDate
+
     ) {
       setShowPopup(false); // Show error popup
       return;
     }
+
 
     // Ensure resume link ends with .pdf
     const pdfRegex = /^(https?:\/\/.*\.pdf(\?.*)?)$/i;
@@ -231,6 +241,7 @@ const CustomBigCalendar = () => {
       alert("Resume must be a valid PDF link ending in .pdf.");
       return;
     }
+
 
     const payload = {
       upcomingInterviews: [
@@ -241,12 +252,15 @@ const CustomBigCalendar = () => {
           linkedin: candidateLinkedIn.trim(),
           resume: resume.trim(),
           jobDescription: jobDescription.trim(),
+          jobTitle: jobTitle.trim(),
           scheduledDate: scheduledDate.trim(),
         },
       ],
     };
 
+
     const encodedEmail = encodeURIComponent(interviewerEmail.trim());
+
 
     try {
       await axios.post(
@@ -259,6 +273,7 @@ const CustomBigCalendar = () => {
       setShowPopup(true);
     } catch (error) {
       console.error("Error submitting details:", error);
+      setShowPopup(false);
       setShowPopup(false);
     }
   };
@@ -412,12 +427,7 @@ const CustomBigCalendar = () => {
             </Typography>
           </Box>
         ) : (
-          <Grid
-            container
-            spacing={2}
-            sx={{ mt: 2 }}
-            ref={interviewersSectionRef}
-          >
+          <Grid container spacing={2} sx={{ mt: 2 }}>
             {selectedDateInterviewers.map((interviewer, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Paper
@@ -438,6 +448,15 @@ const CustomBigCalendar = () => {
                     </Typography>
                   </Box>
 
+                  <Typography variant="body2" color="textSecondary">
+                    <strong>Specialization:</strong> {interviewer.specialization}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    <strong>Experience:</strong> {interviewer.experience}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    <strong>Availability:</strong> {interviewer.availableTime}
+                  </Typography>
                   <Typography variant="body2" color="textSecondary">
                     <strong>Specialization:</strong>{" "}
                     {interviewer.specialization}
@@ -465,6 +484,7 @@ const CustomBigCalendar = () => {
           </Grid>
         )}
 
+
         {/* Interviewer Details Modal (Centered Card) */}
         <InterviewerDetails
           selectedCandidate={selectedCandidate}
@@ -475,6 +495,8 @@ const CustomBigCalendar = () => {
         />
       </Paper>
     </Box>
+
+
   );
 };
 

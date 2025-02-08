@@ -13,11 +13,13 @@ import UserDashboard from "./components/UserDashboard";
 import Availibility from "./components/Availibility";
 import UpcomingInterviews from "./components/UpcomingInterviews";
 import ProfileUpdate from "./components/UserDashboard/ProfileUpdate";
-
+import PendingApprovals from "./components/UserDashboard/PendingApprovals";
+import UserHome from "./components/UserDashboard/UserHome";
 function App() {
   return (
     <Router>
       <AuthProvider>
+
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -36,12 +38,17 @@ function App() {
             }
           >
             {/* Nested Routes for User Dashboard */}
+            <Route path="home" element={<UserHome />} />
             <Route path="availability" element={<Availibility />} />
             <Route path="upcoming-interviews" element={<UpcomingInterviews />} />
             <Route path="profile-update" element={<ProfileUpdate />} />
+            <Route path="pending-approvals" element={<PendingApprovals />} />
             <Route
+
+
               path="logout"
               element={<div>You have been logged out. Redirecting...</div>}
+
             />
           </Route>
 

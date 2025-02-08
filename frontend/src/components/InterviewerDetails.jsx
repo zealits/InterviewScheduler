@@ -13,6 +13,7 @@ const InterviewerDetails = ({ selectedCandidate, formData, handleChange, handleS
     const errors = {};
     if (!formData.candidateName) errors.candidateName = "Candidate Name is required.";
     if (!formData.candidateEmail) errors.candidateEmail = "Candidate Email is required.";
+    if (!formData.jobTitle) errors.jobTitle = "Job Title is required.";
    
     if (!formData.jobDescription) errors.jobDescription = "Job Description is required.";
    
@@ -199,6 +200,19 @@ const InterviewerDetails = ({ selectedCandidate, formData, handleChange, handleS
           onChange={handleChange}
           error={!!formErrors.candidateLinkedIn}
           helperText={formErrors.candidateLinkedIn}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="Job Title"
+          name="jobTitle"
+          value={formData.jobTitle}
+          onChange={handleChange}
+          required
+          error={!!formErrors.jobTitle}
+          helperText={formErrors.jobTitle}
         />
       </Grid>
       <Grid item xs={12}>
