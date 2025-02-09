@@ -172,73 +172,70 @@ const CustomBigCalendar = () => {
 
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async (event, resumeFile) => {
+    event.preventDefault();
+  
     const {
       candidateEmail,
       candidateName,
-      // scheduledTime,
       interviewerEmail,
       candidateLinkedIn,
       jobTitle,
       jobDescription,
-      resume,
       scheduledDate,
     } = formData;
-
+  
+    // Basic validation – you may enhance this as needed
     if (
       !candidateEmail ||
       !candidateName ||
       !jobDescription ||
-      
       !jobTitle ||
-      
       !scheduledDate
-
     ) {
-      setShowPopup(false); // Show error popup
+      setShowPopup(false);
       return;
     }
-
-    // Ensure resume link ends with .pdf
-    const pdfRegex = /^(https?:\/\/.*\.pdf(\?.*)?)$/i;
-
-    if (!pdfRegex.test(resume.trim())) {
-      alert("Resume must be a valid PDF link ending in .pdf.");
-      return;
-    }
-
-    const payload = {
-      upcomingInterviews: [
-        {
-          email: candidateEmail.trim(),
-          interviewerEmail: interviewerEmail.trim(),
-          name: candidateName.trim(),
-          linkedin: candidateLinkedIn.trim(),
-          resume: resume.trim(),
-          jobDescription: jobDescription.trim(),
-          jobTitle: jobTitle.trim(),
-          scheduledDate: scheduledDate.trim(),
-
-
-        },
-      ],
+  
+    // Create a FormData instance to send multipart/form-data
+    const formDataWithFile = new FormData();
+  
+    // Build the interview object
+    const interviewObj = {
+      email: candidateEmail.trim(),
+      scheduledDate: scheduledDate.trim(),
+      name: candidateName.trim(),
+      jobTitle: jobTitle.trim(),
+      linkedin: candidateLinkedIn.trim(),
+      jobDescription: jobDescription.trim(),
     };
-
-    const encodedEmail = encodeURIComponent(interviewerEmail.trim());
-
+  
+    // Append the interview array (as a JSON string) so the backend gets "upcomingInterviews"
+    formDataWithFile.append("upcomingInterviews", JSON.stringify([interviewObj]));
+  
+    // Append the resume file if it exists
+    if (resumeFile) {
+      formDataWithFile.append("resume", resumeFile);
+    }
+  
+    // Use the interviewerEmail from formData for the endpoint parameter
+    const encodedEmail = interviewerEmail.trim();
+  
     try {
-      await axios.post(`/api/interviewers/${encodedEmail}/upcoming-interviews`, payload, {
-        headers: { "Content-Type": "application/json" },
-      });
+      await axios.post(
+        `/api/interviewers/${encodedEmail}/upcoming-interviews`,
+        formDataWithFile,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       setShowPopup(true);
     } catch (error) {
       console.error("Error submitting details:", error);
       setShowPopup(false);
     }
   };
-
+  
 
   return (
     <Box

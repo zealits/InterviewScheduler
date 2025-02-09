@@ -51,8 +51,9 @@ const userSchema = new mongoose.Schema({
         
       },
       resume: {
-        type: String, // Use String for file URL or path
-        
+        filename: { type: String}, // Original file name
+        contentType: { type: String }, // MIME type (e.g., "application/pdf")
+        file: { type: Buffer }, // Binary data of the file
       },
       jobTitle: { type: String },
       details: { type: String },
