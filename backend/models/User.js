@@ -17,18 +17,17 @@ const userSchema = new mongoose.Schema({
   availabilityRange: [
     {
       startDate: { type: Date, required: true }, // Starting date of the range
-      endDate: { type: Date, required: true },   // Ending date of the range
+      endDate: { type: Date, required: true }, // Ending date of the range
       startTime: { type: String, required: true }, // Starting time (e.g., "09:00 AM")
-      endTime: { type: String, required: true },   // Ending time (e.g., "05:00 PM")
+      endTime: { type: String, required: true }, // Ending time (e.g., "05:00 PM")
     },
   ],
-  customAvailability:[
+  customAvailability: [
     {
-      dates: [{ type: Date,required:true }], // List of manually selected dates
-      startTime: { type: String, required: true }, // Starting time (e.g., "09:00 AM")    
-      endTime: { type: String, required: true },   // Ending time (e.g., "05:00 PM")
+      dates: [{ type: Date, required: true }], // List of manually selected dates
+      startTime: { type: String, required: true }, // Starting time (e.g., "09:00 AM")
+      endTime: { type: String, required: true }, // Ending time (e.g., "05:00 PM")
     },
-
   ],
   upcomingInterviews: [
     {
@@ -40,30 +39,26 @@ const userSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Scheduled Date is required"],
       },
-      
+      scheduledTime: {
+        type: String,
+      },
       name: {
         type: String,
         required: true,
       },
       linkedin: {
         type: String,
-        
       },
       resume: {
-        filename: { type: String}, // Original file name
+        filename: { type: String }, // Original file name
         contentType: { type: String }, // MIME type (e.g., "application/pdf")
         file: { type: Buffer }, // Binary data of the file
       },
       jobTitle: { type: String },
       details: { type: String },
-      confirmation: { type: Boolean, default: false   },
-
+      confirmation: { type: Boolean, default: false },
     },
-
-  ]
-  
-  
-
+  ],
 });
 
 // Hash password before saving

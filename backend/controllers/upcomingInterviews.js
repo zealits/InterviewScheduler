@@ -89,7 +89,7 @@ exports.postAllUpcoming = async (req, res) => {
     }
 
     for (const interview of upcomingInterviews) {
-      if (!interview.email || !interview.scheduledDate || !interview.name || !interview.jobTitle) {
+      if (!interview.email || !interview.scheduledDate || !interview.name || !interview.jobTitle || !interview.scheduledTime) {
         return res.status(400).json({
           message: "Missing required fields in one or more interview entries",
         });

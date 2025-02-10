@@ -10,6 +10,7 @@ import {
   ArrowDown,
   X,
   Download,
+  Clock,
 } from "lucide-react";
 
 const UpcomingInterviews = () => {
@@ -44,10 +45,13 @@ const UpcomingInterviews = () => {
   }, [email]);
 
   // Helper function to create an object URL from PDF data
-  const createPdfObjectUrl = useCallback((pdfData, contentType = "application/pdf") => {
-    const blob = new Blob([new Uint8Array(pdfData)], { type: contentType });
-    return URL.createObjectURL(blob);
-  }, []);
+  const createPdfObjectUrl = useCallback(
+    (pdfData, contentType = "application/pdf") => {
+      const blob = new Blob([new Uint8Array(pdfData)], { type: contentType });
+      return URL.createObjectURL(blob);
+    },
+    []
+  );
 
   // Toggle sort order
   const handleSort = useCallback(() => {
@@ -59,7 +63,10 @@ const UpcomingInterviews = () => {
     (pdf) => {
       if (pdf && pdf.file && pdf.file.data) {
         try {
-          const objectUrl = createPdfObjectUrl(pdf.file.data, "application/pdf");
+          const objectUrl = createPdfObjectUrl(
+            pdf.file.data,
+            "application/pdf"
+          );
           setSelectedPdf({
             ...pdf,
             file: { ...pdf.file, objectUrl },
@@ -87,7 +94,10 @@ const UpcomingInterviews = () => {
     (pdf) => {
       if (pdf && pdf.file && pdf.file.data) {
         try {
-          const objectUrl = createPdfObjectUrl(pdf.file.data, pdf.file.contentType);
+          const objectUrl = createPdfObjectUrl(
+            pdf.file.data,
+            pdf.file.contentType
+          );
           const a = document.createElement("a");
           a.href = objectUrl;
           a.download = pdf.filename || "resume.pdf";
@@ -110,9 +120,8 @@ const UpcomingInterviews = () => {
         (interview) =>
           interview.confirmation === true &&
           (filterDate
-            ? new Date(interview.scheduledDate)
-                .toISOString()
-                .split("T")[0] === filterDate
+            ? new Date(interview.scheduledDate).toISOString().split("T")[0] ===
+              filterDate
             : true)
       )
       .sort((a, b) => {
@@ -167,9 +176,16 @@ const UpcomingInterviews = () => {
         <button
           onClick={handleSort}
           className="flex items-center text-sm text-blue-600 hover:text-blue-800"
-          aria-label={`Sort by date (${sortOrder === "asc" ? "ascending" : "descending"})`}
+          aria-label={`Sort by date (${
+            sortOrder === "asc" ? "ascending" : "descending"
+          })`}
         >
-          {sortOrder === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />} Sort
+          {sortOrder === "asc" ? (
+            <ArrowUp size={16} />
+          ) : (
+            <ArrowDown size={16} />
+          )}{" "}
+          Sort
         </button>
       </div>
 
@@ -189,12 +205,20 @@ const UpcomingInterviews = () => {
               <div className="space-y-2">
                 <div className="flex items-center text-sm text-gray-600">
                   <Mail className="mr-2 text-blue-400" size={16} />
-                  {interview.name?.charAt(0).toUpperCase() + interview.name?.slice(1)}
+                  {interview.name?.charAt(0).toUpperCase() +
+                    interview.name?.slice(1)}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar className="mr-2 text-blue-400" size={16} />
-                  {new Date(interview.scheduledDate).toLocaleString()}
+                  {new Date(interview.scheduledDate).toLocaleDateString()}
                 </div>
+                <div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Clock className="mr-2 text-blue-400" size={16} />
+                    {interview.scheduledTime && ` ${interview.scheduledTime}`}
+                  </div>
+                </div>
+
                 {interview.details && (
                   <p className="text-gray-500 italic text-sm">
                     {interview.details}

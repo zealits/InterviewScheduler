@@ -29,6 +29,7 @@ const CustomBigCalendar = () => {
   const [filter, setFilter] = useState({ name: "", specialization: "" });
   const [showPopup, setShowPopup] = useState(null);
   const [formData, setFormData] = useState({
+    scheduledTime: "",
     candidateName: "",
     candidateEmail: "",
     interviewerEmail: "",
@@ -38,6 +39,7 @@ const CustomBigCalendar = () => {
     jobDescription: "",
     resume: "",
     scheduledDate: "",
+    specialization: "",
     startTime: "",
     endTime: "",
   });
@@ -45,65 +47,71 @@ const CustomBigCalendar = () => {
   const interviewersListRef = useRef(null);
 
   useEffect(() => {
+    // Helper function to return a local date string (YYYY-MM-DD)
+    const formatLocalDate = (dateInput) => {
+      const d = new Date(dateInput);
+      const year = d.getFullYear();
+      // getMonth() is zero-based so add 1 and pad to 2 digits
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+  
     const fetchData = async () => {
       const token = localStorage.getItem("adminAuthToken");
       try {
         const response = await axios.get("/api/user/availability", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+  
         const data = Array.isArray(response.data?.data)
           ? response.data.data
           : [];
         const eventMap = new Map();
-
+  
         data.forEach((user) => {
-          // Normalize customAvailability dates
+          // Normalize customAvailability dates using local formatting
           const customDates =
             user.customAvailability?.flatMap((entry) =>
-              entry.dates.map((date) => {
-                const localDate = new Date(date);
-                return localDate.toISOString().slice(0, 10); // Ensure consistent format
-              })
+              entry.dates.map((date) => formatLocalDate(date))
             ) || [];
-
-          // Normalize availabilityRange dates
+  
+          // Normalize availabilityRange dates using local formatting
           const rangeDates =
             user.availabilityRange?.flatMap((range) => {
               if (!range.startDate || !range.endDate) return [];
               const startDate = new Date(range.startDate);
               const endDate = new Date(range.endDate);
               const datesArray = [];
-              for (
-                let d = new Date(startDate);
-                d <= endDate;
-                d.setDate(d.getDate() + 1)
-              ) {
-                const localDate = new Date(d);
-                datesArray.push(localDate.toISOString().slice(0, 10)); // Normalize date
+              // Loop from startDate to endDate (inclusive)
+              for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                datesArray.push(formatLocalDate(d));
               }
               return datesArray;
             }) || [];
-
+  
+          // Add all dates (custom and range) to the eventMap
           [...customDates, ...rangeDates].forEach((date) => {
             if (!eventMap.has(date)) eventMap.set(date, []);
             eventMap.get(date).push(user);
           });
         });
-
-        // Remove entries with no users
+  
+        // Build the events array from the eventMap
         const combinedEvents = Array.from(eventMap.entries())
-          .filter(([date, users]) => users.length > 0) // Filter out empty dates
+          .filter(([date, users]) => users.length > 0) // Remove entries with no users
           .map(([date, users]) => {
-            const uniqueUsers = Array.from(new Set(users));
+            // To ensure local interpretation of the date string,
+            // split the "YYYY-MM-DD" string and construct the date using local values.
+            const [year, month, day] = date.split("-");
             return {
-              title: `${uniqueUsers.length} Users`,
-              start: new Date(date),
-              end: new Date(date),
-              users: uniqueUsers,
+              title: `${users.length} Users`,
+              start: new Date(year, month - 1, day), // month is zero-indexed
+              end: new Date(year, month - 1, day),
+              users,
             };
           });
-
+  
         setEvents(combinedEvents);
         setFilteredEvents(combinedEvents);
       } catch (error) {
@@ -111,9 +119,10 @@ const CustomBigCalendar = () => {
         alert("Failed to fetch calendar data.");
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   const handleSelectSlot = (slotInfo) => {
     const clickedDate = slotInfo.start;
@@ -196,6 +205,7 @@ const CustomBigCalendar = () => {
       scheduledDate: selectedDate
         ? moment(selectedDate).format("YYYY-MM-DD")
         : "",
+        specialization: candidate?.specialization || "",
       startTime: candidate?.startTime || "",
       endTime: candidate?.endTime || "",
     }));
@@ -267,6 +277,7 @@ const CustomBigCalendar = () => {
       candidateEmail,
       candidateName,
       interviewerEmail,
+      specialization,
       candidateLinkedIn,
       jobTitle,
       jobDescription,
@@ -298,6 +309,7 @@ const CustomBigCalendar = () => {
       jobTitle: jobTitle.trim(),
       linkedin: candidateLinkedIn.trim(),
       jobDescription: jobDescription.trim(),
+      scheduledTime: `${startTime} - ${endTime}`,
     };
   
     // Append the interview array (as a JSON string) so the backend gets "upcomingInterviews"
