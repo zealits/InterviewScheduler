@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
+import ical, { ICalCalendarMethod } from "ical-generator";
 import {
   User,
   Mail,
@@ -10,6 +11,7 @@ import {
   ArrowDown,
   X,
   Download,
+  Clock,
 } from "lucide-react";
 
 const UpcomingInterviews = () => {
@@ -44,10 +46,13 @@ const UpcomingInterviews = () => {
   }, [email]);
 
   // Helper function to create an object URL from PDF data
-  const createPdfObjectUrl = useCallback((pdfData, contentType = "application/pdf") => {
-    const blob = new Blob([new Uint8Array(pdfData)], { type: contentType });
-    return URL.createObjectURL(blob);
-  }, []);
+  const createPdfObjectUrl = useCallback(
+    (pdfData, contentType = "application/pdf") => {
+      const blob = new Blob([new Uint8Array(pdfData)], { type: contentType });
+      return URL.createObjectURL(blob);
+    },
+    []
+  );
 
   // Toggle sort order
   const handleSort = useCallback(() => {
@@ -59,7 +64,10 @@ const UpcomingInterviews = () => {
     (pdf) => {
       if (pdf && pdf.file && pdf.file.data) {
         try {
-          const objectUrl = createPdfObjectUrl(pdf.file.data, "application/pdf");
+          const objectUrl = createPdfObjectUrl(
+            pdf.file.data,
+            "application/pdf"
+          );
           setSelectedPdf({
             ...pdf,
             file: { ...pdf.file, objectUrl },
@@ -87,7 +95,10 @@ const UpcomingInterviews = () => {
     (pdf) => {
       if (pdf && pdf.file && pdf.file.data) {
         try {
-          const objectUrl = createPdfObjectUrl(pdf.file.data, pdf.file.contentType);
+          const objectUrl = createPdfObjectUrl(
+            pdf.file.data,
+            pdf.file.contentType
+          );
           const a = document.createElement("a");
           a.href = objectUrl;
           a.download = pdf.filename || "resume.pdf";
@@ -102,6 +113,39 @@ const UpcomingInterviews = () => {
     },
     [createPdfObjectUrl]
   );
+
+  // Handle adding interview to calendar and downloading the .ics file
+  const handleAddToCalendar = useCallback((interview) => {
+    const calendar = ical({ name: `${interview.jobTitle} Interview` });
+    // Use the "PUBLISH" method for better compatibility with Microsoft Calendar
+    calendar.method("PUBLISH");
+    const startTime = new Date(interview.scheduledDate);
+    const endTime = new Date(interview.scheduledDate);
+    endTime.setHours(endTime.getHours() + 1); // Assuming a 1-hour interview duration
+  
+    calendar.createEvent({
+      start: startTime,
+      end: endTime,
+      summary: interview.jobTitle,
+      description: `Interview with ${interview.name}. ${interview.details || ""}`.trim(),
+      // Optionally, add an organizer if required by Microsoft Calendar:
+      // organizer: { name: "Your Company", email: "no-reply@yourcompany.com" },
+    });
+  
+    const icsContent = calendar.toString();
+    const blob = new Blob([icsContent], {
+      type: "text/calendar;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${interview.jobTitle}-Interview.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, []);
+  
 
   // Memoized filtered and sorted interviews
   const filteredInterviews = useMemo(() => {
@@ -167,9 +211,12 @@ const UpcomingInterviews = () => {
         <button
           onClick={handleSort}
           className="flex items-center text-sm text-blue-600 hover:text-blue-800"
-          aria-label={`Sort by date (${sortOrder === "asc" ? "ascending" : "descending"})`}
+          aria-label={`Sort by date (${
+            sortOrder === "asc" ? "ascending" : "descending"
+          })`}
         >
-          {sortOrder === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />} Sort
+          {sortOrder === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />}{" "}
+          Sort
         </button>
       </div>
 
@@ -189,11 +236,13 @@ const UpcomingInterviews = () => {
               <div className="space-y-2">
                 <div className="flex items-center text-sm text-gray-600">
                   <Mail className="mr-2 text-blue-400" size={16} />
-                  {interview.name?.charAt(0).toUpperCase() + interview.name?.slice(1)}
+                  {interview.name?.charAt(0).toUpperCase() +
+                    interview.name?.slice(1)}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar className="mr-2 text-blue-400" size={16} />
                   {new Date(interview.scheduledDate).toLocaleString()}
+                 <Clock className="mr-2 text-blue-400" size={16} /> {interview.scheduledTime}
                 </div>
                 {interview.details && (
                   <p className="text-gray-500 italic text-sm">
@@ -211,6 +260,12 @@ const UpcomingInterviews = () => {
                 >
                   <Linkedin size={20} />
                 </a>
+                <button
+                  onClick={() => handleAddToCalendar(interview)}
+                  className="text-blue-600 hover:text-blue-800 transition"
+                >
+                  <Calendar size={20} />
+                </button>
                 <button
                   onClick={() => handlePdfClick(interview.resume)}
                   className="text-green-600 hover:text-green-800 transition"
