@@ -104,7 +104,7 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="mt-6 text-center">
+            {/* <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Having trouble accessing your account?{" "}
                 <a
@@ -114,7 +114,18 @@ const Login = () => {
                   Contact Support
                 </a>
               </p>
-            </div>
+            </div> */}
+            <div className="relative flex justify-center">
+                  <span className="py-4 bg-white text-sm text-gray-500">
+                    Don't have an account?
+                  </span>
+                  <button
+                    onClick={() => navigate("/user/register")}
+                    className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  >
+                    Create account
+                  </button>
+                </div>
           </div>
         </div>
       </div>

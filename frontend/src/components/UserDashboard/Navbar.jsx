@@ -1,35 +1,27 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { 
-  Home, 
-  LogOut, 
-  Menu, 
-  X, 
-  Bell, 
-  User, 
-  Settings 
-} from "lucide-react";
+import { Home, LogOut, Menu, X, Bell, User, Settings } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userEmail = localStorage.getItem("userEmail");
 
   const NavLinks = [
-    { 
-      icon: <Home size={20} />, 
-      label: "Home", 
-      path: "/" 
+    {
+      icon: <Home size={20} />,
+      label: "Home",
+      path: "/",
     },
-    { 
-      icon: <User size={20} />, 
-      label: "Profile", 
-      path: "/user/dashboard/profile-update" 
+    {
+      icon: <User size={20} />,
+      label: "Profile",
+      path: "/user/dashboard/profile-update",
     },
-    { 
-      icon: <Settings size={20} />, 
-      label: "Settings", 
-      path: "/user/settings" 
-    }
+    {
+      icon: <Settings size={20} />,
+      label: "Settings",
+      path: "/user/settings",
+    },
   ];
 
   const handleLogout = () => {
@@ -40,11 +32,11 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gradient-to-r from-blue-50 to-blue-100 shadow-md">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center relative">
+      <div className="mx-auto px-4 py-3 flex justify-between items-center relative">
         {/* Logo and Mobile Menu Toggle */}
         <div className="flex items-center space-x-4">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center space-x-2 text-xl font-bold text-gray-800 hover:text-blue-600 transition"
           >
             <Home className="text-blue-500" size={24} />
@@ -52,8 +44,8 @@ const Navbar = () => {
           </Link>
 
           {/* Mobile Menu Toggle */}
-          <button 
-            className="md:hidden text-gray-800"
+          <button
+            className="md:hidden text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-md"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -66,7 +58,7 @@ const Navbar = () => {
             <Link
               key={link.path}
               to={link.path}
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition"
+              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition hover:underline"
             >
               {link.icon}
               <span>{link.label}</span>
@@ -74,13 +66,13 @@ const Navbar = () => {
           ))}
 
           <div className="flex items-center space-x-4">
-            <button className="text-gray-600 hover:text-blue-600 transition">
+            <button className="text-gray-600 hover:text-blue-600 transition focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-md">
               <Bell size={20} />
             </button>
 
-            <button 
+            <button
               onClick={handleLogout}
-              className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
+              className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <LogOut size={18} />
               <span>Logout</span>
@@ -96,21 +88,21 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className="flex items-center space-x-3 p-2 hover:bg-blue-50 rounded-lg transition w-full"
+                  className="flex items-center space-x-3 p-2 hover:bg-blue-50 rounded-lg transition w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.icon}
                   <span>{link.label}</span>
                 </Link>
               ))}
-              
+
               <div className="flex items-center space-x-3">
-                <button className="text-gray-600 hover:text-blue-600">
+                <button className="text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-md">
                   <Bell size={20} />
                 </button>
-                <button 
+                <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
+                  className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <LogOut size={18} />
                   <span>Logout</span>

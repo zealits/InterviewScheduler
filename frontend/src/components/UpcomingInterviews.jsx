@@ -154,9 +154,8 @@ const UpcomingInterviews = () => {
         (interview) =>
           interview.confirmation === true &&
           (filterDate
-            ? new Date(interview.scheduledDate)
-                .toISOString()
-                .split("T")[0] === filterDate
+            ? new Date(interview.scheduledDate).toISOString().split("T")[0] ===
+              filterDate
             : true)
       )
       .sort((a, b) => {
@@ -215,7 +214,11 @@ const UpcomingInterviews = () => {
             sortOrder === "asc" ? "ascending" : "descending"
           })`}
         >
-          {sortOrder === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />}{" "}
+          {sortOrder === "asc" ? (
+            <ArrowUp size={16} />
+          ) : (
+            <ArrowDown size={16} />
+          )}{" "}
           Sort
         </button>
       </div>
@@ -241,9 +244,15 @@ const UpcomingInterviews = () => {
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar className="mr-2 text-blue-400" size={16} />
-                  {new Date(interview.scheduledDate).toLocaleString()}
-                 <Clock className="mr-2 text-blue-400" size={16} /> {interview.scheduledTime}
+                  {new Date(interview.scheduledDate).toLocaleDateString()}
                 </div>
+                <div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Clock className="mr-2 text-blue-400" size={16} />
+                    {interview.scheduledTime && ` ${interview.scheduledTime}`}
+                  </div>
+                </div>
+
                 {interview.details && (
                   <p className="text-gray-500 italic text-sm">
                     {interview.details}
