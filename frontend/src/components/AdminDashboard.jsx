@@ -11,7 +11,7 @@ import {
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 // import { fetchAdminData } from "../utils/api"; // Assume this fetches admin data
-import Navbar from "./Navbar";
+import Navbar from "../components/UserDashboard/Navbar";
 import Sidebar from "./UserDashboard/Sidebar";
 import { Menu } from "lucide-react";
 
@@ -23,25 +23,10 @@ const AdminDashboard = () => {
     "Manage interviews, track schedules, and optimize recruitment";
 
   return (
+    
     <div className="bg-gradient-to-br from-blue-50 to-blue-100">
       <div className=" mx-auto p-6">
-        {/* Animated Header */}
-        <Navbar className="flex justify-center animate-fade-in-down" title={title} description={description} />
-        {/* <Sidebar
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-        /> */}
-
-        {/* Toggle Sidebar Button */}
-        {/* {!isSidebarOpen && (
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="fixed top-4 left-4 z-40 p-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 ease-in-out"
-          >
-            <Menu size={24} />
-          </button>
-        )} */}
-
+        <Navbar title={title} description={description} />  
         {/* Calendar Section */}
         <div className="bg-white shadow-lg rounded-lg p-6">
           <div className="flex items-center justify-between ">

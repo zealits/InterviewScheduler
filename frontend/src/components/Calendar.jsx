@@ -1,5 +1,4 @@
 import {
-  
   Box,
   Typography,
   Button,
@@ -12,7 +11,7 @@ import {
   Divider,
 } from "@mui/material";
 import { useState, useEffect, useRef } from "react";
-import { CheckCircle, UserCheck, CalendarDays } from "lucide-react"; // Import UserCheck icon
+import { CheckCircle, UserCheck, CalendarDays } from "lucide-react";
 import axios from "axios";
 import moment from "moment";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
@@ -33,13 +32,17 @@ const CustomBigCalendar = () => {
     candidateName: "",
     candidateEmail: "",
     interviewerEmail: "",
+    interviewerName: "",
     candidateLinkedIn: "",
     jobTitle: "",
     jobDescription: "",
     resume: "",
     scheduledDate: "",
+    startTime: "",
+    endTime: "",
   });
-  const interviewersSectionRef = useRef(null);
+
+  const interviewersListRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,47 +52,60 @@ const CustomBigCalendar = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const data = response.data?.data || [];
+        const data = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
         const eventMap = new Map();
 
         data.forEach((user) => {
-          const dates =
-            user.customAvailability?.flatMap((entry) => entry.dates) || [];
+          // Normalize customAvailability dates
+          const customDates =
+            user.customAvailability?.flatMap((entry) =>
+              entry.dates.map((date) => {
+                const localDate = new Date(date);
+                return localDate.toISOString().slice(0, 10); // Ensure consistent format
+              })
+            ) || [];
+
+          // Normalize availabilityRange dates
           const rangeDates =
             user.availabilityRange?.flatMap((range) => {
-              if (!range.startDate || !range.endDate) return []; // Ensure valid data
+              if (!range.startDate || !range.endDate) return [];
               const startDate = new Date(range.startDate);
               const endDate = new Date(range.endDate);
-              const rangeDatesArray = [];
+              const datesArray = [];
               for (
                 let d = new Date(startDate);
                 d <= endDate;
-                d.setUTCDate(d.getUTCDate() + 1)
+                d.setDate(d.getDate() + 1)
               ) {
-                rangeDatesArray.push(new Date(d).toISOString().slice(0, 10));
+                const localDate = new Date(d);
+                datesArray.push(localDate.toISOString().slice(0, 10)); // Normalize date
               }
-              return rangeDatesArray;
+              return datesArray;
             }) || [];
 
-          [...dates, ...rangeDates].forEach((date) => {
-            if (!eventMap.has(date)) {
-              eventMap.set(date, []);
-            }
+          [...customDates, ...rangeDates].forEach((date) => {
+            if (!eventMap.has(date)) eventMap.set(date, []);
             eventMap.get(date).push(user);
           });
         });
 
-        const allEvents = Array.from(eventMap.entries()).map(
-          ([date, users]) => ({
-            title: `${users.length}`,
-            start: new Date(date),
-            end: new Date(date),
-            users,
-          })
-        );
+        // Remove entries with no users
+        const combinedEvents = Array.from(eventMap.entries())
+          .filter(([date, users]) => users.length > 0) // Filter out empty dates
+          .map(([date, users]) => {
+            const uniqueUsers = Array.from(new Set(users));
+            return {
+              title: `${uniqueUsers.length} Users`,
+              start: new Date(date),
+              end: new Date(date),
+              users: uniqueUsers,
+            };
+          });
 
-        setEvents(allEvents);
-        setFilteredEvents(allEvents);
+        setEvents(combinedEvents);
+        setFilteredEvents(combinedEvents);
       } catch (error) {
         console.error("Error fetching data:", error);
         alert("Failed to fetch calendar data.");
@@ -103,35 +119,71 @@ const CustomBigCalendar = () => {
     const clickedDate = slotInfo.start;
     setSelectedDate(clickedDate);
 
+    const selectedDateString = clickedDate.toISOString().slice(0, 10); // Normalize date format
+
     const eventsOnDate = filteredEvents.filter(
-      (event) =>
-        event.start.toISOString().slice(0, 10) ===
-        clickedDate.toISOString().slice(0, 10)
+      (event) => event.start.toISOString().slice(0, 10) === selectedDateString
     );
 
     const interviewersOnDate = eventsOnDate.flatMap((event) =>
-      event.users.map((user) => ({
-        name: `${user.name}`,
-        specialization: user.specialization,
-        availableTime:
-          user.availabilityRange
-            ?.map((range) => `${range.startTime} - ${range.endTime}`)
-            .join(", ") || "Not Specified",
-        experience: user.yearOfExperience
-          ? `${user.yearOfExperience} years`
-          : "N/A",
-        user,
-      }))
+      event.users.map((user) => {
+        // Extract time from customAvailability or availabilityRange
+        const customEntry = user.customAvailability?.find((entry) =>
+          entry.dates.some(
+            (date) =>
+              new Date(date).toISOString().slice(0, 10) === selectedDateString
+          )
+        );
+
+        const rangeEntry = user.availabilityRange?.find(
+          (range) =>
+            new Date(range.startDate) <= clickedDate &&
+            new Date(range.endDate) >= clickedDate
+        );
+
+        const startTime = customEntry
+          ? customEntry.startTime
+          : rangeEntry
+          ? rangeEntry.startTime
+          : "Not Specified";
+
+        const endTime = customEntry
+          ? customEntry.endTime
+          : rangeEntry
+          ? rangeEntry.endTime
+          : "Not Specified";
+
+        return {
+          name: user.name,
+          specialization: user.specialization,
+          availableTime: `${startTime} - ${endTime}`,
+          experience: user.yearOfExperience
+            ? `${user.yearOfExperience} years`
+            : "N/A",
+          startTime,
+          endTime,
+          user,
+        };
+      })
     );
 
     setSelectedDateInterviewers(interviewersOnDate);
-    setSelectedCandidate(null);
 
-    if (interviewersSectionRef.current) {
-      interviewersSectionRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    if (interviewersOnDate.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        starttime: interviewersOnDate[0].startTime,
+        endtime: interviewersOnDate[0].endTime,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        starttime: "Not Specified",
+        endtime: "Not Specified",
+      }));
+    }
+    if (interviewersListRef.current) {
+      interviewersListRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -139,10 +191,13 @@ const CustomBigCalendar = () => {
     setSelectedCandidate(candidate);
     setFormData((prev) => ({
       ...prev,
+      interviewerName: candidate?.name || "",
       interviewerEmail: candidate?.user?.email || "",
       scheduledDate: selectedDate
         ? moment(selectedDate).format("YYYY-MM-DD")
         : "",
+      startTime: candidate?.startTime || "",
+      endTime: candidate?.endTime || "",
     }));
   };
 
@@ -157,15 +212,17 @@ const CustomBigCalendar = () => {
           : event.users;
 
         return filteredUsers.length > 0
-          ? { ...event, users: filteredUsers, title: filteredUsers.length }
+          ? {
+              ...event,
+              users: filteredUsers,
+              title: `${filteredUsers.length} Users`,
+            }
           : null;
       })
       .filter(Boolean);
 
     setFilteredEvents(filtered);
 
-
-    // Update the interviewers list based on selected date and filter
     if (selectedDate) {
       const eventsOnDate = filtered.filter(
         (event) =>
@@ -173,10 +230,9 @@ const CustomBigCalendar = () => {
           selectedDate.toISOString().slice(0, 10)
       );
 
-
       const interviewersOnDate = eventsOnDate.flatMap((event) =>
         event.users
-          .filter((user) => !value || user.specialization === value) // Ensure only filtered specialization appears
+          .filter((user) => !value || user.specialization === value)
           .map((user) => ({
             name: user.name,
             specialization: user.specialization,
@@ -190,7 +246,6 @@ const CustomBigCalendar = () => {
             user,
           }))
       );
-
 
       setSelectedDateInterviewers(interviewersOnDate);
     } else {
@@ -206,35 +261,31 @@ const CustomBigCalendar = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     const {
       candidateEmail,
       candidateName,
-      // scheduledTime,
+      interviewerName,
       interviewerEmail,
       candidateLinkedIn,
       jobTitle,
       jobDescription,
       resume,
       scheduledDate,
+      startTime,
+      endTime,
     } = formData;
 
     if (
       !candidateEmail ||
       !candidateName ||
       !jobDescription ||
-      
       !jobTitle ||
-      
       !scheduledDate
-
     ) {
-      setShowPopup(false); // Show error popup
+      setShowPopup(false);
       return;
     }
 
-
-    // Ensure resume link ends with .pdf
     const pdfRegex = /^(https?:\/\/.*\.pdf(\?.*)?)$/i;
 
     if (!pdfRegex.test(resume.trim())) {
@@ -242,38 +293,35 @@ const CustomBigCalendar = () => {
       return;
     }
 
-
     const payload = {
       upcomingInterviews: [
         {
           email: candidateEmail.trim(),
           interviewerEmail: interviewerEmail.trim(),
+          interviewerName: interviewerName.trim(),
           name: candidateName.trim(),
           linkedin: candidateLinkedIn.trim(),
           resume: resume.trim(),
           jobDescription: jobDescription.trim(),
           jobTitle: jobTitle.trim(),
           scheduledDate: scheduledDate.trim(),
+          startTime: startTime.trim(),
+          endTime: endTime.trim(),
         },
       ],
     };
 
-
     const encodedEmail = encodeURIComponent(interviewerEmail.trim());
-
 
     try {
       await axios.post(
         `/api/interviewers/${encodedEmail}/upcoming-interviews`,
         payload,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+        { headers: { "Content-Type": "application/json" } }
       );
       setShowPopup(true);
     } catch (error) {
       console.error("Error submitting details:", error);
-      setShowPopup(false);
       setShowPopup(false);
     }
   };
@@ -282,7 +330,7 @@ const CustomBigCalendar = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#f5f5f5",
+        background: "linear-gradient(to right bottom, #f0f4ff, #f5f5f5)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -295,37 +343,39 @@ const CustomBigCalendar = () => {
           width: "100%",
           maxWidth: 1200,
           mx: "auto",
-          p: 4,
+          p: 0,
           mb: 4,
-          borderRadius: 3,
-          boxShadow: 3,
+          borderRadius: 4,
+          boxShadow: "0 10px 40px -10px rgba(0,0,0,0.15)",
+          overflow: "hidden",
         }}
       >
-        {/* Page Header */}
+        {/* Header Section */}
         <Box
           sx={{
+            background: "linear-gradient(135deg, #1976d2, #1565c0)",
+            p: 4,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 1,
-            mb: 2,
+            gap: 2,
           }}
         >
-          <CalendarDays size={30} color="#FF0000" />
-          <Typography variant="h4" color="primary" fontWeight="bold">
+          <CalendarDays size={35} color="#ffffff" />
+          <Typography variant="h4" fontWeight="bold" sx={{ color: "white" }}>
             Interviewer Availability Calendar
           </Typography>
         </Box>
-        <Divider sx={{ mb: 3 }} />
 
-        {/* Filter Fields */}
+        {/* Filter Section */}
         <Paper
           sx={{
             p: 3,
-            mb: 3,
-            borderRadius: 2,
-            boxShadow: 2,
-            bgcolor: "#fafafa",
+            m: 3,
+            borderRadius: 3,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+            bgcolor: "#ffffff",
+            border: "1px solid #e0e0e0",
           }}
         >
           <Grid container spacing={2}>
@@ -337,6 +387,14 @@ const CustomBigCalendar = () => {
                   value={filter.specialization}
                   onChange={handleFilterChange}
                   label="Filter by Specialization"
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                  }}
                 >
                   <MenuItem value="">All Specializations</MenuItem>
                   <MenuItem value="Cloud">Cloud</MenuItem>
@@ -349,63 +407,215 @@ const CustomBigCalendar = () => {
           </Grid>
         </Paper>
 
-        {/* Calendar Section */}
+        {/* Enhanced Calendar Box */}
         <Box
           sx={{
-            height: 750,
-            my: 3,
-            bgcolor: "white",
+            mx: 3,
+            mb: 3,
+            bgcolor: "#ffffff",
             borderRadius: 3,
-            boxShadow: 3,
-            p: 3,
-            overflowX: "auto",
-            border: "1px solid #e0e0e0",
+            overflow: "hidden",
+            border: "2px solid #1976d2",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
           }}
         >
-          <BigCalendar
-            localizer={localizer}
-            events={filteredEvents.map((event) => ({
-              ...event,
-              title: event.users.length, // Ensuring title holds count only
-            }))}
-            startAccessor="start"
-            endAccessor="end"
-            selectable
-            onSelectSlot={handleSelectSlot}
-            components={{
-              event: ({ event }) => (
+          {/* Calendar Header Strip */}
+          <Box
+            sx={{
+              background: "linear-gradient(135deg, #2196f3, #1565c0)",
+              p: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderBottom: "2px solid #1976d2",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ color: "white", fontWeight: "bold" }}
+            >
+              Interview Schedule
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Box
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    px: 1.5,
-                    py: 0.8,
-                    fontWeight: "bold",
-                    boxShadow: 2,
-                    justifyContent: "center",
-                    cursor: "pointer",
+                    width: 12,
+                    height: 12,
+                    bgcolor: "#4caf50",
+                    borderRadius: "50%",
                   }}
-                  onClick={() => handleSelectSlot({ start: event.start })}
-                >
-                  <UserCheck size={18} />
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {event.title}
-                  </Typography>
-                </Box>
-              ),
+                />
+                <Typography sx={{ color: "white", fontSize: "0.875rem" }}>
+                  Available
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    bgcolor: "#ff9800",
+                    borderRadius: "50%",
+                  }}
+                />
+                <Typography sx={{ color: "white", fontSize: "0.875rem" }}>
+                  Busy
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box
+            sx={{
+              height: 750,
+              p: 3,
+              overflowX: "auto",
+              "& .rbc-calendar": {
+                borderRadius: 2,
+                overflow: "hidden",
+                border: "1px solid #e0e0e0",
+              },
+              "& .rbc-header": {
+                padding: "12px 8px",
+                fontWeight: "bold",
+                background: "linear-gradient(to bottom, #f8f9fa, #f1f3f5)",
+                borderBottom: "2px solid #1976d2",
+                color: "#1976d2",
+                fontSize: "0.95rem",
+                textTransform: "uppercase",
+              },
+              "& .rbc-month-view": {
+                borderRadius: 2,
+                border: "1px solid #1976d2",
+              },
+              "& .rbc-day-bg": {
+                borderRight: "1px solid #e0e0e0",
+                borderBottom: "1px solid #e0e0e0",
+                transition: "background-color 0.2s",
+                "&:hover": {
+                  backgroundColor: "#f5f9ff",
+                },
+              },
+              "& .rbc-today": {
+                backgroundColor: "#e3f2fd",
+                border: "2px solid #1976d2",
+              },
+              "& .rbc-off-range-bg": {
+                backgroundColor: "#f8f9fa",
+              },
+              "& .rbc-date-cell": {
+                padding: "8px",
+                fontWeight: 500,
+                fontSize: "0.9rem",
+                "&.rbc-now": {
+                  color: "#1976d2",
+                  fontWeight: "bold",
+                },
+              },
+              "& .rbc-show-more": {
+                color: "#1976d2",
+                fontWeight: 500,
+                background: "rgba(25, 118, 210, 0.1)",
+                borderRadius: "4px",
+                padding: "2px 8px",
+              },
+              "& .rbc-event": {
+                borderRadius: "6px",
+                padding: "4px 8px",
+                backgroundColor: "#4caf50",
+                border: "none",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                "&.rbc-selected": {
+                  backgroundColor: "#2196f3",
+                },
+              },
+              "& .rbc-toolbar": {
+                marginBottom: "20px",
+                gap: "10px",
+                "& button": {
+                  color: "#1976d2",
+                  borderColor: "#1976d2",
+                  borderRadius: "8px",
+                  padding: "8px 16px",
+                  fontWeight: 500,
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    backgroundColor: "#e3f2fd",
+                  },
+                  "&.rbc-active": {
+                    backgroundColor: "#1976d2",
+                    color: "white",
+                  },
+                },
+              },
+              "& .rbc-month-row": {
+                borderLeft: "1px solid #e0e0e0",
+              },
             }}
-          />
+          >
+            <BigCalendar
+              localizer={localizer}
+              events={filteredEvents.map((event) => ({
+                ...event,
+                title: event.title,
+              }))}
+              startAccessor="start"
+              endAccessor="end"
+              selectable
+              onSelectSlot={handleSelectSlot}
+              components={{
+                event: ({ event }) => (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 1,
+                      py: 0.5,
+                      fontWeight: "bold",
+                      borderRadius: "6px",
+                      background: "linear-gradient(135deg, #4caf50, #43a047)",
+                      color: "white",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                      "&:hover": {
+                        transform: "scale(1.02)",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+                      },
+                    }}
+                    onClick={() => handleSelectSlot({ start: event.start })}
+                  >
+                    <UserCheck size={16} />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {event.title}
+                    </Typography>
+                  </Box>
+                ),
+              }}
+            />
+          </Box>
         </Box>
 
-        {/* Interviewers Available Section */}
-        {/* Display selected date title */}
+        {/* Selected Date Section */}
         {selectedDate && (
-          <Typography variant="h5" fontWeight="bold" sx={{ mt: 3, mb: 2 }}>
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            sx={{
+              mt: 3,
+              mb: 2,
+              px: 3,
+              color: "#1976d2",
+            }}
+          >
             Schedule of {moment(selectedDate).format("DD MMM YYYY")}
           </Typography>
         )}
 
+        {/* No Interviewers Message */}
         {selectedDateInterviewers.length === 0 ? (
           <Box
             sx={{
@@ -414,20 +624,27 @@ const CustomBigCalendar = () => {
               alignItems: "center",
               justifyContent: "center",
               textAlign: "center",
-              py: 4,
-              bgcolor: "#f9f9f9",
-              borderRadius: 2,
-              boxShadow: 2,
-              mt: 2,
+              py: 6,
+              mx: 3,
+              mb: 3,
+              bgcolor: "#f8faff",
+              borderRadius: 3,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              border: "1px solid #e0e0e0",
             }}
           >
-            <UserCheck size={50} color="#9e9e9e" />
+            <UserCheck size={60} color="#9e9e9e" />
             <Typography variant="h6" color="textSecondary" sx={{ mt: 2 }}>
               No Interviewers available on this date
             </Typography>
           </Box>
         ) : (
-          <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid
+            container
+            spacing={3}
+            sx={{ mt: 1, px: 3, mb: 3 }}
+            ref={interviewersListRef}
+          >
             {selectedDateInterviewers.map((interviewer, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Paper
@@ -435,48 +652,77 @@ const CustomBigCalendar = () => {
                     p: 3,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 1.5,
-                    borderRadius: 2,
-                    boxShadow: 3,
+                    gap: 2,
+                    borderRadius: 3,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                     bgcolor: "white",
+                    border: "1px solid #e0e0e0",
+                    transition: "transform 0.2s, box-shadow 0.2s",
+                    "&:hover": {
+                      transform: "translateY(-4px)",
+                      boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+                    },
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <UserCheck size={20} color="#1976d2" />
-                    <Typography variant="body1" fontWeight="bold">
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                    <Box
+                      sx={{
+                        bgcolor: "#f0f7ff",
+                        p: 1,
+                        borderRadius: "50%",
+                      }}
+                    >
+                      <UserCheck size={24} color="#1976d2" />
+                    </Box>
+                    <Typography variant="h6" fontWeight="bold" color="primary">
                       {interviewer.name}
                     </Typography>
                   </Box>
 
-                  <Typography variant="body2" color="textSecondary">
-                    <strong>Specialization:</strong> {interviewer.specialization}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    <strong>Experience:</strong> {interviewer.experience}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    <strong>Availability:</strong> {interviewer.availableTime}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    <strong>Specialization:</strong>{" "}
-                    {interviewer.specialization}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    <strong>Experience:</strong> {interviewer.experience}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    <strong>Availability:</strong> {interviewer.availableTime}
-                  </Typography>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                  >
+                    <Typography variant="body2">
+                      <strong>Specialization:</strong>{" "}
+                      <Box
+                        component="span"
+                        sx={{
+                          bgcolor: "#f0f7ff",
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: "full",
+                          color: "#1976d2",
+                          ml: 1,
+                        }}
+                      >
+                        {interviewer.specialization}
+                      </Box>
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Experience:</strong> {interviewer.experience}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Availability:</strong> {interviewer.availableTime}
+                    </Typography>
+                  </Box>
 
                   <Button
                     variant="contained"
                     color="primary"
-                    size="small"
-                    sx={{ mt: 2, alignSelf: "flex-start" }}
-                    startIcon={<CheckCircle size={18} />}
+                    size="large"
+                    sx={{
+                      mt: 1,
+                      textTransform: "none",
+                      borderRadius: 2,
+                      boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
+                      "&:hover": {
+                        boxShadow: "0 6px 16px rgba(25, 118, 210, 0.3)",
+                      },
+                    }}
+                    startIcon={<CheckCircle size={20} />}
                     onClick={() => handleViewDetails(interviewer)}
                   >
-                    Schedule
+                    Schedule Interview
                   </Button>
                 </Paper>
               </Grid>
@@ -484,8 +730,7 @@ const CustomBigCalendar = () => {
           </Grid>
         )}
 
-
-        {/* Interviewer Details Modal (Centered Card) */}
+        {/* Interviewer Details Modal */}
         <InterviewerDetails
           selectedCandidate={selectedCandidate}
           formData={formData}
@@ -495,8 +740,6 @@ const CustomBigCalendar = () => {
         />
       </Paper>
     </Box>
-
-
   );
 };
 
