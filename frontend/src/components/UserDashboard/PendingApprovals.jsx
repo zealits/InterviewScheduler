@@ -33,7 +33,7 @@ const PendingApprovals = () => {
     const fetchPendingApprovals = async () => {
       try {
         const response = await axios.get(
-          `/api/interviewers/${email}/upcoming-interviews`
+          `/api/interviewers/${email}/pending-interviews`
         );
         // Only include pending (non-confirmed) interviews
         setPendingInterviews(

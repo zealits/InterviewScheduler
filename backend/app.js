@@ -7,7 +7,6 @@ const emailRoutes = require("./routes/emailRoutes");
 const updateProfile = require("./routes/UpdateProfile");
 const path = require("path");
 const app = express();
-
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -19,7 +18,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/interviewers", interviewerRoutes);
 app.use("/api/user", getavailable);
 app.use("/api", updateProfile);
-// app.use("/api", emailRoutes);
+
+
 
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 

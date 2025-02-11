@@ -23,6 +23,31 @@ exports.uploadPDF = upload.single("resume");
 //     res.status(500).json({ message: "Server error", error: error.message });
 //   }
 // };
+
+exports.getAllPending = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Map only the required fields for each interview
+    const updatedInterviews = user.upcomingInterviews.map((interview) => ({
+      _id: interview._id, // Include _id for identification
+      jobTitle: interview.jobTitle,
+      name: interview.name,
+      scheduledDate: interview.scheduledDate,
+      scheduledTime: interview.scheduledTime,
+      confirmation: interview.confirmation,
+    }));
+
+    res.status(200).json({ upcomingInterviews: updatedInterviews });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 exports.getAllUpcoming = async (req, res) => {
   try {
     const { email } = req.params;

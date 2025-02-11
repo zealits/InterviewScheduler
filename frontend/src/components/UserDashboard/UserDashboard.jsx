@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "./UserDashboard/Navbar";
-import Sidebar from "./UserDashboard/Sidebar";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 import { Menu } from "lucide-react";
 
 const UserDashboard = () => {
