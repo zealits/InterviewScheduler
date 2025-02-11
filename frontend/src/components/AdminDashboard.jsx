@@ -11,22 +11,22 @@ import {
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 // import { fetchAdminData } from "../utils/api"; // Assume this fetches admin data
-import Navbar from "../components/UserDashboard/Navbar";
+import Navbar from "../components/Navbar";
 import Sidebar from "./UserDashboard/Sidebar";
 import { Menu } from "lucide-react";
 
 
 const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const title = "Recruiter Dashboard";
+  const title = "Recruiter ";
   const description =
     "Manage interviews, track schedules, and optimize recruitment";
 
   return (
     
     <div className="bg-gradient-to-br from-blue-50 to-blue-100">
-      <div className=" mx-auto p-6">
-        <Navbar title={title} description={description} />  
+      <div className=" mx-auto ">
+        <Navbar title={title}  />  
         {/* Calendar Section */}
         <div className="bg-white shadow-lg rounded-lg p-6">
           <div className="flex items-center justify-between ">
