@@ -11,7 +11,11 @@ router.get("/user", async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    const user = await User.findOne({ email }).select("-password"); // Exclude the hashed password
+    // Only select the fields needed for the UpdateProfile form
+    const user = await User.findOne({ email }).select(
+      "name email linkedinProfile yearOfExperience experienceAsInterviewer candidatesInterviewed specialization"
+    );
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -22,6 +26,7 @@ router.get("/user", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 
 // Update user profile
 router.put("/profile", async (req, res) => {
