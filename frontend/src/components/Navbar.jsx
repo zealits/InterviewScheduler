@@ -1,38 +1,42 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { Home, LogOut } from "lucide-react";
+
 import LogoutButton from "./LogoutButton";
 
-const Navbar = ({ title, description }) => {
+const Navbar = ({ title, onLogout }) => {
+
+  
+
   return (
-    <nav className=" bg-gradient-to-r from-blue-50 to-blue-100 shadow-md py-4 px-6">
-      <div className="container mx-auto flex flex-row justify-between">
-        {/* Logo or Home Link */}
-        {/* <Link
-          to="/"
-          className="flex items-center space-x-2 text-xl font-bold text-gray-800 hover:text-blue-600 transition duration-300 group"
-        >
-          <Home
-            className="text-blue-500 group-hover:rotate-12 transition-transform"
-            size={24}
-          />
-          <span>Home</span>
-        </Link> */}
+    <nav className="relative">
+      {/* Background with gradient and glass effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 opacity-90" />
 
-        {/* Content passed as props */}
-        <div className="text-center mb-8 animate-fade-in-down">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 mb-2 mt-10">
-            {title}
-          </h1>
-          <p className="text-sm text-gray-600 max-w-xl mx-auto">
-            {description}
-          </p>
+      {/* Glass overlay */}
+      <div className="absolute inset-0 backdrop-blur-sm" />
+
+      {/* Content */}
+      <div className="relative">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            {/* Title with animated underline */}
+            <div className="group">
+              <h1 className="text-2xl font-bold text-white tracking-wide">
+                {title}
+              </h1>
+              <div className="h-0.5 w-0 group-hover:w-full bg-white transition-all duration-300 ease-in-out" />
+            </div>
+
+            {/* Right side with logout */}
+            <div className="flex items-center">
+
+              <LogoutButton onLogout={onLogout} />
+            </div>
+          </div>
         </div>
 
-        {/* Navigation Links */}
-        <div className="flex items-center space-x-4">
-          <LogoutButton />
-        </div>
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl" />
+        <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-32 h-32 bg-blue-200 opacity-10 rounded-full blur-xl" />
       </div>
     </nav>
   );
