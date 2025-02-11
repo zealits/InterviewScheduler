@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const app = require("./app");
-
+const morgan = require("morgan");
+app.use(morgan('dev'));  // 'dev' format gives concise colored output
 dotenv.config({ path: "config/.env" });
 
 // MongoDB Connection

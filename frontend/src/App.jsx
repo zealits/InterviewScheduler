@@ -1,20 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import AdminDashboard from "./components/AdminDashboard";
-import InterviewerDetails from "./components/InterviewerDetails";
-import { ProtectedRoute, ProtectedRouteUser } from "./routes/ProtectedRoute";
-
+import AdminDashboard from "./components/RecruiterDashboard/AdminDashboard";
+import InterviewerDetails from "./components/RecruiterDashboard/InterviewerDetails";
+import { ProtectedRoute, ProtectedRouteUser } from "./routes/ProtectedRoute"; 
 import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Register";
 import RegisterUser from "./pages/UserLogin/Register";
 import LoginUser from "./pages/UserLogin/Login";
-import UserDashboard from "./components/UserDashboard";
-import Availibility from "./components/Availibility";
-import UpcomingInterviews from "./components/UpcomingInterviews";
+import UserDashboard from "./components/UserDashboard/UserDashboard";
+import Availibility from "./components/UserDashboard/Availibility";
+import UpcomingInterviews from "./components/UserDashboard/UpcomingInterviews";
 import ProfileUpdate from "./components/UserDashboard/ProfileUpdate";
 import PendingApprovals from "./components/UserDashboard/PendingApprovals";
-import UserHome from "./components/UserDashboard/UserHome";
+import UserHome from "./components/UserDashboard/UserHome";   
+
 function App() {
   return (
     <Router>

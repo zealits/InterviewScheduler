@@ -9,7 +9,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 // import { fetchAdminData } from "../utils/api"; // Assume this fetches admin data
 import Navbar from "../components/Navbar";
 import Sidebar from "./UserDashboard/Sidebar";

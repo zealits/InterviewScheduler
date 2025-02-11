@@ -13,7 +13,7 @@ import {
   Download,
   Clock,
 } from "lucide-react";
-import PopupData from "../model/PopupData";
+import PopupData from "../../model/PopupData";
 
 const UpcomingInterviews = () => {
   const [interviews, setInterviews] = useState([]);
