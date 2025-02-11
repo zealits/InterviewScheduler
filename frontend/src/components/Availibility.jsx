@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import axios from "axios";
-import DatePicker from "react-datepicker";
+import React, { useState, Suspense } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+
+// Lazy load the DatePicker component
+const DatePicker = React.lazy(() => import("react-datepicker"));
 
 const Availibility = () => {
   const [availabilityType, setAvailabilityType] = useState("range");
@@ -86,6 +87,9 @@ const Availibility = () => {
 
   const handleSubmit = async () => {
     try {
+      // Lazy load Axios when the submit button is clicked
+      const { default: axios } = await import("axios");
+
       let payload = {};
       if (availabilityType === "range" && validateRange()) {
         payload = {
@@ -190,22 +194,24 @@ const Availibility = () => {
               <label className="block text-sm font-medium text-gray-700">
                 Date Range:
               </label>
-              <DatePicker
-                selectsRange
-                startDate={availabilityRange.range[0]}
-                endDate={availabilityRange.range[1]}
-                onChange={(range) => {
-                  setAvailabilityRange({
-                    ...availabilityRange,
-                    range,
-                    startDate: range[0] || null, // Synchronize startDate
-                    endDate: range[1] || null, // Synchronize endDate
-                  });
-                }}
-                minDate={new Date()} // Disable past dates
-                className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
-                placeholderText="Select date range"
-              />
+              <Suspense fallback={<div>Loading date picker...</div>}>
+                <DatePicker
+                  selectsRange
+                  startDate={availabilityRange.range[0]}
+                  endDate={availabilityRange.range[1]}
+                  onChange={(range) => {
+                    setAvailabilityRange({
+                      ...availabilityRange,
+                      range,
+                      startDate: range[0] || null, // Synchronize startDate
+                      endDate: range[1] || null, // Synchronize endDate
+                    });
+                  }}
+                  minDate={new Date()} // Disable past dates
+                  className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                  placeholderText="Select date range"
+                />
+              </Suspense>
             </div>
             <label className="block text-sm font-medium text-gray-700">
               Timezone:
@@ -277,23 +283,25 @@ const Availibility = () => {
               Select Custom Dates:
             </label>
             <div className="border border-gray-300 rounded p-2">
-              <DatePicker
-                selected={null}
-                onChange={(date) => {
-                  if (
-                    customDates.some(
-                      (d) => d.toDateString() === date.toDateString()
-                    )
-                  ) {
-                    alert("This date is already selected.");
-                    return;
-                  }
-                  handleAddCustomDate(date);
-                }}
-                minDate={new Date()} // Disable past dates
-                className="w-full focus:ring-2 focus:ring-blue-500"
-                inline
-              />
+              <Suspense fallback={<div>Loading date picker...</div>}>
+                <DatePicker
+                  selected={null}
+                  onChange={(date) => {
+                    if (
+                      customDates.some(
+                        (d) => d.toDateString() === date.toDateString()
+                      )
+                    ) {
+                      alert("This date is already selected.");
+                      return;
+                    }
+                    handleAddCustomDate(date);
+                  }}
+                  minDate={new Date()} // Disable past dates
+                  className="w-full focus:ring-2 focus:ring-blue-500"
+                  inline
+                />
+              </Suspense>
             </div>
             {customDates.length > 0 ? (
               <div>
@@ -364,7 +372,6 @@ const Availibility = () => {
                   className="w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   End Time:
