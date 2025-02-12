@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const app = require("./app");
 const morgan = require("morgan");
 app.use(morgan('dev'));  // 'dev' format gives concise colored output
-dotenv.config({ path: "config/.env" });
+dotenv.config({ path: "config/config.env" }); 
 
 // MongoDB Connection
 mongoose

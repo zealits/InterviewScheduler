@@ -9,14 +9,7 @@ function UserHome() {
       </header>
 
       <main className="flex flex-col gap-6 w-full max-w-3xl mt-6">
-        <div className="bg-white rounded-lg shadow p-4 flex items-center gap-4 hover:bg-blue-50">
-          <Home className="text-blue-600" size={32} />
-          <div>
-            <h2 className="text-lg font-bold">Home</h2>
-            <p className="text-gray-600">Explore the main dashboard for an overview of all features.</p>
-          </div>
-        </div>
-
+      
         <div className="bg-white rounded-lg shadow p-4 flex items-center gap-4 hover:bg-blue-50">
           <Calendar className="text-blue-600" size={32} />
           <div>
@@ -49,17 +42,11 @@ function UserHome() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-4 flex items-center gap-4 hover:bg-blue-50">
-          <LogOut className="text-blue-600" size={32} />
-          <div>
-            <h2 className="text-lg font-bold">Logout</h2>
-            <p className="text-gray-600">Sign out of your account securely.</p>
-          </div>
-        </div>
+       
       </main>
 
       <footer className="bg-gray-200 w-full text-center py-4 mt-6">
-        <p className="text-gray-600">© 2024 Your Company Name. All rights reserved.</p>
+        <p className="text-gray-600">© 2025 Your Company Name. All rights reserved.</p>
       </footer>
     </div>
   );
