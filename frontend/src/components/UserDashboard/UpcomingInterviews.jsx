@@ -75,28 +75,29 @@ const UpcomingInterviews = () => {
     setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
   }, []);
 
-  // Handle viewing the PDF in the modal with validation
+  // Handle viewing the PDF in the modal with on-demand fetching
   const handlePdfClick = useCallback(
-    (pdf) => {
-      if (!pdf || !pdf.file || !pdf.file.data) {
-        setPopup({ isOpen: true, message: "PDF data is not available." });
+    async (interview) => {
+      if (!interview.hasResume) {
+        setPopup({ isOpen: true, message: "Resume data is not available." });
         return;
       }
       try {
-        const objectUrl = createPdfObjectUrl(pdf.file.data, "application/pdf");
+        const response = await axios.get(
+          `/api/interviewers/${email}/interviews/${interview._id}/resume`,
+          { responseType: "arraybuffer" }
+        );
+        const objectUrl = createPdfObjectUrl(response.data, "application/pdf");
         setSelectedPdf({
-          ...pdf,
-          file: { ...pdf.file, objectUrl },
+          filename: interview.resumeFilename || "Resume.pdf",
+          file: { objectUrl },
         });
       } catch (error) {
-        console.error("Error creating object URL for PDF:", error);
-        setPopup({
-          isOpen: true,
-          message: "An error occurred while preparing the PDF viewer.",
-        });
+        console.error("Error fetching PDF:", error);
+        setPopup({ isOpen: true, message: "Failed to fetch resume PDF." });
       }
     },
-    [createPdfObjectUrl]
+    [createPdfObjectUrl, email]
   );
 
   // Handle closing the PDF modal and cleaning up the URL
@@ -107,21 +108,25 @@ const UpcomingInterviews = () => {
     setSelectedPdf(null);
   }, [selectedPdf]);
 
-  // Handle downloading the PDF with validation
+  // Handle downloading the PDF with on-demand fetching
   const handleDownload = useCallback(
-    (pdf) => {
-      if (!pdf || !pdf.file || !pdf.file.data) {
+    async (interview) => {
+      if (!interview.hasResume) {
         setPopup({
           isOpen: true,
-          message: "PDF data is not available for download.",
+          message: "Resume data is not available for download.",
         });
         return;
       }
       try {
-        const objectUrl = createPdfObjectUrl(pdf.file.data, pdf.file.contentType);
+        const response = await axios.get(
+          `/api/interviewers/${email}/interviews/${interview._id}/resume`,
+          { responseType: "arraybuffer" }
+        );
+        const objectUrl = createPdfObjectUrl(response.data, "application/pdf");
         const a = document.createElement("a");
         a.href = objectUrl;
-        a.download = pdf.filename || "resume.pdf";
+        a.download = interview.resumeFilename || "resume.pdf";
         a.click();
         URL.revokeObjectURL(objectUrl);
       } catch (error) {
@@ -129,7 +134,7 @@ const UpcomingInterviews = () => {
         setPopup({ isOpen: true, message: "Failed to download PDF." });
       }
     },
-    [createPdfObjectUrl]
+    [createPdfObjectUrl, email]
   );
 
   // Handle adding interview to calendar and downloading the .ics file
@@ -287,14 +292,14 @@ const UpcomingInterviews = () => {
                     <Calendar size={20} />
                   </button>
                   <button
-                    onClick={() => handlePdfClick(interview.resume)}
+                    onClick={() => handlePdfClick(interview)}
                     className="text-green-600 hover:text-green-800 transition"
                     aria-label="View Resume"
                   >
                     <FileText size={20} />
                   </button>
                   <button
-                    onClick={() => handleDownload(interview.resume)}
+                    onClick={() => handleDownload(interview)}
                     className="text-green-600 hover:text-green-800 transition"
                     aria-label="Download Resume"
                   >
