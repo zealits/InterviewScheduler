@@ -2,64 +2,27 @@ const User = require("../models/User");
 
 const getAvailabilityForCalendar = async (req, res) => {
   try {
-    // Fetch all user data
+    // Fetch only the required fields from all users
     const users = await User.find(
       {},
-      "name email linkedinProfile yearOfExperience experienceAsInterviewer specialization availabilityRange customAvailability upcomingInterviews"
+      "name email linkedinProfile specialization customAvailability availabilityRange upcomingInterviews yearOfExperience experienceAsInterviewer"
     );
 
-    // Map user data to include availability and interview details
+    // Map the data so that only the required fields are sent.
+    // (You can further process or remove any fields that your frontend does not need.)
     const userDetails = users.map((user) => ({
       name: user.name,
       email: user.email,
       linkedinProfile: user.linkedinProfile,
+      specialization: user.specialization,
       yearOfExperience: user.yearOfExperience,
       experienceAsInterviewer: user.experienceAsInterviewer,
-      specialization: user.specialization,
-      availabilityRange: user.availabilityRange,
-      customAvailability: user.customAvailability,
-      upcomingInterviews: user.upcomingInterviews,
-      availabilityEvents: [
-        // Availability Range Events
-        ...user.availabilityRange.map((range) => ({
-          title: "Available",
-          start: range.startDate,
-          end: range.endDate,
-          extendedProps: {
-            startTime: range.startTime,
-            endTime: range.endTime,
-            specialization: user.specialization,
-          },
-          backgroundColor: "lightgreen",
-          borderColor: "green",
-        })),
-        // Custom Availability Events
-        ...user.customAvailability.flatMap((entry) =>
-          entry.dates.map((date) => ({
-            title: "Custom Availability",
-            start: date,
-            extendedProps: {
-              specialization: user.specialization,
-            },
-            backgroundColor: "lightblue",
-            borderColor: "blue",
-          }))
-        ),
-        // Upcoming Interview Events
-        ...user.upcomingInterviews.map((interview) => ({
-          title: `Interview: ${interview.email}`,
-          start: interview.scheduledDate,
-          extendedProps: {
-            details: interview.details,
-            specialization: user.specialization,
-          },
-          backgroundColor: "lightcoral",
-          borderColor: "red",
-        })),
-      ],
+      customAvailability: user.customAvailability, // Expected to be an array of entries (each with dates, startTime, endTime)
+      availabilityRange: user.availabilityRange,   // Expected to be an array of ranges (each with startDate, endDate, startTime, endTime)
+      // upcomingInterviews: user.upcomingInterviews,   // Only include if needed for calendar events
+
     }));
 
-    // Respond with all user data including availability and events
     res.status(200).json({ data: userDetails });
   } catch (error) {
     console.error("Error fetching availability:", error);
