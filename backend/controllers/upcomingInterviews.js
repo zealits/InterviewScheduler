@@ -48,37 +48,8 @@ exports.getAllPending = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-exports.getAllUpcoming = async (req, res) => {
-  try {
-    const { email } = req.params;
-    const user = await User.findOne({ email });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
-    // Map and encode resume file as Base64
-    const updatedInterviews = user.upcomingInterviews.map((interview) => {
-      if (interview.resume && interview.resume.file && interview.resume.file.data) {
-        return {
-          ...interview,
-          resume: {
-            ...interview.resume,
-            file: {
-              contentType: interview.resume.file.contentType, // Ensure content type is preserved
-              data: Buffer.from(interview.resume.file.data).toString("base64"),
-            },
-          },
-        };
-      }
-      return interview;
-    });
-
-    res.status(200).json({ upcomingInterviews: updatedInterviews });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
 
 
 
@@ -114,27 +85,76 @@ exports.postAllUpcoming = async (req, res) => {
     }
 
     for (const interview of upcomingInterviews) {
-      if (!interview.email || !interview.scheduledDate || !interview.name || !interview.jobTitle || !interview.scheduledTime) {
+      if (
+        !interview.email ||
+        !interview.scheduledDate ||
+        !interview.name ||
+        !interview.jobTitle ||
+        !interview.scheduledTime
+      ) {
         return res.status(400).json({
           message: "Missing required fields in one or more interview entries",
         });
       }
 
+      // If a resume file is provided, attach resume data and related info
       if (req.file) {
+        interview.hasResume = true;
         interview.resume = {
           filename: req.file.originalname,
           contentType: req.file.mimetype,
           file: req.file.buffer,
         };
+        interview.resumeFilename = req.file.originalname;
+      } else {
+        interview.hasResume = false;
       }
 
       user.upcomingInterviews.push(interview);
     }
 
     await user.save();
-    // console.log("User:", user);
     res.status(201).json({ message: "Interviews added successfully", user });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+// Get upcoming interviews without sending the resume file data
+exports.getUpcomingInterviews = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({ email }).select("upcomingInterviews");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // For each interview, remove the resume file data but include a flag and filename
+    const interviews = user.upcomingInterviews.map((interview) => {
+      const { resume, ...rest } = interview.toObject();
+      return { ...rest, hasResume: !!resume, resumeFilename: resume ? resume.filename : null };
+    });
+    res.status(200).json({ upcomingInterviews: interviews });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Endpoint to get the resume PDF for a specific interview
+exports.getInterviewResume = async (req, res) => {
+  try {
+    const { email, interviewId } = req.params;
+    const user = await User.findOne({ email }).select("upcomingInterviews");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const interview = user.upcomingInterviews.id(interviewId);
+    if (!interview || !interview.resume) {
+      return res.status(404).json({ message: "Resume not found" });
+    }
+    res.set("Content-Type", interview.resume.contentType);
+    res.send(interview.resume.file);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
