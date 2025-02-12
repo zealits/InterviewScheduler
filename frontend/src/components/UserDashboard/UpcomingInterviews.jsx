@@ -278,6 +278,7 @@ const UpcomingInterviews = () => {
                 <div className="flex justify-between mt-4 pt-2 border-t">
                   <a
                     href={interview.linkedin}
+                    title="LinkedIn Profile" // Tooltip text
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800 transition"
@@ -286,25 +287,29 @@ const UpcomingInterviews = () => {
                     <Linkedin size={20} />
                   </a>
                   <button
+                    title="Add to Calendar" // Tooltip text
                     onClick={() => handleAddToCalendar(interview)}
                     className="text-blue-600 hover:text-blue-800 transition"
                   >
                     <Calendar size={20} />
                   </button>
                   <button
-                    onClick={() => handlePdfClick(interview)}
-                    className="text-green-600 hover:text-green-800 transition"
-                    aria-label="View Resume"
-                  >
-                    <FileText size={20} />
-                  </button>
-                  <button
-                    onClick={() => handleDownload(interview)}
-                    className="text-green-600 hover:text-green-800 transition"
-                    aria-label="Download Resume"
-                  >
-                    <Download size={20} />
-                  </button>
+  title="View Resume PDF" // Tooltip text
+  onClick={() => handlePdfClick(interview)}
+  className="text-green-600 hover:text-green-800 transition"
+  aria-label="View Resume"
+>
+  <FileText size={20} />
+</button>
+<button
+  title="Download Resume PDF" // Tooltip text
+  onClick={() => handleDownload(interview)}
+  className="text-green-600 hover:text-green-800 transition"
+  aria-label="Download Resume"
+>
+  <Download size={20} />
+</button>
+
                 </div>
               </div>
             ))}
