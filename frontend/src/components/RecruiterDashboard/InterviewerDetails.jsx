@@ -361,9 +361,20 @@ const InterviewerDetails = ({
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
               >
+                <User size={16} color="#666" />
+                <Typography variant="body2" fontWeight="medium">
+                  Interviewer Name:
+                </Typography>
+                <Typography variant="body2">  
+                  {formData.interviewerName}
+                </Typography>
+              </Box>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
                 <Mail size={16} color="#666" />
                 <Typography variant="body2" fontWeight="medium">
-                  Interviewer:
+                  Interviewer Email:
                 </Typography>
                 <Typography variant="body2">
                   {formData.interviewerEmail}

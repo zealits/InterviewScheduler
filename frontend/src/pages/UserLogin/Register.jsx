@@ -7,6 +7,8 @@ const RegisterUser = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const [modalData, setModalData] = useState({ title: "", message: "" });
+  const [specialization, setSpecialization] = useState("");
+  const [customSpecialization, setCustomSpecialization] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -17,7 +19,8 @@ const RegisterUser = () => {
       linkedinProfile: e.target.linkedinProfile.value,
       yearOfExperience: parseInt(e.target.yearOfExperience.value, 10),
       experienceAsInterviewer: e.target.experienceAsInterviewer.checked,
-      specialization: e.target.specialization.value,
+      specialization: specialization === "Other" ? customSpecialization : specialization,
+
       candidatesInterviewed: parseInt(e.target.candidatesInterviewed.value, 10),
     };
 
@@ -144,21 +147,44 @@ const RegisterUser = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Specialization
-                </label>
-                <select
-                  name="specialization"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                >
-                  <option value="">Select your specialization</option>
-                  <option value="Cloud">Cloud Computing</option>
-                  <option value="AI">Artificial Intelligence</option>
-                  <option value="Language">Programming Languages</option>
-                  <option value="Domain">Domain Expertise</option>
-                </select>
-              </div>
+  <label className="text-sm font-medium text-gray-700">
+    Specialization
+  </label>
+  <select
+    name="specialization"
+    required
+    value={specialization}
+    onChange={(e) => setSpecialization(e.target.value)}
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+  >
+    <option value="">Select your specialization</option>
+    <option value="Cloud">Cloud Computing</option>
+    <option value="AI">Artificial Intelligence</option>
+    <option value="Language">Programming Languages</option>
+    <option value="Domain">Domain Expertise</option>
+    <option value="Other">Other</option>
+  </select>
+</div>
+
+{specialization === "Other" && (
+  <div className="space-y-2">
+    <label className="text-sm font-medium text-gray-700">
+      Specify Your Specialization
+    </label>
+    <input
+      type="text"
+      name="customSpecialization"
+      value={customSpecialization}
+      onChange={(e) => setCustomSpecialization(e.target.value)}
+      placeholder="Enter your specialization"
+      required
+      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+    />
+  </div>
+)}
+
+
+
             </div>
 
             <div className="pt-4">
