@@ -188,6 +188,11 @@ const PendingApprovals = () => {
                   <div className="flex items-center text-sm text-gray-600">
                     <Calendar className="mr-2 text-blue-400" size={16} />
                     Date: {new Date(interview.scheduledDate).toLocaleDateString()}{" "}
+                   
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Calendar className="mr-2 text-blue-400" size={16} />
+                    Time: {interview.scheduledTime} 
                     {
                       Intl.DateTimeFormat(undefined, {
                         timeZoneName: "short",
@@ -195,10 +200,6 @@ const PendingApprovals = () => {
                         .formatToParts(new Date(interview.scheduledDate))
                         .find((part) => part.type === "timeZoneName").value
                     }
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="mr-2 text-blue-400" size={16} />
-                    Time: {interview.scheduledTime}
                   </div>
                 </div>
                 <div className="flex justify-between mt-4">
