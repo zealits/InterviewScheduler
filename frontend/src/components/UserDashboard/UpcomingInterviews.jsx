@@ -239,7 +239,7 @@ const UpcomingInterviews = () => {
           className="flex items-center text-sm text-blue-600 hover:text-blue-800"
           aria-label={`Sort by date (${sortOrder === "asc" ? "ascending" : "descending"})`}
         >
-          {sortOrder === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />} Sort by date
+          {sortOrder === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />} Sort
         </button>
       </div>
 

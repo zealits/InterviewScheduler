@@ -4,9 +4,7 @@ import axios from "axios";
 const UpdateProfile = () => {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [customSpecialization, setCustomSpecialization] = useState("");
-  
-  
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       const email = localStorage.getItem("userEmail");
@@ -14,19 +12,10 @@ const UpdateProfile = () => {
         alert("No email found in localStorage");
         return;
       }
-  
+
       try {
         const response = await axios.get(`/api/user?email=${email}`);
-        const fetchedData = response.data;
-  
-        // If specialization is not in the predefined list, treat it as "Other"
-        const validSpecializations = ["Cloud", "AI", "Language", "Domain"];
-        if (!validSpecializations.includes(fetchedData.specialization)) {
-          setCustomSpecialization(fetchedData.specialization);
-          fetchedData.specialization = "Other";
-        }
-  
-        setUserData(fetchedData);
+        setUserData(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
         alert("Failed to fetch user details.");
@@ -34,29 +23,20 @@ const UpdateProfile = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchUserDetails();
   }, []);
-  
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-  
-    const updatedData = {
-      ...userData,
-      specialization:
-        userData.specialization === "Other" ? customSpecialization : userData.specialization,
-    };
-  
     try {
-      await axios.put("/api/profile", updatedData);
+      const response = await axios.put("/api/profile", userData);
       alert("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile.");
     }
   };
-  
 
   const handleInputChange = (field, value) => {
     setUserData((prevData) => ({ ...prevData, [field]: value }));
@@ -153,51 +133,23 @@ const UpdateProfile = () => {
             />
           </div>
           <div>
-  <label className="block text-sm font-semibold text-gray-600">Specialization</label>
-  <select
-    value={userData.specialization || ""}
-    onChange={(e) => {
-      const selectedValue = e.target.value;
-      setUserData((prevData) => ({
-        ...prevData,
-        specialization: selectedValue,
-      }));
-
-      if (selectedValue === "Other") {
-        setCustomSpecialization(""); // Reset custom input field
-      }
-    }}
-    required
-    className="w-full p-3 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-  >
-    <option value="Cloud">Cloud</option>
-    <option value="AI">AI</option>
-    <option value="Language">Language</option>
-    <option value="Domain">Domain</option>
-    <option value="Other">Other</option>
-  </select>
-</div>
-
-{userData.specialization === "Other" && (
-  <div>
-    <label className="block text-sm font-semibold text-gray-600">
-      Specify Your Specialization
-    </label>
-    <input
-      type="text"
-      value={customSpecialization}
-      onChange={(e) => setCustomSpecialization(e.target.value)}
-      placeholder="Enter your specialization"
-      required
-      className="w-full p-3 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-    />
-  </div>
-)}
-
+            <label className="block text-sm font-semibold text-gray-600">Specialization</label>
+            <select
+              value={userData.specialization || ""}
+              onChange={(e) => handleInputChange("specialization", e.target.value)}
+              required
+              className="w-full p-3 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            >
+              <option value="Cloud">Cloud</option>
+              <option value="AI">AI</option>
+              <option value="Language">Language</option>
+              <option value="Domain">Domain</option>
+            </select>
+          </div>
           <div className="md:col-span-2">
             <button
               type="submit"
-              className="w-full py-3 bg-gradient-to-b from-gray-800 to-gray-700  text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+              className="w-full py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
             >
               Update Profile
             </button>
