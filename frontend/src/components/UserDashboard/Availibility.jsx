@@ -403,7 +403,7 @@ const Availibility = () => {
       {/* Submit Button */}
       <button
         onClick={handleSubmit}
-        className="w-full bg-gradient-to-b from-gray-800 to-gray-700 text-white py-2 px-4 rounded hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
       >
         Submit Availability
       </button>

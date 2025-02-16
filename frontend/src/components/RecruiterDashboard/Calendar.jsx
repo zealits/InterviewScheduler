@@ -1,4 +1,15 @@
-import {Box,Typography,Button,Paper,Grid,FormControl,InputLabel,Select,MenuItem,Divider,TextField} from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Divider,
+} from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 import { CheckCircle, UserCheck, CalendarDays } from "lucide-react";
 import axios from "axios";
@@ -265,16 +276,11 @@ const CustomBigCalendar = () => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
 
-    const predefinedSpecializations = ["Cloud", "AI", "Language", "Domain"];
-
     const filtered = events
       .map((event) => {
-        const filteredUsers = value === "Others"
-          ? event.users.filter((user) => !predefinedSpecializations.includes(user.specialization))
-          : value
+        const filteredUsers = value
           ? event.users.filter((user) => user.specialization === value)
           : event.users;
-
         return filteredUsers.length > 0
           ? {
               ...event,
@@ -292,19 +298,15 @@ const CustomBigCalendar = () => {
       const eventsOnDate = filtered.filter(
         (event) => event.start.toISOString().slice(0, 10) === selectedDateString
       );
-
       const interviewersOnDate = eventsOnDate.flatMap((event) =>
         event.users
-          .filter((user) => 
-            value === "Others"
-              ? !predefinedSpecializations.includes(user.specialization)
-              : user.specialization === value
-          )
+          .filter((user) => !value || user.specialization === value)
           .map((user) => {
             const customEntry = user.customAvailability?.find((entry) =>
               entry.dates.some(
                 (date) =>
-                  new Date(date).toISOString().slice(0, 10) === selectedDateString
+                  new Date(date).toISOString().slice(0, 10) ===
+                  selectedDateString
               )
             );
             const rangeEntry = user.availabilityRange?.find(
@@ -339,7 +341,8 @@ const CustomBigCalendar = () => {
     } else {
       setSelectedDateInterviewers([]);
     }
-};
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -486,7 +489,6 @@ const CustomBigCalendar = () => {
                   <MenuItem value="AI">AI</MenuItem>
                   <MenuItem value="Language">Language</MenuItem>
                   <MenuItem value="Domain">Domain</MenuItem>
-                  <MenuItem value="Others">Others</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
