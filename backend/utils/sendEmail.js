@@ -1,23 +1,29 @@
 const nodemailer = require("nodemailer");
-require("dotenv").config();
 
-const sendEmail = async ({ to, subject, text }) => {
+const sendEmail = async (to, subject, text, html) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: "gmail", // You can use another service or a service like SendGrid
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: process.env.EMAIL_USER, // Your email address
+      pass: process.env.EMAIL_PASS, // Your email password or app-specific password
     },
   });
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
+    from: process.env.EMAIL_USER, 
+    to: to, 
+    subject: subject, 
+    text: text,
+    html: html,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully!");
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
 };
 
-module.exports = sendEmail;
+
+module.exports= sendEmail;

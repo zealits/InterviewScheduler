@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const multer = require("multer");
+const sendEmail = require("../utils/sendEmail");
 
 // Multer configuration for memory storage
 const storage = multer.memoryStorage();
@@ -8,21 +9,7 @@ const upload = multer({ storage });
 // Middleware for uploading a single PDF
 exports.uploadPDF = upload.single("resume");
 
-// Fetch all upcoming interviews for a specific user
-// exports.getAllUpcoming = async (req, res) => {
-//   try {
-//     const { email } = req.params;
-//     const user = await User.findOne({ email });
-    
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
 
-//     res.status(200).json({ upcomingInterviews: user.upcomingInterviews });
-//   } catch (error) {
-//     res.status(500).json({ message: "Server error", error: error.message });
-//   }
-// };
 
 exports.getAllPending = async (req, res) => {
   try {
@@ -37,6 +24,7 @@ exports.getAllPending = async (req, res) => {
     const updatedInterviews = user.upcomingInterviews.map((interview) => ({
       _id: interview._id, // Include _id for identification
       jobTitle: interview.jobTitle,
+      email: interview.email,
       name: interview.name,
       scheduledDate: interview.scheduledDate,
       scheduledTime: interview.scheduledTime,
@@ -49,11 +37,6 @@ exports.getAllPending = async (req, res) => {
   }
 };
 
-
-
-
-
-
 // Add new upcoming interviews for a specific user
 exports.postAllUpcoming = async (req, res) => {
   try {
@@ -64,7 +47,6 @@ exports.postAllUpcoming = async (req, res) => {
     const { email } = req.params;
     let { upcomingInterviews } = req.body;
 
-    // Parse `upcomingInterviews` if it's a string
     if (typeof upcomingInterviews === "string") {
       try {
         upcomingInterviews = JSON.parse(upcomingInterviews);
@@ -97,7 +79,6 @@ exports.postAllUpcoming = async (req, res) => {
         });
       }
 
-      // If a resume file is provided, attach resume data and related info
       if (req.file) {
         interview.hasResume = true;
         interview.resume = {
@@ -114,6 +95,22 @@ exports.postAllUpcoming = async (req, res) => {
     }
 
     await user.save();
+
+    // **Send Email Notification after saving interview**
+    for (const interview of upcomingInterviews) {
+      await sendEmail(
+        email, // Interviewer email (from route param)
+        interview.name,
+        interview.email, // Candidate email
+        interview.jobTitle,
+        interview.jobDescription,
+        interview.scheduledDate,
+        interview.scheduledTime.split(" - ")[0],
+        interview.scheduledTime.split(" - ")[1],
+        process.env.ADMIN_EMAIL // Admin Email
+      );
+    }
+
     res.status(201).json({ message: "Interviews added successfully", user });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -131,7 +128,11 @@ exports.getUpcomingInterviews = async (req, res) => {
     // For each interview, remove the resume file data but include a flag and filename
     const interviews = user.upcomingInterviews.map((interview) => {
       const { resume, ...rest } = interview.toObject();
-      return { ...rest, hasResume: !!resume, resumeFilename: resume ? resume.filename : null };
+      return {
+        ...rest,
+        hasResume: !!resume,
+        resumeFilename: resume ? resume.filename : null,
+      };
     });
     res.status(200).json({ upcomingInterviews: interviews });
   } catch (error) {
@@ -157,4 +158,3 @@ exports.getInterviewResume = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-

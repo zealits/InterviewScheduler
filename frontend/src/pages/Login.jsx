@@ -20,19 +20,18 @@ const Login = () => {
     setError("");
     try {
       const response = await loginUser({ email, password });
-
-      if (response) {
-        const { token } = response;
-        login(token);
-        localStorage.setItem("adminAuthToken", token);
-
-        // setModalData({ title: "Success", message: "Login successful!" });
-        // setModalOpen(true);
+      if (response && response.token) {
+        login(response.token);
+        localStorage.setItem("adminAuthToken", response.token);
+        localStorage.setItem("adminEmail", email);
+        console.log("Login successful:", response);
 
         setTimeout(() => {
           setModalOpen(false);
           navigate("/admin");
         }, 1500);
+      } else {
+        setError("Invalid response from server.");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");
@@ -54,9 +53,7 @@ const Login = () => {
           <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-8">
             <div className="flex items-center justify-center space-x-2">
               <Lock className="h-6 w-6 text-gray-100" />
-              <h3 className="text-xl font-semibold text-white">
-                Recruiter Login
-              </h3>
+              <h3 className="text-xl font-semibold text-white">Recruiter Login</h3>
             </div>
           </div>
 
@@ -104,28 +101,17 @@ const Login = () => {
               </button>
             </form>
 
-            {/* <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Having trouble accessing your account?{" "}
-                <a
-                  href="/contact-support"
-                  className="font-medium text-blue-600 hover:text-blue-700"
-                >
-                  Contact Support
-                </a>
-              </p>
-            </div> */}
             <div className="relative flex justify-center">
-                  <span className="py-4 bg-white text-sm text-gray-500">
-                    Don't have an account?
-                  </span>
-                  <button
-                    onClick={() => navigate("/user/register")}
-                    className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm"
-                  >
-                    Create account
-                  </button>
-                </div>
+              <span className="py-4 bg-white text-sm text-gray-500">
+                Don't have an account?
+              </span>
+              <button
+                onClick={() => navigate("/user/register")}
+                className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm"
+              >
+                Create account
+              </button>
+            </div>
           </div>
         </div>
       </div>
