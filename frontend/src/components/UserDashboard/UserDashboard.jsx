@@ -17,14 +17,7 @@ const UserDashboard = () => {
       />
 
       {/* Toggle Sidebar Button */}
-      {!isSidebarOpen && (
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="fixed top-4 left-4 z-40 p-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 ease-in-out"
-        >
-          <Menu size={24} />
-        </button>
-      )}
+      
 
       {/* Main Content Area */}
       <main 
@@ -32,10 +25,18 @@ const UserDashboard = () => {
           isSidebarOpen ? 'md:ml-64' : 'ml-0'
         } overflow-y-auto`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {!isSidebarOpen && (
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="fixed top-4 left-4 z-40 p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white  shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 ease-in-out"
+        >
+          <Menu size={24} />
+        </button>
+      )}
+        <div className="max-w-8xl mx-auto ">
          
           
-          <div className="bg-white shadow-md rounded-lg p-6 mt-6">
+          <div className="bg-white shadow-md rounded-lg">
             
             
 

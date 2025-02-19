@@ -32,7 +32,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gradient-to-r from-blue-50 to-blue-100 shadow-md">
-      <div className="mx-auto px-4 py-3 flex justify-between items-center relative">
+      <div className="mx-auto  flex justify-between items-center relative">
         {/* Logo and Mobile Menu Toggle */}
         <div className="flex items-center space-x-4">
           <Link
