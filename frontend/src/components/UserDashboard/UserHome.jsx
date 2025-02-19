@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Calendar, User, ListChecks, Clock, Users, CheckCircle, TrendingUp, ArrowRight } from "lucide-react";
 
 function UserHome() {
-  const [profile] = useState({
+  const [interview] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
     linkedin: "linkedin.com/in/johndoe"
@@ -25,7 +25,7 @@ function UserHome() {
               <div className=" rounded-full bg-white/20 flex items-center justify-center">
                 <User size={20} className="text-white" />
               </div>
-              <span className="text-white font-medium">{profile.name}</span>
+              <span className="text-white font-medium">{interview.name}</span>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@ function UserHome() {
             </div>
           </div>
 
-          {/* Profile Section - Purple Theme */}
+          {/* interview Section - Purple Theme */}
           <div className="group relative overflow-hidden bg-white rounded-2xl shadow-xl">
             <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-purple-600 opacity-95"></div>
             <div className="absolute inset-0 bg-[linear-gradient(40deg,transparent_40%,rgba(255,255,255,0.1)_60%)]"></div>
@@ -137,27 +137,27 @@ function UserHome() {
                   <div className="p-2 bg-purple-400/30 backdrop-blur-md rounded-xl">
                     <User className="text-purple-50" size={24} />
                   </div>
-                  <h2 className="text-xl font-bold text-purple-50">Profile Information</h2>
+                  <h2 className="text-xl font-bold text-purple-50">interview Information</h2>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="bg-purple-400/30 backdrop-blur-md rounded-xl p-4 hover:bg-purple-400/40 transition-colors">
                   <span className="text-purple-200 font-medium text-sm block mb-1">Full Name</span>
-                  <span className="text-purple-50 font-medium">{profile.name}</span>
+                  <span className="text-purple-50 font-medium">{interview.name}</span>
                 </div>
                 <div className="bg-purple-400/30 backdrop-blur-md rounded-xl p-4 hover:bg-purple-400/40 transition-colors">
                   <span className="text-purple-200 font-medium text-sm block mb-1">Email Address</span>
-                  <span className="text-purple-50 font-medium">{profile.email}</span>
+                  <span className="text-purple-50 font-medium">{interview.email}</span>
                 </div>
                 <div className="bg-purple-400/30 backdrop-blur-md rounded-xl p-4 hover:bg-purple-400/40 transition-colors">
-                  <span className="text-purple-200 font-medium text-sm block mb-1">LinkedIn Profile</span>
+                  <span className="text-purple-200 font-medium text-sm block mb-1">LinkedIn interview</span>
                   <a 
-                    href={`https://${profile.linkedin}`} 
+                    href={`https://${interview.linkedin}`} 
                     className="text-purple-50 font-medium hover:text-white transition-colors" 
                     target="_blank" 
                     rel="noopener noreferrer"
                   >
-                    {profile.linkedin}
+                    {interview.linkedin}
                   </a>
                 </div>
               </div>
