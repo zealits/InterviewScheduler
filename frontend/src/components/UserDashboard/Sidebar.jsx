@@ -24,7 +24,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
         {/* Header */}
         <div className="mb-8 flex items-center space-x-3">
-          <DashboardIcon size={32} className="text-blue-400" />
+          <Link to="/user/dashboard/home"><DashboardIcon size={32} className="text-blue-400" /></Link>
           <h2 className="text-2xl font-bold text-white tracking-wider">Dashboard</h2>
         </div>
 

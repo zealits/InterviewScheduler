@@ -46,7 +46,9 @@ export const loginUser2 = async (userData) => {
       },
     });
     localStorage.setItem("authToken", response.data.token); // Save the token properly
+    
     console.log(response.data);
+    
     return response.data; // Return the response data if login is successful
   } catch (error) {
     // Handle error and rethrow to handle it in the calling function

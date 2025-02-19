@@ -15,6 +15,7 @@ const CustomBigCalendar = () => {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedDateInterviewers, setSelectedDateInterviewers] = useState([]);
+  const [adminEmail, setAdminEmail] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [filter, setFilter] = useState({ name: "", specialization: "" });
@@ -24,6 +25,7 @@ const CustomBigCalendar = () => {
     candidateName: "",
     candidateEmail: "",
     interviewerEmail: "",
+    adminEmail: "",
     interviewerName: "",
     candidateLinkedIn: "",
     jobTitle: "",
@@ -36,6 +38,43 @@ const CustomBigCalendar = () => {
   });
 
   const interviewersListRef = useRef(null);
+
+ 
+
+  useEffect(() => {
+    const fetchAdminEmail = async () => {
+      const token = localStorage.getItem("adminAuthToken");
+      console.log(token);
+      const adminEmail = localStorage.getItem("adminEmail"); // ✅ Fetch inside function
+      console.log(adminEmail);
+
+      if (!token || !adminEmail) {
+        console.error("Missing admin token or admin ID in localStorage");
+        return;
+      }
+
+      try {
+        const response = await axios.get(`/api/admin/${adminEmail}/admin-email`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data?.email) {
+          setAdminEmail(response.data.email);
+          localStorage.setItem("adminEmail", response.data.email); // Store for future use
+        } else {
+          console.error("Admin email not found in response");
+        }
+      } catch (error) {
+        console.error("Error fetching admin email:", error.response?.data || error.message);
+      }
+    };
+
+    fetchAdminEmail();
+  }, []);
+
+
+
+
 
   // --- Helper Functions ---
   const parseTimeString = (timeInput) => {
@@ -84,10 +123,7 @@ const CustomBigCalendar = () => {
   useEffect(() => {
     const formatLocalDate = (dateInput) => {
       const d = new Date(dateInput);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+      return d.toLocaleDateString("en-CA");
     };
 
     const fetchData = async () => {
@@ -97,6 +133,8 @@ const CustomBigCalendar = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
+
+        
         const data = Array.isArray(response.data?.data)
           ? response.data.data
           : [];
@@ -107,18 +145,18 @@ const CustomBigCalendar = () => {
             user.customAvailability?.flatMap((entry) =>
               entry.dates.map((date) => formatLocalDate(date))
             ) || [];
+
           const rangeDates =
             user.availabilityRange?.flatMap((range) => {
               if (!range.startDate || !range.endDate) return [];
-              const startDate = new Date(range.startDate);
-              const endDate = new Date(range.endDate);
+
+              let current = moment(range.startDate).startOf("day");
+              const endDate = moment(range.endDate).startOf("day");
+
               const datesArray = [];
-              for (
-                let d = new Date(startDate);
-                d <= endDate;
-                d.setDate(d.getDate() + 1)
-              ) {
-                datesArray.push(formatLocalDate(d));
+              while (current.isSameOrBefore(endDate, "day")) {
+                datesArray.push(formatLocalDate(current)); // Ensure local format
+                current.add(1, "day");
               }
               return datesArray;
             }) || [];
@@ -132,12 +170,12 @@ const CustomBigCalendar = () => {
         const combinedEvents = Array.from(eventMap.entries())
           .filter(([date, users]) => users.length > 0)
           .map(([date, users]) => {
-            const [year, month, day] = date.split("-");
-            const eventDate = new Date(year, month - 1, day);
+            const eventDate = moment(date, "YYYY-MM-DD").toDate();
             const { startTime, endTime } = getUserAvailabilityForDate(
               users[0],
               eventDate
             );
+
             let eventStart = eventDate;
             let eventEnd = eventDate;
             let availability = "Not Specified";
@@ -145,18 +183,17 @@ const CustomBigCalendar = () => {
             if (startTime !== "Not Specified" && endTime !== "Not Specified") {
               const [startHour, startMinute] = parseTimeString(startTime);
               const [endHour, endMinute] = parseTimeString(endTime);
-              eventStart = new Date(
-                year,
-                month - 1,
-                day,
-                startHour,
-                startMinute
-              );
-              eventEnd = new Date(year, month - 1, day, endHour, endMinute);
+              eventStart = moment(eventDate)
+                .set({ hour: startHour, minute: startMinute })
+                .toDate();
+              eventEnd = moment(eventDate)
+                .set({ hour: endHour, minute: endMinute })
+                .toDate();
               availability = `${startTime} - ${endTime}`;
             }
+
             return {
-              title: `${users.length} Users`,
+              title: `${users.length}`,
               start: eventStart,
               end: eventEnd,
               users,
@@ -177,32 +214,35 @@ const CustomBigCalendar = () => {
 
   // --- Handlers ---
   const handleSelectSlot = (slotInfo) => {
-    const clickedDate = slotInfo.start;
+    const clickedDate = moment(slotInfo.start).startOf("day").toDate();
     setSelectedDate(clickedDate);
 
-    const selectedDateString = clickedDate.toISOString().slice(0, 10);
+    const selectedDateString = moment(clickedDate).format("YYYY-MM-DD");
+
     const eventsOnDate = filteredEvents.filter(
-      (event) => event.start.toISOString().slice(0, 10) === selectedDateString
+      (event) => moment(event.start).format("YYYY-MM-DD") === selectedDateString
     );
 
     const interviewersOnDate = eventsOnDate.flatMap((event) =>
       event.users.map((user) => {
         const customEntry = user.customAvailability?.find((entry) =>
           entry.dates.some(
-            (date) =>
-              new Date(date).toISOString().slice(0, 10) === selectedDateString
+            (date) => moment(date).format("YYYY-MM-DD") === selectedDateString
           )
         );
+
         const rangeEntry = user.availabilityRange?.find(
           (range) =>
-            new Date(range.startDate) <= clickedDate &&
-            new Date(range.endDate) >= clickedDate
+            moment(range.startDate).isSameOrBefore(clickedDate, "day") &&
+            moment(range.endDate).isSameOrAfter(clickedDate, "day")
         );
+
         const startTime = customEntry
           ? customEntry.startTime
           : rangeEntry
           ? rangeEntry.startTime
           : "Not Specified";
+
         const endTime = customEntry
           ? customEntry.endTime
           : rangeEntry
@@ -225,19 +265,18 @@ const CustomBigCalendar = () => {
 
     setSelectedDateInterviewers(interviewersOnDate);
 
-    if (interviewersOnDate.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
-        startTime: interviewersOnDate[0].startTime,
-        endTime: interviewersOnDate[0].endTime,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        startTime: "Not Specified",
-        endTime: "Not Specified",
-      }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      startTime:
+        interviewersOnDate.length > 0
+          ? interviewersOnDate[0].startTime
+          : "Not Specified",
+      endTime:
+        interviewersOnDate.length > 0
+          ? interviewersOnDate[0].endTime
+          : "Not Specified",
+    }));
+
     if (interviewersListRef.current) {
       interviewersListRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -339,14 +378,16 @@ const CustomBigCalendar = () => {
     } else {
       setSelectedDateInterviewers([]);
     }
-};
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+
   const handleSubmit = async (event, resumeFile) => {
     event.preventDefault();
+  
     const {
       candidateEmail,
       candidateName,
@@ -359,51 +400,123 @@ const CustomBigCalendar = () => {
       startTime,
       endTime,
     } = formData;
-
-    if (
-      !candidateEmail ||
-      !candidateName ||
-      !jobDescription ||
-      !jobTitle ||
-      !scheduledDate
-    ) {
+  
+    // Validate required fields
+    if (!candidateEmail || !candidateName || !jobDescription || !jobTitle || !scheduledDate) {
+      console.error("Missing required fields");
       setShowPopup(false);
       return;
     }
-
-    const formDataWithFile = new FormData();
-    const interviewObj = {
-      email: candidateEmail.trim(),
-      scheduledDate: scheduledDate.trim(),
-      name: candidateName.trim(),
-      jobTitle: jobTitle.trim(),
-      linkedin: candidateLinkedIn.trim(),
-      jobDescription: jobDescription.trim(),
-      scheduledTime: `${startTime} - ${endTime}`,
-    };
-    formDataWithFile.append(
-      "upcomingInterviews",
-      JSON.stringify([interviewObj])
-    );
-
-    if (resumeFile) {
-      formDataWithFile.append("resume", resumeFile);
-    }
-
-    const encodedEmail = interviewerEmail.trim();
-
+  
     try {
+      const token = localStorage.getItem("adminAuthToken");
+      if (!token) {
+        console.error("No auth token found");
+        return;
+      }
+
+      const adminEmail = localStorage.getItem("adminEmail");
+
+      // Step 1: Fetch Admin Email using Correct API Route
+      const adminResponse = await axios.get(`/api/admin/${adminEmail}/admin-email`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      console.log("Token:", token);
+  
+      const fetchedAdminEmail = adminResponse.data.email;
+      if (!fetchedAdminEmail) {
+        console.error("Admin email is undefined or not returned correctly");
+        return;
+      }
+      console.log("Fetched Admin Email:", fetchedAdminEmail);
+  
+      // Step 2: Prepare Form Data
+      const formDataWithFile = new FormData();
+      const interviewObj = {
+        email: candidateEmail.trim(),
+        scheduledDate: scheduledDate.trim(),
+        name: candidateName.trim(),
+        jobTitle: jobTitle.trim(),
+        linkedin: candidateLinkedIn.trim(),
+        jobDescription: jobDescription.trim(),
+        scheduledTime: `${startTime} - ${endTime}`,
+      };
+      formDataWithFile.append("upcomingInterviews", JSON.stringify([interviewObj]));
+  
+      if (resumeFile) {
+        formDataWithFile.append("resume", resumeFile);
+      }
+  
+      const encodedEmail = interviewerEmail.trim();
+  
+      // Step 3: Submit Interview Data
       await axios.post(
         `/api/interviewers/${encodedEmail}/upcoming-interviews`,
         formDataWithFile,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+  
+      // Step 4: Send Emails (Admin & Interviewer)
+      const emailPromises = [
+        axios.post("http://localhost:5000/send-email", {
+          email: fetchedAdminEmail, // ✅ Using the dynamically fetched email
+          subject: `New Interview Scheduled for ${candidateName}`,
+          text: `Dear Admin,\n\nA new interview has been scheduled.\n\nCandidate: ${candidateName}\nRole: ${jobTitle}\nDate: ${scheduledDate}\nTime: ${startTime} - ${endTime}\n\nJob Description: ${jobDescription}\nLinkedIn: ${candidateLinkedIn}\n\nBest regards,\nYour Team`,
+          html: `
+            <p>Dear Admin,</p>
+            <p>A new interview has been scheduled.</p>
+            <p><strong>Candidate:</strong> ${candidateName}</p>
+            <p><strong>Role:</strong> ${jobTitle}</p>
+            <p><strong>Date:</strong> ${scheduledDate}</p>
+            <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+            <p><strong>Job Description:</strong> ${jobDescription}</p>
+            <p><strong>LinkedIn:</strong> <a href="${candidateLinkedIn}" target="_blank">${candidateLinkedIn}</a></p>
+            <p>Best regards,<br>Your Team</p>
+          `,
+        }),
+
+  
+        axios.post("http://localhost:5000/send-email", {
+          email: interviewerEmail,
+          subject: `New Interview Scheduled with ${candidateName}`,
+          text: `Dear Interviewer,\n\nYou have a new interview scheduled with ${candidateName}.\nRole: ${jobTitle}\nDate: ${scheduledDate}\nTime: ${startTime} - ${endTime}\n\nJob Description: ${jobDescription}\nLinkedIn: ${candidateLinkedIn}\n\nBest regards,\nYour Team`,
+          html: `
+            <p>Dear Interviewer,</p>
+            <p>You have a new interview scheduled.</p>
+            <p><strong>Candidate:</strong> ${candidateName}</p>
+            <p><strong>Role:</strong> ${jobTitle}</p>
+            <p><strong>Date:</strong> ${scheduledDate}</p>
+            <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+            <p><strong>Job Description:</strong> ${jobDescription}</p>
+            <p><strong>LinkedIn:</strong> <a href="${candidateLinkedIn}" target="_blank">${candidateLinkedIn}</a></p>
+            <p>Best regards,<br>Your Team</p>
+          `,
+        }),
+      ];
+  
+      await Promise.allSettled(emailPromises).then((results) => {
+        results.forEach((result, index) => {
+          if (result.status === "rejected") {
+            console.error(`Error sending email to ${index === 0 ? "Admin" : "Interviewer"}:`, result.reason);
+          }
+        });
+      });
+
+  
       setShowPopup(true);
     } catch (error) {
-      console.error("Error submitting details:", error);
+      console.error("Error submitting details:", error.response?.data || error.message);
       setShowPopup(false);
     }
   };
+  
+  
 
   // --- Render ---
   return (
@@ -487,6 +600,7 @@ const CustomBigCalendar = () => {
                   <MenuItem value="Language">Language</MenuItem>
                   <MenuItem value="Domain">Domain</MenuItem>
                   <MenuItem value="Others">Others</MenuItem>
+                  <MenuItem value="Others">Others</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -499,7 +613,7 @@ const CustomBigCalendar = () => {
             mx: 3,
             mb: 3,
             bgcolor: "#ffffff",
-            borderRadius: 3,
+            borderRadius: 10,
             overflow: "hidden",
             border: "1px solid #e5e7eb",
             boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
@@ -540,7 +654,7 @@ const CustomBigCalendar = () => {
                 backgroundColor: "#eff6ff",
                 border: "1px solid #2563eb",
               },
-              "& .rbc-off-range-bg": { backgroundColor: "#f8fafc" },
+
               "& .rbc-date-cell": {
                 padding: "8px",
                 fontWeight: 500,
@@ -548,38 +662,15 @@ const CustomBigCalendar = () => {
                 color: "#1e293b",
                 "&.rbc-now": { color: "#2563eb", fontWeight: "bold" },
               },
-              "& .rbc-show-more": {
-                color: "#2563eb",
-                fontWeight: 500,
-                background: "rgba(37, 99, 235, 0.1)",
-                borderRadius: "4px",
-                padding: "2px 8px",
-              },
               "& .rbc-event": {
-                borderRadius: "6px",
-                padding: "4px 8px",
                 backgroundColor: "#2563eb",
-                border: "none",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                "&.rbc-selected": { backgroundColor: "#1d4ed8" },
+                borderRadius: 20,
+                color: "#ffffff",
+                "&:hover": { backgroundColor: "#1d4ed8" },
               },
-              "& .rbc-toolbar": {
-                marginBottom: "20px",
-                gap: "10px",
-                "& button": {
-                  color: "#2563eb",
-                  borderColor: "#e5e7eb",
-                  borderRadius: "8px",
-                  padding: "8px 16px",
-                  fontWeight: 500,
-                  transition: "all 0.2s",
-                  backgroundColor: "#ffffff",
-                  "&:hover": { backgroundColor: "#eff6ff" },
-                  "&.rbc-active": {
-                    backgroundColor: "#2563eb",
-                    color: "#ffffff",
-                  },
-                },
+              "& .rbc-selected": {
+                backgroundColor: "#1d4ed8",
+                "&:hover": { backgroundColor: "#1d4ed8" },
               },
             }}
           >
@@ -598,35 +689,12 @@ const CustomBigCalendar = () => {
               onView={(view) => setCurrentView(view)}
               components={{
                 event: ({ event }) => (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: 0.5,
-                      px: 1,
-                      py: 0.5,
-                      fontWeight: "bold",
-                      borderRadius: "6px",
-                      background: "linear-gradient(#2563eb, #1d4ed8)",
-                      color: "white",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                      "&:hover": {
-                        transform: "scale(1.02)",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-                      },
-                    }}
-                    onClick={() => handleSelectSlot({ start: event.start })}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <UserCheck size={16} />
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  <Box onClick={() => handleSelectSlot({ start: event.start })}>
+                    <Box sx={{ alignItems: "center", gap: 1 }}>
+                      <Typography variant="body1" fontWeight="600">
                         {event.title}
                       </Typography>
                     </Box>
-                    
                   </Box>
                 ),
               }}

@@ -31,9 +31,25 @@ exports.login = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+    
 
-    res.status(200).json({ token: generateToken(admin._id) });
+     res.status(200).json({ 
+      token: generateToken(admin._id)
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+};
+
+// Get Admin Email
+exports.getAdminEmail = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.admin.id);
+    if (!admin) return res.status(404).json({ error: "Admin not found" });  
+
+    res.json({ email: admin.email });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  } 
 };

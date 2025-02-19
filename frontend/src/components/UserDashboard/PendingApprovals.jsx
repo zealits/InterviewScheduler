@@ -22,6 +22,7 @@ const PendingApprovals = () => {
 
   const userEmail = localStorage.getItem("userEmail");
   const email = userEmail;
+  
 
   // Function to close the popup modal
   const handleClosePopup = () => {
@@ -41,6 +42,7 @@ const PendingApprovals = () => {
             (interview) => !interview.confirmation
           )
         );
+        console.log(response.data.upcomingInterviews);
       } catch (err) {
         setError("Failed to fetch pending approvals.");
       } finally {
@@ -63,6 +65,20 @@ const PendingApprovals = () => {
         email,
         interviewId,
       });
+
+      // const adminResponse = await axios.get(`/api/admin/${email}/admin-email`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
+      // const adminEmail = adminResponse.data.email;
+
+      // await axios.post(`/api/send-email`, {
+      //   interviewerEmail: email,
+      //   adminEmail,
+      //   candidateEmail,
+      //   interviewId,
+      // });
+
+      
       setPendingInterviews((prev) =>
         prev.filter((interview) => interview._id !== interviewId)
       );
@@ -72,6 +88,9 @@ const PendingApprovals = () => {
       setPopup({ isOpen: true, message: "Failed to confirm the interview." });
     }
   };
+
+
+
 
   // Update sort order based on user selection
   const handleSortChange = (order) => {
@@ -181,10 +200,16 @@ const PendingApprovals = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center text-sm text-gray-600">
-                    <Mail className="mr-2 text-blue-400" size={16} />
+                    <User className="mr-2 text-blue-400" size={16} />
                     {interview.name.charAt(0).toUpperCase() +
                       interview.name.slice(1)}
                   </div>
+
+                  <div className="flex items-center text-sm text-gray-600">
+                   <Mail className="mr-2 text-blue-400" size={16} />
+                    {interview.email}
+                  </div>
+
                   <div className="flex items-center text-sm text-gray-600">
                     <Calendar className="mr-2 text-blue-400" size={16} />
                     Date: {new Date(interview.scheduledDate).toLocaleDateString()}{" "}
