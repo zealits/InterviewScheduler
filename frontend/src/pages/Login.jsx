@@ -15,17 +15,22 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+  
+    
     try {
       const response = await loginUser({ email, password });
       if (response && response.token) {
         login(response.token);
         localStorage.setItem("adminAuthToken", response.token);
-        localStorage.setItem("adminEmail", email);
         console.log("Login successful:", response);
-
+        localStorage.setItem("adminEmail", response.email);
+          console.log("adminEmail", email);
         setTimeout(() => {
           setModalOpen(false);
           navigate("/admin");
