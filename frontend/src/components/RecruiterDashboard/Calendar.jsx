@@ -1,16 +1,4 @@
-import {
-  Box,
-  Typography,
-  Button,
-  Paper,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Divider,
-  TextField,
-} from "@mui/material";
+import {Box,Typography,Button,Paper,Grid,FormControl,InputLabel,Select,MenuItem,Divider,TextField} from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 import { CheckCircle, UserCheck, CalendarDays } from "lucide-react";
 import axios from "axios";
@@ -322,15 +310,11 @@ const CustomBigCalendar = () => {
 
     const filtered = events
       .map((event) => {
-        const filteredUsers =
-          value === "Others"
-            ? event.users.filter(
-              (user) =>
-                !predefinedSpecializations.includes(user.specialization)
-            )
-            : value
-              ? event.users.filter((user) => user.specialization === value)
-              : event.users;
+        const filteredUsers = value === "Others"
+          ? event.users.filter((user) => !predefinedSpecializations.includes(user.specialization))
+          : value
+          ? event.users.filter((user) => user.specialization === value)
+          : event.users;
 
         return filteredUsers.length > 0
           ? {
@@ -352,7 +336,7 @@ const CustomBigCalendar = () => {
 
       const interviewersOnDate = eventsOnDate.flatMap((event) =>
         event.users
-          .filter((user) =>
+          .filter((user) => 
             value === "Others"
               ? !predefinedSpecializations.includes(user.specialization)
               : user.specialization === value
@@ -361,8 +345,7 @@ const CustomBigCalendar = () => {
             const customEntry = user.customAvailability?.find((entry) =>
               entry.dates.some(
                 (date) =>
-                  new Date(date).toISOString().slice(0, 10) ===
-                  selectedDateString
+                  new Date(date).toISOString().slice(0, 10) === selectedDateString
               )
             );
             const rangeEntry = user.availabilityRange?.find(
@@ -605,6 +588,7 @@ const CustomBigCalendar = () => {
                   <MenuItem value="AI">AI</MenuItem>
                   <MenuItem value="Language">Language</MenuItem>
                   <MenuItem value="Domain">Domain</MenuItem>
+                  <MenuItem value="Others">Others</MenuItem>
                   <MenuItem value="Others">Others</MenuItem>
                 </Select>
               </FormControl>
