@@ -43,6 +43,7 @@ exports.login = async (req, res) => {
 
 // Get Admin Email
 exports.getAdminEmail = async (req, res) => {
+
   try {
     const admin = await Admin.findById(req.admin.id);
     if (!admin) return res.status(404).json({ error: "Admin not found" });  
@@ -53,3 +54,5 @@ exports.getAdminEmail = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   } 
 };
+
+

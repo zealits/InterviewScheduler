@@ -19,6 +19,7 @@ import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import InterviewerDetails from "./InterviewerDetails";
 
+
 const localizer = momentLocalizer(moment);
 
 const CustomBigCalendar = () => {
@@ -51,14 +52,13 @@ const CustomBigCalendar = () => {
 
   const interviewersListRef = useRef(null);
 
- 
+
 
   useEffect(() => {
     const fetchAdminEmail = async () => {
       const token = localStorage.getItem("adminAuthToken");
-      console.log(token);
       const adminEmail = localStorage.getItem("adminEmail"); // ✅ Fetch inside function
-      console.log(adminEmail);
+      
 
       if (!token || !adminEmail) {
         console.error("Missing admin token or admin ID in localStorage");
@@ -69,10 +69,12 @@ const CustomBigCalendar = () => {
         const response = await axios.get(`/api/admin/${adminEmail}/admin-email`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("adminnnn",response.data.email);
 
         if (response.data?.email) {
           setAdminEmail(response.data.email);
           localStorage.setItem("adminEmail", response.data.email); // Store for future use
+          
         } else {
           console.error("Admin email not found in response");
         }
@@ -121,13 +123,13 @@ const CustomBigCalendar = () => {
     const startTime = customEntry
       ? customEntry.startTime
       : rangeEntry
-      ? rangeEntry.startTime
-      : "Not Specified";
+        ? rangeEntry.startTime
+        : "Not Specified";
     const endTime = customEntry
       ? customEntry.endTime
       : rangeEntry
-      ? rangeEntry.endTime
-      : "Not Specified";
+        ? rangeEntry.endTime
+        : "Not Specified";
     return { startTime, endTime };
   };
 
@@ -146,7 +148,7 @@ const CustomBigCalendar = () => {
         });
 
 
-        
+
         const data = Array.isArray(response.data?.data)
           ? response.data.data
           : [];
@@ -252,14 +254,14 @@ const CustomBigCalendar = () => {
         const startTime = customEntry
           ? customEntry.startTime
           : rangeEntry
-          ? rangeEntry.startTime
-          : "Not Specified";
+            ? rangeEntry.startTime
+            : "Not Specified";
 
         const endTime = customEntry
           ? customEntry.endTime
           : rangeEntry
-          ? rangeEntry.endTime
-          : "Not Specified";
+            ? rangeEntry.endTime
+            : "Not Specified";
 
         return {
           name: user.name,
@@ -323,19 +325,19 @@ const CustomBigCalendar = () => {
         const filteredUsers =
           value === "Others"
             ? event.users.filter(
-                (user) =>
-                  !predefinedSpecializations.includes(user.specialization)
-              )
+              (user) =>
+                !predefinedSpecializations.includes(user.specialization)
+            )
             : value
-            ? event.users.filter((user) => user.specialization === value)
-            : event.users;
+              ? event.users.filter((user) => user.specialization === value)
+              : event.users;
 
         return filteredUsers.length > 0
           ? {
-              ...event,
-              users: filteredUsers,
-              title: `${filteredUsers.length} Users`,
-            }
+            ...event,
+            users: filteredUsers,
+            title: `${filteredUsers.length} Users`,
+          }
           : null;
       })
       .filter(Boolean);
@@ -371,13 +373,13 @@ const CustomBigCalendar = () => {
             const startTime = customEntry
               ? customEntry.startTime
               : rangeEntry
-              ? rangeEntry.startTime
-              : "Not Specified";
+                ? rangeEntry.startTime
+                : "Not Specified";
             const endTime = customEntry
               ? customEntry.endTime
               : rangeEntry
-              ? rangeEntry.endTime
-              : "Not Specified";
+                ? rangeEntry.endTime
+                : "Not Specified";
             return {
               name: user.name,
               specialization: user.specialization,
@@ -403,137 +405,124 @@ const CustomBigCalendar = () => {
 
 
   const handleSubmit = async (event, resumeFile) => {
-    event.preventDefault();
-  
-    const {
-      candidateEmail,
-      candidateName,
-      interviewerEmail,
-      specialization,
-      candidateLinkedIn,
-      jobTitle,
-      jobDescription,
-      scheduledDate,
-      startTime,
-      endTime,
-    } = formData;
-  
-    // Validate required fields
-    if (!candidateEmail || !candidateName || !jobDescription || !jobTitle || !scheduledDate) {
-      console.error("Missing required fields");
-      setShowPopup(false);
+  event.preventDefault();
+
+  const {
+    candidateEmail,
+    candidateName,
+    interviewerEmail,
+    specialization,
+    candidateLinkedIn,
+    jobTitle,
+    jobDescription,
+    scheduledDate,
+    startTime,
+    endTime,
+  } = formData;
+
+  // Validate required fields
+  if (!candidateEmail || !candidateName || !jobDescription || !jobTitle || !scheduledDate) {
+    console.error("Missing required fields");
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("adminAuthToken");
+    if (!token) {
+      console.error("No auth token found");
+      alert("You are not authorized! Please log in.");
       return;
     }
-  
-    try {
-      const token = localStorage.getItem("adminAuthToken");
-      if (!token) {
-        console.error("No auth token found");
-        return;
-      }
 
-      const adminEmail = localStorage.getItem("adminEmail");
+    const adminEmail = localStorage.getItem("adminEmail");
 
-      // Step 1: Fetch Admin Email using Correct API Route
-      const adminResponse = await axios.get(`/api/admin/${adminEmail}/admin-email`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      console.log("Token:", token);
-  
-      const fetchedAdminEmail = adminResponse.data.email;
-      if (!fetchedAdminEmail) {
-        console.error("Admin email is undefined or not returned correctly");
-        return;
-      }
-      console.log("Fetched Admin Email:", fetchedAdminEmail);
-  
-      // Step 2: Prepare Form Data
-      const formDataWithFile = new FormData();
-      const interviewObj = {
-        email: candidateEmail.trim(),
-        scheduledDate: scheduledDate.trim(),
-        name: candidateName.trim(),
-        jobTitle: jobTitle.trim(),
-        linkedin: candidateLinkedIn.trim(),
-        jobDescription: jobDescription.trim(),
-        scheduledTime: `${startTime} - ${endTime}`,
-      };
-      formDataWithFile.append("upcomingInterviews", JSON.stringify([interviewObj]));
-  
-      if (resumeFile) {
-        formDataWithFile.append("resume", resumeFile);
-      }
-  
-      const encodedEmail = interviewerEmail.trim();
-  
-      // Step 3: Submit Interview Data
-      await axios.post(
-        `/api/interviewers/${encodedEmail}/upcoming-interviews`,
-        formDataWithFile,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      // Step 4: Send Emails (Admin & Interviewer)
-      const emailPromises = [
-        axios.post("http://localhost:5000/send-email", {
-          email: fetchedAdminEmail, // ✅ Using the dynamically fetched email
-          subject: `New Interview Scheduled for ${candidateName}`,
-          text: `Dear Admin,\n\nA new interview has been scheduled.\n\nCandidate: ${candidateName}\nRole: ${jobTitle}\nDate: ${scheduledDate}\nTime: ${startTime} - ${endTime}\n\nJob Description: ${jobDescription}\nLinkedIn: ${candidateLinkedIn}\n\nBest regards,\nYour Team`,
-          html: `
-            <p>Dear Admin,</p>
-            <p>A new interview has been scheduled.</p>
-            <p><strong>Candidate:</strong> ${candidateName}</p>
-            <p><strong>Role:</strong> ${jobTitle}</p>
-            <p><strong>Date:</strong> ${scheduledDate}</p>
-            <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
-            <p><strong>Job Description:</strong> ${jobDescription}</p>
-            <p><strong>LinkedIn:</strong> <a href="${candidateLinkedIn}" target="_blank">${candidateLinkedIn}</a></p>
-            <p>Best regards,<br>Your Team</p>
-          `,
-        }),
+    // Step 1: Fetch Admin Email
+    const adminResponse = await axios.get(`/api/admin/${adminEmail}/admin-email`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  
-        axios.post("http://localhost:5000/send-email", {
-          email: interviewerEmail,
-          subject: `New Interview Scheduled with ${candidateName}`,
-          text: `Dear Interviewer,\n\nYou have a new interview scheduled with ${candidateName}.\nRole: ${jobTitle}\nDate: ${scheduledDate}\nTime: ${startTime} - ${endTime}\n\nJob Description: ${jobDescription}\nLinkedIn: ${candidateLinkedIn}\n\nBest regards,\nYour Team`,
-          html: `
-            <p>Dear Interviewer,</p>
-            <p>You have a new interview scheduled.</p>
-            <p><strong>Candidate:</strong> ${candidateName}</p>
-            <p><strong>Role:</strong> ${jobTitle}</p>
-            <p><strong>Date:</strong> ${scheduledDate}</p>
-            <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
-            <p><strong>Job Description:</strong> ${jobDescription}</p>
-            <p><strong>LinkedIn:</strong> <a href="${candidateLinkedIn}" target="_blank">${candidateLinkedIn}</a></p>
-            <p>Best regards,<br>Your Team</p>
-          `,
-        }),
-      ];
-  
-      await Promise.allSettled(emailPromises).then((results) => {
-        results.forEach((result, index) => {
-          if (result.status === "rejected") {
-            console.error(`Error sending email to ${index === 0 ? "Admin" : "Interviewer"}:`, result.reason);
-          }
-        });
-      });
-
-  
-      setShowPopup(true);
-    } catch (error) {
-      console.error("Error submitting details:", error.response?.data || error.message);
-      setShowPopup(false);
+    const fetchedAdminEmail = adminResponse.data.email;
+    if (!fetchedAdminEmail) {
+      console.error("Admin email is not found.");
+      return;
     }
-  };
-  
-  
+
+    console.log("Fetched Admin Email:", fetchedAdminEmail);
+
+    // Step 2: Prepare Form Data
+    const formDataWithFile = new FormData();
+    const interviewObj = {
+      email: candidateEmail.trim(),
+      scheduledDate: scheduledDate.trim(),
+      name: candidateName.trim(),
+      jobTitle: jobTitle.trim(),
+      linkedin: candidateLinkedIn.trim(),
+      jobDescription: jobDescription.trim(),
+      scheduledTime: `${startTime} - ${endTime}`,
+    };
+
+    formDataWithFile.append("upcomingInterviews", JSON.stringify([interviewObj]));
+
+    if (resumeFile) {
+      formDataWithFile.append("resume", resumeFile);
+    }
+
+    const encodedEmail = encodeURIComponent(interviewerEmail.trim());
+
+    // Step 3: Submit Interview Data
+    await axios.post(
+      `/api/interviewers/${encodedEmail}/upcoming-interviews`,
+      formDataWithFile,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // Step 4: Send Emails (Admin & Interviewer)
+    const emailPromises = [
+      axios.post("/api/email/send-email", {
+        recipient: fetchedAdminEmail,
+        subject: `New Interview Scheduled for ${candidateName}`,
+        candidateName,
+        interviewerEmail: "",
+        jobTitle,
+        scheduledDate,
+        startTime,
+        endTime,
+        jobDescription,
+        candidateLinkedIn,
+      }),
+
+      axios.post("/api/email/send-email", {
+        recipient: interviewerEmail,
+        subject: `New Interview Scheduled for ${candidateName}`,
+        candidateName,
+        interviewerEmail,
+        jobTitle,
+        scheduledDate,
+        startTime,
+        endTime,
+        jobDescription,
+        candidateLinkedIn,
+      }),
+    ];
+
+    await Promise.allSettled(emailPromises);
+
+    alert("Interview scheduled successfully! Emails sent.");
+    setShowPopup(true);
+  } catch (error) {
+    console.error("Error submitting details:", error.response?.data || error.message);
+    alert("Failed to schedule interview. Please try again.");
+    setShowPopup(false);
+  }
+};
+
+
 
   // --- Render ---
   return (
