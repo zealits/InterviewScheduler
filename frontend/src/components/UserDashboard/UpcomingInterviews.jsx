@@ -25,26 +25,28 @@ const UpcomingInterviews = () => {
   const email = localStorage.getItem("userEmail");
 
   // Fetch interviews on component mount or when email changes
-  useEffect(() => {
-    const fetchInterviews = async () => {
-      if (!email) {
-        setError("Email is required to fetch upcoming interviews.");
-        setLoading(false);
-        return;
-      }
-      try {
-        const { data } = await axios.get(
-          `/api/interviewers/${email}/upcoming-interviews`
-        );
-        setInterviews(data.upcomingInterviews);
-      } catch (err) {
-        setError("Failed to fetch interviews. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchInterviews();
-  }, [email]);
+ useEffect(() => {
+  const fetchInterviews = async () => {
+    if (!email) {
+      setError("Email is required to fetch upcoming interviews.");
+      setLoading(false);
+      return;
+    }
+    try {
+      const { data } = await axios.get(
+        `/api/interviewers/${email}/upcoming-interviews`
+      );
+      setInterviews(data.upcomingInterviews || []);  // Ensure it's always an array
+    } catch (err) {
+      setError("Failed to fetch interviews. Please try again later.");
+      setInterviews([]);  // Set to empty array on error
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchInterviews();
+}, [email]);
+
 
   // Reset visible count when filters or sort order change
   useEffect(() => {
