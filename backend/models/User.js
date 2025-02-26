@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   linkedinProfile: { type: String, required: true },
   yearOfExperience: { type: Number, required: true },
   experienceAsInterviewer: { type: Number, required: true },
-  specialization: { type: String, required: true }, // e.g., language, cloud, AI, domain
+  specialization: { type: [String], required: true }, // e.g., language, cloud, AI, domain
   candidatesInterviewed: { type: Number, required: true },
   availability: {
     type: String,
@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
       endDate: { type: Date, required: true }, // Ending date of the range
       startTime: { type: String, required: true }, // Starting time (e.g., "09:00 AM")
       endTime: { type: String, required: true }, // Ending time (e.g., "05:00 PM")
+      timezone: { type: String, required: true },
     },
   ],
   customAvailability: [
@@ -27,6 +28,7 @@ const userSchema = new mongoose.Schema({
       dates: [{ type: Date, required: true }], // List of manually selected dates
       startTime: { type: String, required: true }, // Starting time (e.g., "09:00 AM")
       endTime: { type: String, required: true }, // Ending time (e.g., "05:00 PM")
+      timezone: { type: String, required: true },
     },
   ],
   upcomingInterviews: [
@@ -42,6 +44,15 @@ const userSchema = new mongoose.Schema({
       scheduledTime: {
         type: String,
       },
+      interviewTime: {
+        type: String,
+      },
+      specialization: [
+        {
+          type: String,
+          required: [true, "Specialization is required"],
+        },
+      ],
       name: {
         type: String,
         required: true,

@@ -31,22 +31,26 @@ router.get("/user", async (req, res) => {
 // Update user profile
 router.put("/profile", async (req, res) => {
   try {
-    const { email, password, ...otherFields } = req.body;
+    const { email, password, specialization, ...otherFields } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // Hash the new password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Update user details
+    // Ensure specialization is an array
+    const formattedSpecialization = Array.isArray(specialization)
+      ? specialization
+      : [specialization]; // Convert single value to array
+
+    console.log("Updating profile with specialization:", formattedSpecialization); // ✅ Debugging step
+
     const updatedUser = await User.findOneAndUpdate(
       { email },
-      { ...otherFields, password: hashedPassword },
+      { ...otherFields, password: hashedPassword, specialization: formattedSpecialization },
       { new: true }
-    ).select("-password"); // Exclude the hashed password from the response
+    ).select("-password"); // Exclude password from response
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -54,9 +58,11 @@ router.put("/profile", async (req, res) => {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.error("Error updating profile:", error);
+    console.error("❌ Error updating profile:", error); // ✅ Debugging step
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
 
 module.exports = router;

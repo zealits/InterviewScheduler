@@ -1,4 +1,16 @@
-import {Box,Typography,Button,Paper,Grid,FormControl,InputLabel,Select,MenuItem,Divider,TextField} from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Divider,
+  TextField,
+} from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 import { CheckCircle, UserCheck, CalendarDays } from "lucide-react";
 import axios from "axios";
@@ -6,7 +18,6 @@ import moment from "moment";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import InterviewerDetails from "./InterviewerDetails";
-
 
 const localizer = momentLocalizer(moment);
 
@@ -19,7 +30,7 @@ const CustomBigCalendar = () => {
   const [adminEmail, setAdminEmail] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [filter, setFilter] = useState({ name: "", specialization: "" });
+  const [filter, setFilter] = useState({ name: "", specialization: [] });
   const [showPopup, setShowPopup] = useState(null);
   const [formData, setFormData] = useState({
     scheduledTime: "",
@@ -30,23 +41,23 @@ const CustomBigCalendar = () => {
     interviewerName: "",
     candidateLinkedIn: "",
     jobTitle: "",
+    timeZone: "",
     jobDescription: "",
     resume: "",
     scheduledDate: "",
+    interviewTime: "",
     specialization: "",
     startTime: "",
     endTime: "",
+    time: "",
   });
 
   const interviewersListRef = useRef(null);
-
-
 
   useEffect(() => {
     const fetchAdminEmail = async () => {
       const token = localStorage.getItem("adminAuthToken");
       const adminEmail = localStorage.getItem("adminEmail"); // ✅ Fetch inside function
-      
 
       if (!token || !adminEmail) {
         console.error("Missing admin token or admin ID in localStorage");
@@ -54,29 +65,30 @@ const CustomBigCalendar = () => {
       }
 
       try {
-        const response = await axios.get(`/api/admin/${adminEmail}/admin-email`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        console.log("adminnnn",response.data.email);
+        const response = await axios.get(
+          `/api/admin/${adminEmail}/admin-email`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log("adminnnn", response.data.email);
 
         if (response.data?.email) {
           setAdminEmail(response.data.email);
           localStorage.setItem("adminEmail", response.data.email); // Store for future use
-          
         } else {
           console.error("Admin email not found in response");
         }
       } catch (error) {
-        console.error("Error fetching admin email:", error.response?.data || error.message);
+        console.error(
+          "Error fetching admin email:",
+          error.response?.data || error.message
+        );
       }
     };
 
     fetchAdminEmail();
   }, []);
-
-
-
-
 
   // --- Helper Functions ---
   const parseTimeString = (timeInput) => {
@@ -111,14 +123,19 @@ const CustomBigCalendar = () => {
     const startTime = customEntry
       ? customEntry.startTime
       : rangeEntry
-        ? rangeEntry.startTime
-        : "Not Specified";
+      ? rangeEntry.startTime
+      : "Not Specified";
     const endTime = customEntry
       ? customEntry.endTime
       : rangeEntry
-        ? rangeEntry.endTime
-        : "Not Specified";
-    return { startTime, endTime };
+      ? rangeEntry.endTime
+      : "Not Specified";
+    const timeZone = customEntry
+      ? customEntry.timezone
+      : rangeEntry
+      ? rangeEntry.timezone
+      : "Not Specified";
+    return { startTime, endTime, timeZone };
   };
 
   // --- Data Fetching and Event Creation ---
@@ -134,8 +151,7 @@ const CustomBigCalendar = () => {
         const response = await axios.get("/api/user/availability", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-
+        console.log("Fetched Availability Data:", response.data);
 
         const data = Array.isArray(response.data?.data)
           ? response.data.data
@@ -227,12 +243,14 @@ const CustomBigCalendar = () => {
 
     const interviewersOnDate = eventsOnDate.flatMap((event) =>
       event.users.map((user) => {
+        // Look for a custom availability entry that has the selected date in its dates array
         const customEntry = user.customAvailability?.find((entry) =>
           entry.dates.some(
             (date) => moment(date).format("YYYY-MM-DD") === selectedDateString
           )
         );
 
+        // Look for an availability range that covers the clicked date
         const rangeEntry = user.availabilityRange?.find(
           (range) =>
             moment(range.startDate).isSameOrBefore(clickedDate, "day") &&
@@ -242,19 +260,27 @@ const CustomBigCalendar = () => {
         const startTime = customEntry
           ? customEntry.startTime
           : rangeEntry
-            ? rangeEntry.startTime
-            : "Not Specified";
+          ? rangeEntry.startTime
+          : "Not Specified";
 
         const endTime = customEntry
           ? customEntry.endTime
           : rangeEntry
-            ? rangeEntry.endTime
-            : "Not Specified";
+          ? rangeEntry.endTime
+          : "Not Specified";
+
+        // Use the timezone from customEntry if available, otherwise from rangeEntry
+        const timeZone = customEntry
+          ? customEntry.timezone
+          : rangeEntry
+          ? rangeEntry.timezone
+          : "Not Specified";
 
         return {
           name: user.name,
           specialization: user.specialization,
           availableTime: `${startTime} - ${endTime}`,
+          timeZone,
           experience: user.yearOfExperience
             ? `${user.yearOfExperience} years`
             : "N/A",
@@ -277,6 +303,10 @@ const CustomBigCalendar = () => {
         interviewersOnDate.length > 0
           ? interviewersOnDate[0].endTime
           : "Not Specified",
+      timeZone:
+        interviewersOnDate.length > 0
+          ? interviewersOnDate[0].timeZone
+          : "Not Specified",
     }));
 
     if (interviewersListRef.current) {
@@ -296,6 +326,7 @@ const CustomBigCalendar = () => {
       specialization: candidate?.specialization || "",
       startTime: candidate?.startTime || "",
       endTime: candidate?.endTime || "",
+      timeZone: candidate?.timeZone || "",
       scheduledTime: candidate
         ? `${candidate.startTime} - ${candidate.endTime}`
         : "",
@@ -306,206 +337,246 @@ const CustomBigCalendar = () => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
 
+    if (!events || events.length === 0) return; // Prevent filtering empty data
+
     const predefinedSpecializations = ["Cloud", "AI", "Language", "Domain"];
 
+    // **Filter events based on specialization**
     const filtered = events
       .map((event) => {
-        const filteredUsers = value === "Others"
-          ? event.users.filter((user) => !predefinedSpecializations.includes(user.specialization))
-          : value
-          ? event.users.filter((user) => user.specialization === value)
-          : event.users;
+        const filteredUsers =
+          value === "Others"
+            ? event.users.filter(
+                (user) =>
+                  user.specialization &&
+                  !predefinedSpecializations.includes(user.specialization)
+              )
+            : value
+            ? event.users.filter(
+                (user) => user.specialization && user.specialization === value
+              )
+            : event.users;
 
         return filteredUsers.length > 0
           ? {
-            ...event,
-            users: filteredUsers,
-            title: `${filteredUsers.length} Users`,
-          }
+              ...event,
+              users: filteredUsers,
+              title: `${filteredUsers.length}`,
+            }
           : null;
       })
-      .filter(Boolean);
+      .filter(Boolean); // Remove null values
 
     setFilteredEvents(filtered);
 
+    // **Handle Interviewers for the Selected Date**
     if (selectedDate) {
       const selectedDateString = selectedDate.toISOString().slice(0, 10);
+
       const eventsOnDate = filtered.filter(
         (event) => event.start.toISOString().slice(0, 10) === selectedDateString
       );
 
       const interviewersOnDate = eventsOnDate.flatMap((event) =>
-        event.users
-          .filter((user) => 
-            value === "Others"
-              ? !predefinedSpecializations.includes(user.specialization)
-              : user.specialization === value
-          )
-          .map((user) => {
-            const customEntry = user.customAvailability?.find((entry) =>
-              entry.dates.some(
-                (date) =>
-                  new Date(date).toISOString().slice(0, 10) === selectedDateString
-              )
-            );
-            const rangeEntry = user.availabilityRange?.find(
-              (range) =>
-                new Date(range.startDate) <= selectedDate &&
-                new Date(range.endDate) >= selectedDate
-            );
-            const startTime = customEntry
-              ? customEntry.startTime
-              : rangeEntry
-                ? rangeEntry.startTime
-                : "Not Specified";
-            const endTime = customEntry
-              ? customEntry.endTime
-              : rangeEntry
-                ? rangeEntry.endTime
-                : "Not Specified";
-            return {
-              name: user.name,
-              specialization: user.specialization,
-              availableTime: `${startTime} - ${endTime}`,
-              experience: user.yearOfExperience
-                ? `${user.yearOfExperience} years`
-                : "N/A",
-              startTime,
-              endTime,
-              user,
-            };
-          })
+        event.users.map((user) => {
+          const customEntry = user.customAvailability?.find((entry) =>
+            entry.dates.some(
+              (date) =>
+                new Date(date).toISOString().slice(0, 10) === selectedDateString
+            )
+          );
+
+          const rangeEntry = user.availabilityRange?.find(
+            (range) =>
+              new Date(range.startDate) <= selectedDate &&
+              new Date(range.endDate) >= selectedDate
+          );
+
+          const startTime = customEntry
+            ? customEntry.startTime
+            : rangeEntry
+            ? rangeEntry.startTime
+            : "Not Specified";
+
+          const endTime = customEntry
+            ? customEntry.endTime
+            : rangeEntry
+            ? rangeEntry.endTime
+            : "Not Specified";
+
+          const timeZone = customEntry
+            ? customEntry.timezone
+            : rangeEntry
+            ? rangeEntry.timezone
+            : "Not Specified";
+
+          return {
+            name: user.name,
+            specialization: user.specialization || "Unknown",
+            availableTime: `${startTime} - ${endTime}`,
+            timeZone,
+            experience: user.yearOfExperience
+              ? `${user.yearOfExperience} years`
+              : "N/A",
+            startTime,
+            endTime,
+            user,
+          };
+        })
       );
+
       setSelectedDateInterviewers(interviewersOnDate);
     } else {
       setSelectedDateInterviewers([]);
     }
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-
   const handleSubmit = async (event, resumeFile) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  const {
-    candidateEmail,
-    candidateName,
-    interviewerEmail,
-    specialization,
-    candidateLinkedIn,
-    jobTitle,
-    jobDescription,
-    scheduledDate,
-    startTime,
-    endTime,
-  } = formData;
+    const {
+      candidateEmail,
+      candidateName,
+      interviewerEmail,
+      specialization,
+      interviewTime,
+      candidateLinkedIn,
+      jobTitle,
+      jobDescription,
+      scheduledDate,
+      startTime,
+      endTime,
+    } = formData;
 
-  // Validate required fields
-  if (!candidateEmail || !candidateName || !jobDescription || !jobTitle || !scheduledDate) {
-    console.error("Missing required fields");
-    alert("Please fill in all required fields.");
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("adminAuthToken");
-    if (!token) {
-      console.error("No auth token found");
-      alert("You are not authorized! Please log in.");
+    // Validate required fields (include specialization now)
+    if (
+      !candidateEmail ||
+      !candidateName ||
+      !specialization ||
+      !jobTitle ||
+      !scheduledDate
+    ) {
+      console.error("Missing required fields");
+      alert("Please fill in all required fields.");
       return;
     }
 
-    const adminEmail = localStorage.getItem("adminEmail");
-
-    // Step 1: Fetch Admin Email
-    const adminResponse = await axios.get(`/api/admin/${adminEmail}/admin-email`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const fetchedAdminEmail = adminResponse.data.email;
-    if (!fetchedAdminEmail) {
-      console.error("Admin email is not found.");
-      return;
-    }
-
-    console.log("Fetched Admin Email:", fetchedAdminEmail);
-
-    // Step 2: Prepare Form Data
-    const formDataWithFile = new FormData();
-    const interviewObj = {
-      email: candidateEmail.trim(),
-      scheduledDate: scheduledDate.trim(),
-      name: candidateName.trim(),
-      jobTitle: jobTitle.trim(),
-      linkedin: candidateLinkedIn.trim(),
-      jobDescription: jobDescription.trim(),
-      scheduledTime: `${startTime} - ${endTime}`,
-    };
-
-    formDataWithFile.append("upcomingInterviews", JSON.stringify([interviewObj]));
-
-    if (resumeFile) {
-      formDataWithFile.append("resume", resumeFile);
-    }
-
-    const encodedEmail = encodeURIComponent(interviewerEmail.trim());
-
-    // Step 3: Submit Interview Data
-    await axios.post(
-      `/api/interviewers/${encodedEmail}/upcoming-interviews`,
-      formDataWithFile,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
+    try {
+      const token = localStorage.getItem("adminAuthToken");
+      if (!token) {
+        console.error("No auth token found");
+        alert("You are not authorized! Please log in.");
+        return;
       }
-    );
 
-    // Step 4: Send Emails (Admin & Interviewer)
-    const emailPromises = [
-      axios.post("/api/email/send-email", {
-        recipient: fetchedAdminEmail,
-        subject: `New Interview Scheduled for ${candidateName}`,
-        candidateName,
-        interviewerEmail: "",
-        jobTitle,
-        scheduledDate,
-        startTime,
-        endTime,
-        jobDescription,
-        candidateLinkedIn,
-      }),
+      const adminEmail = localStorage.getItem("adminEmail");
 
-      axios.post("/api/email/send-email", {
-        recipient: interviewerEmail,
-        subject: `New Interview Scheduled for ${candidateName}`,
-        candidateName,
-        interviewerEmail,
-        jobTitle,
-        scheduledDate,
-        startTime,
-        endTime,
-        jobDescription,
-        candidateLinkedIn,
-      }),
-    ];
+      // Step 1: Fetch Admin Email
+      const adminResponse = await axios.get(
+        `/api/admin/${adminEmail}/admin-email`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    await Promise.allSettled(emailPromises);
+      const fetchedAdminEmail = adminResponse.data.email;
+      if (!fetchedAdminEmail) {
+        console.error("Admin email is not found.");
+        return;
+      }
 
-    alert("Interview scheduled successfully! Emails sent.");
-    setShowPopup(true);
-  } catch (error) {
-    console.error("Error submitting details:", error.response?.data || error.message);
-    alert("Failed to schedule interview. Please try again.");
-    setShowPopup(false);
-  }
-};
+      console.log("Fetched Admin Email:", fetchedAdminEmail);
 
+      // Step 2: Prepare Form Data
+      const formDataWithFile = new FormData();
+      const interviewObj = {
+        email: candidateEmail.trim(),
+        scheduledDate: scheduledDate.trim(),
+        name: candidateName.trim(),
+        jobTitle: jobTitle.trim(),
+        linkedin: candidateLinkedIn.trim(),
+        details: jobDescription.trim(), // Updated to match schema
+        scheduledTime: `${startTime} - ${endTime}`,
+        specialization: Array.isArray(specialization)
+          ? specialization
+          : [specialization], // Ensure it's an array
+        interviewTime: interviewTime.trim(),
+      };
 
+      formDataWithFile.append(
+        "upcomingInterviews",
+        JSON.stringify([interviewObj])
+      );
+
+      if (resumeFile) {
+        formDataWithFile.append("resume", resumeFile);
+      }
+
+      const encodedEmail = encodeURIComponent(interviewerEmail.trim());
+
+      // Step 3: Submit Interview Data
+      await axios.post(
+        `/api/interviewers/${encodedEmail}/upcoming-interviews`,
+        formDataWithFile,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Step 4: Send Emails (Admin & Interviewer)
+      const emailPromises = [
+        axios.post(`/api/email/send-email`, {
+          recipient: fetchedAdminEmail,
+          subject: `New Interview Scheduled for ${candidateName}`,
+          candidateName,
+          interviewerEmail, // ✅ Ensure it's passed correctly
+          jobTitle,
+          scheduledDate,
+          interviewTime,
+          specialization,
+          startTime,
+          endTime,
+          jobDescription,
+          candidateLinkedIn,
+        }),
+
+        axios.post(`/api/email/send-email`, {
+          recipient: interviewerEmail,
+          subject: `You have new Interview Scheduled for ${candidateName}`,
+          candidateName,
+          interviewerEmail,
+          jobTitle,
+          scheduledDate,
+          interviewTime,
+          specialization,
+          startTime,
+          endTime,
+          jobDescription,
+          candidateLinkedIn,
+        }),
+      ];
+
+      await Promise.allSettled(emailPromises);
+
+      alert("Interview scheduled successfully! Emails sent.");
+      setShowPopup(true);
+    } catch (error) {
+      console.error(
+        "Error submitting details:",
+        error.response?.data || error.message
+      );
+      alert("Failed to schedule interview. Please try again.");
+      setShowPopup(false);
+    }
+  };
 
   // --- Render ---
   return (
@@ -589,7 +660,6 @@ const CustomBigCalendar = () => {
                   <MenuItem value="Language">Language</MenuItem>
                   <MenuItem value="Domain">Domain</MenuItem>
                   <MenuItem value="Others">Others</MenuItem>
-                  <MenuItem value="Others">Others</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -601,7 +671,7 @@ const CustomBigCalendar = () => {
           sx={{
             mx: 3,
             mb: 3,
-            bgcolor: "#ffffff",
+            bgcolor: "#f8fafc",
             borderRadius: 10,
             overflow: "hidden",
             border: "1px solid #e5e7eb",
@@ -696,7 +766,7 @@ const CustomBigCalendar = () => {
           <Typography
             variant="h5"
             fontWeight="bold"
-            sx={{ mt: 3, mb: 2, px: 3, color: "#2563eb" }}
+            sx={{ mt: 3, mb: 2, px: 3, color: "#ffffff" }}
           >
             Schedule of {moment(selectedDate).format("DD MMM YYYY")}
           </Typography>
@@ -741,7 +811,7 @@ const CustomBigCalendar = () => {
                     flexDirection: "column",
                     gap: 2,
                     borderRadius: 3,
-                    bgcolor: "#ffffff",
+                    bgcolor: "#1f2937",
                     border: "1px solid #e5e7eb",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                     transition: "transform 0.2s, box-shadow 0.2s",
@@ -758,7 +828,7 @@ const CustomBigCalendar = () => {
                     <Typography
                       variant="h6"
                       fontWeight="bold"
-                      sx={{ color: "#1e293b" }}
+                      sx={{ color: "#ffffff" }}
                     >
                       {interviewer.name}
                     </Typography>
@@ -767,14 +837,12 @@ const CustomBigCalendar = () => {
                   <Box
                     sx={{ display: "flex", flexDirection: "column", gap: 1 }}
                   >
-                    <Typography variant="body2" sx={{ color: "#1e293b" }}>
+                    <Typography variant="body2" sx={{ color: "#ffffff" }}>
                       <strong>Specialization:</strong>{" "}
                       <Box
                         component="span"
                         sx={{
                           bgcolor: "#eff6ff",
-                          px: 1.5,
-                          py: 0.5,
                           borderRadius: "full",
                           color: "#2563eb",
                           ml: 1,
@@ -783,11 +851,12 @@ const CustomBigCalendar = () => {
                         {interviewer.specialization}
                       </Box>
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "#64748b" }}>
+                    <Typography variant="body2" sx={{ color: "#ffffff" }}>
                       <strong>Experience:</strong> {interviewer.experience}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "#64748b" }}>
-                      <strong>Availability:</strong> {interviewer.availableTime}
+                    <Typography variant="body2" sx={{ color: "#ffffff" }}>
+                      <strong>Availability:</strong> {interviewer.availableTime}{" "}
+                      ({interviewer.timeZone})
                     </Typography>
                   </Box>
 
