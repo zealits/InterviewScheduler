@@ -1,11 +1,14 @@
 import React, { useState, Suspense } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import Popup from "../../model/Popup";
 
 // Lazy load the DatePicker component
 const DatePicker = React.lazy(() => import("react-datepicker"));
 
 const Availibility = () => {
   const [availabilityType, setAvailabilityType] = useState("range");
+  const [popup, setPopup] = useState(null);
+  const [error, setError] = useState(null);
   const [availabilityRange, setAvailabilityRange] = useState({
     startDate: null,
     endDate: null,
@@ -26,6 +29,15 @@ const Availibility = () => {
       setCustomDates((prevDates) => [...prevDates, date]);
     }
   };
+
+  const handlePopup = (data) => {
+    setPopup(data);
+  };
+
+  const handleClosePopup = () => {
+    setPopup(null);
+  };
+
 
   const handleRemoveCustomDate = (index) => {
     setCustomDates((prevDates) => prevDates.filter((_, i) => i !== index));
@@ -124,8 +136,8 @@ const Availibility = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      alert("Availability updated successfully!");
+      setPopup(onclose);
+      
       console.log(response.data);
 
       // Reset fields after successful submission
@@ -149,7 +161,8 @@ const Availibility = () => {
         "Error updating availability:",
         error.response?.data || error.message
       );
-      alert("Failed to update availability. Please try again.");
+
+      popup();
     }
   };
 
@@ -407,6 +420,7 @@ const Availibility = () => {
       >
         Submit Availability
       </button>
+      {popup && <Popup message={error} onClose={handleClosePopup} />}
     </div>
   );
 };

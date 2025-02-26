@@ -11,6 +11,8 @@ exports.sendEmail = async (req, res) => {
       interviewerEmail,
       jobTitle,
       scheduledDate,
+      specialization,
+      interviewTime,
       startTime,
       endTime,
       jobDescription,
@@ -43,7 +45,8 @@ exports.sendEmail = async (req, res) => {
         Job Title: ${jobTitle}\n
         Interviewer: ${interviewerEmail}\n
         Scheduled Date: ${scheduledDate}\n
-        Time: ${startTime} - ${endTime}\n
+        interviewTime: ${interviewTime}\n
+        Specialization: ${specialization}\n
         Job Description: ${jobDescription}\n
         Candidate LinkedIn: ${candidateLinkedIn}\n\n
         Please ensure all arrangements are in place.\n`,
@@ -55,7 +58,8 @@ exports.sendEmail = async (req, res) => {
           <p><strong>Job Title:</strong> ${jobTitle}</p>
           <p><strong>Interviewer:</strong> ${interviewerEmail}</p>
           <p><strong>Scheduled Date:</strong> ${scheduledDate}</p>
-          <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+          <p><strong>interviewTime:</strong> ${interviewTime} </p>
+          <p><strong>Specialization:</strong> ${specialization}</p>
           <p><strong>Job Description:</strong> ${jobDescription}</p>
           <p><strong>Candidate LinkedIn:</strong> <a href="${candidateLinkedIn}" target="_blank">${candidateLinkedIn}</a></p>
           <p>Please ensure all arrangements are in place.</p>

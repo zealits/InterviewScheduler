@@ -22,6 +22,7 @@ import {
   Mail,
   User,
   Linkedin,
+  CalendarHeartIcon,
 } from "lucide-react";
 
 const InterviewerDetails = ({
@@ -30,9 +31,11 @@ const InterviewerDetails = ({
   handleChange,
   handleSubmit,
   closeDetails,
+  specialization = [], // dynamic list passed as prop
 }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const [error, setError] = useState(""); // error is now a string
   const [resumeFile, setResumeFile] = useState(null);
 
   if (!selectedCandidate) return null;
@@ -73,350 +76,393 @@ const InterviewerDetails = ({
     }
   };
 
-  // Directly redirect without resetting showSuccess to prevent re-rendering the form
+  // Updated to handle single selection
+  const handleSpecializationChange = (event) => {
+    const { value, checked } = event.target;
+    const updatedSpecialization = checked
+      ? [...specialization, value] // Add if checked
+      : specialization.filter((item) => item !== value);
+
+    if (updatedSpecialization.length === 0) {
+      setError("Please select at least one specialization.");
+    } else {
+      setError("");
+    }
+
+    handleChange(updatedSpecialization);
+  };
+
+  // Redirect to admin dashboard after success
   const handleClosePopup = () => {
-    window.location.href = "/admin"; // Redirect to admin dashboard
+    window.location.href = "/admin";
   };
 
   return (
     <>
-      {/* Render the main form overlay only when the success popup is not shown */}
       {!showSuccess && (
-        <Box
-          sx={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            backdropFilter: "blur(5px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1300,
-            p: 2,
-          }}
-        >
-          <Paper
-            sx={{
-              width: "100%",
-              maxWidth: 600,
-              maxHeight: "90vh",
-              overflowY: "auto",
-              p: 2,
-              boxShadow: 24,
-            }}
-          >
-            {/* Header */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                mb: 1,
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <UserCheck size={24} color="#1976d2" />
-                <Typography variant="h6" component="h2">
-                  Meeting Details
-                </Typography>
-              </Box>
-              <IconButton onClick={closeDetails}>
-                <X size={20} />
-              </IconButton>
-            </Box>
-
-            <Divider sx={{ mb: 2 }} />
-
-            {/* Form */}
-            <Box component="form" onSubmit={handleFormSubmit}>
-              {/* Interviewer Information */}
-              <Box sx={{ mb: 3 }}>
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-hidden">
+          <div className="w-full max-w-2xl h-screen max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-xl">
+            <div className="border-b p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <Calendar className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold">
+                    Meeting Slot Details
+                  </h2>
+                </div>
+                <button
+                  onClick={closeDetails}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  <UserCheck size={20} color="#1976d2" />
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Interviewer Information
-                  </Typography>
-                </Box>
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <User size={16} color="#666" />
-                        <Typography variant="body2" fontWeight="medium">
-                          Name:
-                        </Typography>
-                        <Typography variant="body2">
-                          {formData.interviewerName}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Mail size={16} color="#666" />
-                        <Typography variant="body2" fontWeight="medium">
-                          Email:
-                        </Typography>
-                        <Typography variant="body2">
-                          {formData.interviewerEmail}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Calendar size={16} color="#666" />
-                        <Typography variant="body2" fontWeight="medium">
-                          Date:
-                        </Typography>
-                        <Typography variant="body2">
-                          {formData.scheduledDate}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Clock size={16} color="#666" />
-                        <Typography variant="body2" fontWeight="medium">
-                          Time:
-                        </Typography>
-                        <Typography variant="body2">
-                          {formData.startTime} - {formData.endTime}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Paper>
-              </Box>
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
 
-              <Divider sx={{ my: 2 }} />
+            <div className="p-6">
+              <form onSubmit={handleFormSubmit}>
+                {/* Interviewer Information */}
+                <div className="mb-8">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="bg-blue-50 p-1.5 rounded-full">
+                      <UserCheck className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <h3 className="font-semibold text-lg">
+                      Interviewer Information
+                    </h3>
+                  </div>
 
-              {/* Candidate Details */}
-              <Box sx={{ mb: 3 }}>
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-                >
-                  <UserCheck size={20} color="#1976d2" />
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Candidate Details
-                  </Typography>
-                </Box>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Name"
-                      name="candidateName"
-                      value={formData.candidateName}
-                      onChange={handleChange}
-                      error={!!formErrors.candidateName}
-                      helperText={formErrors.candidateName}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      name="candidateEmail"
-                      value={formData.candidateEmail}
-                      onChange={handleChange}
-                      error={!!formErrors.candidateEmail}
-                      helperText={formErrors.candidateEmail}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="LinkedIn Profile"
-                      name="candidateLinkedIn"
-                      value={formData.candidateLinkedIn}
-                      onChange={handleChange}
-                      InputProps={{
-                        startAdornment: (
-                          <Box sx={{ mr: 1 }}>
-                            <Linkedin size={16} color="#666" />
-                          </Box>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Job Title"
-                      name="jobTitle"
-                      value={formData.jobTitle}
-                      onChange={handleChange}
-                      error={!!formErrors.jobTitle}
-                      helperText={formErrors.jobTitle}
-                      InputProps={{
-                        startAdornment: (
-                          <Box sx={{ mr: 1 }}>
-                            <Briefcase size={16} color="#666" />
-                          </Box>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Job Description"
-                      name="jobDescription"
-                      value={formData.jobDescription}
-                      onChange={handleChange}
-                      multiline
-                      minRows={3}
-                      error={!!formErrors.jobDescription}
-                      helperText={formErrors.jobDescription}
-                      InputProps={{
-                        endAdornment: (
-                          <Box sx={{ ml: 1 }}>
-                            <FileText size={16} color="#666" />
-                          </Box>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button
-                      variant="outlined"
-                      onClick={() =>
-                        document.getElementById("resume-upload").click()
-                      }
-                      startIcon={<Upload size={16} />}
-                    >
-                      Upload Resume
-                    </Button>
-                    <input
-                      id="resume-upload"
-                      type="file"
-                      accept=".pdf"
-                      style={{ display: "none" }}
-                      onChange={handleResumeChange}
-                    />
-                    {resumeFile && (
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        sx={{ mt: 1 }}
+                  <div className="bg-gray-50 rounded-lg border p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">Name:</span>
+                        <span>{formData.interviewerName}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Mail className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">Email:</span>
+                        <span>{formData.interviewerEmail}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">Date:</span>
+                        <span>{formData.scheduledDate}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">Time:</span>
+                        <span>
+                          {formData.startTime} - {formData.endTime}({formData.timeZone})
+
+                        </span>
+
+                      </div>
+                      <div className="flex justify-end items-center space-x-2">
+                        <Briefcase className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">Specialization:</span>
+                        <span>{formData.specialization || "N/A"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Candidate Details */}
+                <div className="mb-8">
+                  <div className="flex items-center space-x-2 mb-6">
+                    <div className="bg-blue-50 p-1.5 rounded-full">
+                      <User className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <h3 className="font-semibold text-lg">Candidate Details</h3>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          placeholder="Full Name"
+                          name="candidateName"
+                          value={formData.candidateName}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-2 rounded-lg border ${formErrors.candidateName
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                        {formErrors.candidateName && (
+                          <p className="text-sm text-red-500">
+                            {formErrors.candidateName}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <input
+                          type="email"
+                          placeholder="Email Address"
+                          name="candidateEmail"
+                          value={formData.candidateEmail}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-2 rounded-lg border ${formErrors.candidateEmail
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                        {formErrors.candidateEmail && (
+                          <p className="text-sm text-red-500">
+                            {formErrors.candidateEmail}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="LinkedIn Profile"
+                          name="candidateLinkedIn"
+                          value={formData.candidateLinkedIn}
+                          onChange={handleChange}
+                          className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <Linkedin className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Job Title"
+                          name="jobTitle"
+                          value={formData.jobTitle}
+                          onChange={handleChange}
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.jobTitle
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
+                      {formErrors.jobTitle && (
+                        <p className="text-sm text-red-500">
+                          {formErrors.jobTitle}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <input
+                          type="time"
+                          placeholder="Slot Time"
+                          name="time"
+                          value={formData.time}
+                          onChange={handleChange}
+                          min="09:00"
+                          max="18:00"
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.time
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
+                      {formErrors.time && (
+                        <p className="text-sm text-red-500">
+                          {formErrors.time}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <textarea
+                        placeholder="Job Description"
+                        name="jobDescription"
+                        value={formData.jobDescription}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-2 rounded-lg border ${formErrors.jobDescription
+                          ? "border-red-500"
+                          : "border-gray-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]`}
+                      />
+                      {formErrors.jobDescription && (
+                        <p className="text-sm text-red-500">
+                          {formErrors.jobDescription}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Specialization as multiple checkboxes */}
+                    {/* <div className="space-y-2">
+                      <label className="font-medium">Specialization:</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {formData.specialization.map((option) => (
+                          <label
+                            key={option}
+                            className="flex items-center space-x-2"
+                          >
+                            <input
+                              type="checkbox"
+                              name="specialization"
+                              value={option}
+                              checked={formData.specialization}
+                              onChange={handleSpecializationChange}
+                              className="w-5 h-10"
+                            />
+                            <span>{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                      {error && (
+                        <p className="text-sm text-red-500 flex items-center">
+                          <AlertCircle className="h-4 w-4 mr-1" />
+                          {error}
+                        </p>
+                      )}
+                      {formData.specialization.length > 0 && (
+                        <p className="text-sm text-gray-700">
+                          Selected: {formData.specialization.join(", ")}
+                        </p>
+                      )}
+                    </div> */}
+
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="specialization"
+                          name="specialization"
+                          value={formData.specialization}
+                          onChange={handleChange}
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.specialization
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
+                      {formErrors.specialization && (
+                        <p className="text-sm text-red-500">
+                          {formErrors.specialization}
+                        </p>
+                      )}
+                    </div>
+
+
+
+                    <div className="space-y-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          document.getElementById("resume-upload").click()
+                        }
+                        className="flex items-center px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
                       >
-                        {resumeFile.name}
-                      </Typography>
-                    )}
-                  </Grid>
-                </Grid>
-              </Box>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Resume
+                      </button>
+                      <input
+                        id="resume-upload"
+                        type="file"
+                        accept=".pdf"
+                        className="hidden"
+                        onChange={handleResumeChange}
+                      />
+                      {resumeFile && (
+                        <p className="text-sm text-gray-600">
+                          {resumeFile.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-              {/* Action Buttons */}
-              <Box sx={{ display: "flex", gap: 2, pt: 2 }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  startIcon={<Send size={16} />}
-                >
-                  Submit
-                </Button>
-                <Button type="button" variant="outlined" onClick={closeDetails}>
-                  Cancel
-                </Button>
-              </Box>
-            </Box>
-          </Paper>
-        </Box>
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                  <button
+                    type="submit"
+                    className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    Submit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeDetails}
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* Success Popup with white background */}
+      {/* Success Popup */}
       {showSuccess && (
-        <Box
-          sx={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0.4,0.7)", // White background instead of dark overla
-            backdropFilter: "blur(5px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1400,
-            p: 2,
-          }}
-        >
-          <Paper sx={{ width: "100%", maxWidth: 400, p: 3 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                mb: 2,
-              }}
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="bg-green-100 p-2 rounded-full">
+                  <div className="h-6 w-6 text-green-600">✓</div>
+                </div>
+                <h3 className="text-xl font-semibold">
+                  Request Sent Successfully!
+                </h3>
+              </div>
+              <button
+                onClick={handleClosePopup}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div className="grid grid-cols-1 gap-3">
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-gray-500" />
+                  <span className="font-medium">Interviewer:</span>
+                  <span>{formData.interviewerName}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-4 w-4 text-gray-500" />
+                  <span className="font-medium">Email:</span>
+                  <span>{formData.interviewerEmail}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <span className="font-medium">Date:</span>
+                  <span>{formData.scheduledDate}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <span className="font-medium">Time:</span>
+                  <span>{formData.scheduledTime}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Briefcase className="h-4 w-4 text-gray-500" />
+                  <span className="font-medium">Specialization:</span>
+                  <span>{formData.specialization || "N/A"}</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={handleClosePopup}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              <Typography variant="h6">
-                Request Sent Successfully!
-              </Typography>
-              <IconButton onClick={handleClosePopup}>
-                <X size={20} />
-              </IconButton>
-            </Box>
-            <Box sx={{ mb: 2 }}>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-              >
-                <User size={16} color="#666" />
-                <Typography variant="body2" fontWeight="medium">
-                  Interviewer Name:
-                </Typography>
-                <Typography variant="body2">  
-                  {formData.interviewerName}
-                </Typography>
-              </Box>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-              >
-                <Mail size={16} color="#666" />
-                <Typography variant="body2" fontWeight="medium">
-                  Interviewer Email:
-                </Typography>
-                <Typography variant="body2">
-                  {formData.interviewerEmail}
-                </Typography>
-              </Box>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-              >
-                <Calendar size={16} color="#666" />
-                <Typography variant="body2" fontWeight="medium">
-                  Scheduled Date:
-                </Typography>
-                <Typography variant="body2">
-                  {formData.scheduledDate}
-                </Typography>
-              </Box>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-              >
-                <Clock size={16} color="#666" />
-                <Typography variant="body2" fontWeight="medium">
-                  Scheduled Time:
-                </Typography>
-                <Typography variant="body2">
-                  {formData.scheduledTime}
-                </Typography>
-              </Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Briefcase size={16} color="#666" />
-                <Typography variant="body2" fontWeight="medium">
-                  Specialization:
-                </Typography>
-                <Typography variant="body2">
-                  {formData.specialization || "N/A"}
-                </Typography>
-              </Box>
-            </Box>
-            <Button fullWidth variant="contained" onClick={handleClosePopup}>
               OK
-            </Button>
-          </Paper>
-        </Box>
+            </button>
+          </div>
+        </div>
       )}
     </>
   );

@@ -7,7 +7,9 @@ const {
 } = require("../controllers/upcomingInterviews");
 const {
   updateInterviewConfirmation,
+  // deleteInterview,
 } = require("../controllers/updateInterviewConfirmation");
+
 const { uploadPDF } = require("../controllers/upcomingInterviews");
 const router = express.Router();
 
@@ -16,6 +18,9 @@ router.get("/:email/upcoming-interviews", getUpcomingInterviews);
 router.get("/:email/pending-interviews", getAllPending);
 router.post("/:email/upcoming-interviews", uploadPDF, postAllUpcoming); // Middleware for file upload
 router.post("/:email/pending-interviews", updateInterviewConfirmation);
+
+// Route for updating interview confirmation
+// router.delete("/:email/pending-interviews/:interviewId", deleteInterview);
 
 // New endpoint for fetching resume PDF on-demand
 router.get("/:email/interviews/:interviewId/resume", getInterviewResume);

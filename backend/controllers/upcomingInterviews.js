@@ -9,8 +9,6 @@ const upload = multer({ storage });
 // Middleware for uploading a single PDF
 exports.uploadPDF = upload.single("resume");
 
-
-
 exports.getAllPending = async (req, res) => {
   try {
     const { email } = req.params;
@@ -27,8 +25,9 @@ exports.getAllPending = async (req, res) => {
       email: interview.email,
       name: interview.name,
       scheduledDate: interview.scheduledDate,
-      scheduledTime: interview.scheduledTime,
       confirmation: interview.confirmation,
+      specialization: interview.specialization,
+      interviewTime: interview.interviewTime,
     }));
 
     res.status(200).json({ upcomingInterviews: updatedInterviews });
@@ -67,17 +66,17 @@ exports.postAllUpcoming = async (req, res) => {
     }
 
     for (const interview of upcomingInterviews) {
-      if (
-        !interview.email ||
-        !interview.scheduledDate ||
-        !interview.name ||
-        !interview.jobTitle ||
-        !interview.scheduledTime
-      ) {
-        return res.status(400).json({
-          message: "Missing required fields in one or more interview entries",
-        });
-      }
+      // if (
+      //   !interview.email ||
+      //   // !interview.scheduledDate ||
+      //   !interview.interviewTime ||
+      //   !interview.specialization ||
+      //   !interview.name
+      // ) {
+      //   return res.status(400).json({
+      //     message: "Missing required fields in one or more interview entries",
+      //   });
+      // }
 
       if (req.file) {
         interview.hasResume = true;
@@ -107,6 +106,8 @@ exports.postAllUpcoming = async (req, res) => {
         interview.scheduledDate,
         interview.scheduledTime.split(" - ")[0],
         interview.scheduledTime.split(" - ")[1],
+        interview.jobDescription,
+        interview.interviewTime,
         process.env.ADMIN_EMAIL // Admin Email
       );
     }

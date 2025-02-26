@@ -8,6 +8,25 @@ const RegisterUser = () => {
   const navigate = useNavigate();
   const [modalData, setModalData] = useState({ title: "", message: "" });
 
+  // State to store multiple specializations
+  const [specializations, setSpecializations] = useState([""]);
+
+  const handleAddSpecialization = () => {
+    setSpecializations([...specializations, ""]);
+  };
+
+  const handleRemoveSpecialization = (index) => {
+    if (specializations.length > 1) {
+      setSpecializations(specializations.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleChangeSpecialization = (index, value) => {
+    const updated = [...specializations];
+    updated[index] = value;
+    setSpecializations(updated);
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     const userData = {
@@ -16,8 +35,8 @@ const RegisterUser = () => {
       password: e.target.password.value,
       linkedinProfile: e.target.linkedinProfile.value,
       yearOfExperience: parseInt(e.target.yearOfExperience.value, 10),
-      experienceAsInterviewer: e.target.experienceAsInterviewer.checked,
-      specialization: e.target.specialization.value,
+      experienceAsInterviewer: parseInt(e.target.experienceAsInterviewer.value, 10),
+      specialization: specializations.join(","), // Convert array to string
       candidatesInterviewed: parseInt(e.target.candidatesInterviewed.value, 10),
     };
 
@@ -49,143 +68,134 @@ const RegisterUser = () => {
 
           <form onSubmit={handleRegister} className="p-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Name Field */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Name
-                </label>
+                <label className="text-sm font-medium text-gray-700">Name</label>
                 <input
                   type="text"
                   name="name"
                   placeholder="Enter your full name"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
+              {/* Email Field */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Email
-                </label>
+                <label className="text-sm font-medium text-gray-700">Email</label>
                 <input
                   type="email"
                   name="email"
                   placeholder="your.email@example.com"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
+              {/* Password Field */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Password
-                </label>
+                <label className="text-sm font-medium text-gray-700">Password</label>
                 <input
                   type="password"
                   name="password"
                   placeholder="••••••••"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
+              {/* LinkedIn Profile */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  LinkedIn Profile
-                </label>
+                <label className="text-sm font-medium text-gray-700">LinkedIn Profile</label>
                 <input
                   type="url"
                   name="linkedinProfile"
                   placeholder="https://linkedin.com/in/yourprofile"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
+              {/* Years of Experience */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Years of Experience
-                </label>
+                <label className="text-sm font-medium text-gray-700">Years of Experience</label>
                 <input
                   type="number"
                   name="yearOfExperience"
                   placeholder="0"
                   required
                   min="0"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
+              {/* Experience as Interviewer */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Experience as Interviewer (Years)
-                </label>
+                <label className="text-sm font-medium text-gray-700">Experience as Interviewer</label>
                 <input
                   type="number"
                   name="experienceAsInterviewer"
                   placeholder="0"
                   required
                   min="0"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
+              {/* Candidates Interviewed */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Candidates Interviewed
-                </label>
+                <label className="text-sm font-medium text-gray-700">Candidates Interviewed</label>
                 <input
                   type="number"
                   name="candidatesInterviewed"
                   placeholder="0"
                   required
                   min="0"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Specialization
-                </label>
-                <select
-                  name="specialization"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+              {/* Specialization Section */}
+              <div className="space-y-2 col-span-2">
+                <label className="text-sm font-medium text-gray-700">Specialization</label>
+                {specializations.map((spec, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={spec}
+                      onChange={(e) => handleChangeSpecialization(index, e.target.value)}
+                      placeholder="Enter specialization"
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSpecialization(index)}
+                        className="bg-red-500 text-white px-3 py-1 rounded-lg"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleAddSpecialization}
+                  className="mt-2 bg-green-500 text-white px-3 py-2 rounded-lg"
                 >
-                  <option value="">Select your specialization</option>
-                  <option value="Cloud">Cloud Computing</option>
-                  <option value="AI">Artificial Intelligence</option>
-                  <option value="Language">Programming Languages</option>
-                  <option value="Domain">Domain Expertise</option>
-                </select>
+                  Add Specialization
+                </button>
               </div>
             </div>
 
             <div className="pt-4">
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-300 transition duration-200"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700"
               >
                 Create Account
               </button>
-
-              <div className="text-center">
-                {/* <a navigate="/user/login" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                Already have an account? Login here
-              </a> */}
-                {/* use navigate instead of href */}
-                <div className="relative flex justify-center">
-                  <span className="py-4 bg-white text-sm text-gray-500">
-                    Already have account ?
-                  </span>
-                  <button
-                    onClick={() => navigate("/user/login")}
-                    className="inline-block text-blue-600 hover:text-blue-700 font-medium text-sm"
-                  >
-                    Login
-                  </button>
-                </div>
-              </div>
             </div>
           </form>
         </div>
