@@ -53,56 +53,47 @@ const Availibility = () => {
 
   const validateRange = () => {
     const { range, startTime, endTime } = availabilityRange;
+    let newErrors = {};
 
     if (!range || !range[0] || !range[1]) {
-      alert("Please select a valid date range.");
-      return false;
-    }
-
-    const [startDate, endDate] = range;
-
-    if (startDate > endDate) {
-      alert("Start date must be earlier than end date.");
-      return false;
+      newErrors.range = "Please select a valid date range.";
+    } else {
+      const [startDate, endDate] = range;
+      if (startDate > endDate) {
+        newErrors.range = "Start date must be earlier than end date.";
+      }
     }
 
     if (!startTime || !endTime) {
-      alert("Please provide both start and end times.");
-      return false;
+      newErrors.time = "Please provide both start and end times.";
+    } else if (startTime >= endTime) {
+      newErrors.time = "Start time must be earlier than end time.";
     }
 
-    if (startTime >= endTime) {
-      alert("Start time must be earlier than end time.");
-      return false;
-    }
-
-    return true;
+    setError(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const validateCustom = () => {
     const { startTime, endTime, timezone } = customAvailability;
+    let newErrors = {};
 
     if (customDates.length === 0) {
-      alert("Please select at least one date.");
-      return false;
+      newErrors.customDates = "Please select at least one date.";
     }
 
     if (!startTime || !endTime) {
-      alert("Please provide both start and end times.");
-      return false;
-    }
-
-    if (startTime >= endTime) {
-      alert("Start time must be earlier than end time.");
-      return false;
+      newErrors.customTime = "Please provide both start and end times.";
+    } else if (startTime >= endTime) {
+      newErrors.customTime = "Start time must be earlier than end time.";
     }
 
     if (!timezone) {
-      alert("Please select a timezone.");
-      return false;
+      newErrors.timezone = "Please select a timezone.";
     }
 
-    return true;
+    setError(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
@@ -211,7 +202,7 @@ const Availibility = () => {
                 />
                 <span className="ml-2 font-medium">Range Selection</span>
               </div>
-              <p className="text-sm text-gray-600 ml-6">
+              <p className="text-sm text-black ml-6">
                 Select a continuous date range with same daily hours
               </p>
             </div>
@@ -325,19 +316,7 @@ const Availibility = () => {
                       }
                       className="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                     />
-                    <select
-                      value={availabilityRange.period}
-                      onChange={(e) =>
-                        setAvailabilityRange({
-                          ...availabilityRange,
-                          period: e.target.value,
-                        })
-                      }
-                      className="ml-2 p-3 border border-gray-300 rounded-md"
-                    >
-                      <option value="AM">AM</option>
-                      <option value="PM">PM</option>
-                    </select>
+                   
                   </div>
                 </div>
 
@@ -357,19 +336,7 @@ const Availibility = () => {
                       }
                       className="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                     />
-                    <select
-                      value={availabilityRange.endPeriod}
-                      onChange={(e) =>
-                        setAvailabilityRange({
-                          ...availabilityRange,
-                          endPeriod: e.target.value,
-                        })
-                      }
-                      className="ml-2 p-3 border border-gray-300 rounded-md"
-                    >
-                      <option value="AM">AM</option>
-                      <option value="PM">PM</option>
-                    </select>
+                    
                   </div>
                 </div>
 
