@@ -44,7 +44,11 @@ const userSchema = new mongoose.Schema({
       // scheduledTime: {
       //   type: String,
       // },
-      interviewTime: {
+      interviewStartTime: {
+        type: String,
+       
+      },
+      interviewEndTime: {
         type: String,
        
       },

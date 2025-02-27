@@ -14,7 +14,8 @@ exports.sendEmail = async (req, res) => {
       jobTitle,
       scheduledDate,
       specialization,
-      interviewTime,
+      interviewStartTime,
+      interviewEndTime,
       jobDescription,
       candidateLinkedIn,
     } = req.body;
@@ -25,7 +26,8 @@ exports.sendEmail = async (req, res) => {
       !candidateName ||
       !jobTitle ||
       !scheduledDate ||
-      !interviewTime
+      !interviewStartTime ||
+      !interviewEndTime
     ) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -33,7 +35,6 @@ exports.sendEmail = async (req, res) => {
     // ✅ Fetch admin emails from database
     const adminEmails = await Admin.find().select("email");
     const adminEmailList = adminEmails.map((a) => a.email);
-    console.log("Admin Emails:", adminEmailList); // Debugging
 
     const isAdmin = adminEmailList.includes(recipient); // ✅ Correct check
 
@@ -47,7 +48,8 @@ Candidate: ${candidateName}\n
 Job Title: ${jobTitle}\n
 Interviewer: ${interviewerEmail}\n
 Scheduled Date: ${scheduledDate}\n
-Interview Time: ${interviewTime}\n
+Interview Start Time: ${interviewStartTime}\n
+Interview End Time: ${interviewEndTime}\n
 Specialization: ${specialization}\n
 Job Description: ${jobDescription}\n
 Candidate LinkedIn: ${candidateLinkedIn}\n\n
@@ -58,7 +60,8 @@ Please ensure all arrangements are in place.\n`,
           <p><strong>Job Title:</strong> ${jobTitle}</p>
           <p><strong>Interviewer:</strong> ${interviewerEmail}</p>
           <p><strong>Scheduled Date:</strong> ${scheduledDate}</p>
-          <p><strong>Interview Time:</strong> ${interviewTime}</p>
+          <p><strong>Interview Start Time:</strong> ${interviewStartTime}</p>
+          <p><strong>Interview End Time:</strong> ${interviewEndTime}</p>
           <p><strong>Specialization:</strong> ${specialization}</p>
           <p><strong>Job Description:</strong> ${jobDescription}</p>
           <p><strong>Candidate LinkedIn:</strong> <a href="${candidateLinkedIn}" target="_blank">${candidateLinkedIn}</a></p>
@@ -70,7 +73,9 @@ Please ensure all arrangements are in place.\n`,
         text: `Hello,\n\nYou have been assigned an upcoming interview.\n\n
 Candidate: ${candidateName}\n
 Job Title: ${jobTitle}\n
-interviewTime:${interviewTime}\n
+Interviewer: ${interviewerEmail}\n
+Interview Start Time: ${interviewStartTime}\n
+Interview End Time: ${interviewEndTime}\n
 Scheduled Date: ${scheduledDate}\n
 Job Description: ${jobDescription}\n
 Candidate LinkedIn: ${candidateLinkedIn}\n\n
@@ -79,7 +84,9 @@ Please be prepared for the interview.\n`,
           <p>You have been assigned an upcoming interview.</p>
           <p><strong>Candidate:</strong> ${candidateName}</p>
           <p><strong>Job Title:</strong> ${jobTitle}</p>
-          <p>strong>interviewTime:${interviewTime}</p>
+          <p><strong>Interviewer:</strong> ${interviewerEmail}</p>
+          <p><strong>Interview Start Time:</strong> ${interviewStartTime}</p>
+          <p><strong>Interview End Time:</strong> ${interviewEndTime}</p>
           <p><strong>Scheduled Date:</strong> ${scheduledDate}</p>
           <p><strong>Job Description:</strong> ${jobDescription}</p>
           <p><strong>Candidate LinkedIn:</strong> <a href="${candidateLinkedIn}" target="_blank">${candidateLinkedIn}</a></p>
