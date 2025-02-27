@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { User, Mail, Calendar, Check, XCircle } from "lucide-react";
+import { User, Mail, Calendar, Check, XCircle, Clock } from "lucide-react";
 import PopupData from "../../model/PopupData";
 import Navbar from "./Navbar";
 
@@ -17,7 +17,6 @@ const PendingApprovals = () => {
   const userEmail = localStorage.getItem("userEmail");
   const email = userEmail;
   // const candidateEmail = interview.email;
-
 
   // Function to close the popup modal
   const handleClosePopup = () => {
@@ -37,6 +36,7 @@ const PendingApprovals = () => {
             (interview) => !interview.confirmation
           )
         );
+        console.log("Fetched Pending Approvals:", response.data);
       } catch (err) {
         setError("Failed to fetch pending approvals.");
       } finally {
@@ -55,12 +55,14 @@ const PendingApprovals = () => {
   // Handler to approve an interview
   const handleApproval = async (interviewId) => {
     // Find the interview object in your pendingInterviews array
-    const interview = pendingInterviews.find((item) => item._id === interviewId);
+    const interview = pendingInterviews.find(
+      (item) => item._id === interviewId
+    );
     if (!interview) {
       console.error("Interview not found");
       return;
     }
-  
+
     // Extract candidate email and other necessary fields from the interview object
     const {
       email: candidateEmail, // candidate's email
@@ -73,13 +75,12 @@ const PendingApprovals = () => {
       interviewTime,
       linkedin: candidateLinkedIn,
     } = interview;
-  
+
     // Optionally, split scheduledTime into startTime and endTime if needed:
     const [startTime, endTime] = scheduledTime
-  ? scheduledTime.split(" - ")
-  : ["", ""]; // or handle error as needed
+      ? scheduledTime.split(" - ")
+      : ["", ""]; // or handle error as needed
 
-  
     try {
       // Approve the interview (using the interviewId)
       await axios.post(`/api/interviewers/${email}/pending-interviews`, {
@@ -89,7 +90,7 @@ const PendingApprovals = () => {
       setPendingInterviews((prev) =>
         prev.filter((interview) => interview._id !== interviewId)
       );
-  
+
       // Continue with the rest of your flow (e.g., sending emails)
       const token = localStorage.getItem("adminAuthToken");
       if (!token) {
@@ -97,20 +98,23 @@ const PendingApprovals = () => {
         alert("You are not authorized! Please log in.");
         return;
       }
-  
+
       const adminEmail = localStorage.getItem("adminEmail");
-  
+
       // Fetch Admin Email
-      const adminResponse = await axios.get(`/api/admin/${adminEmail}/admin-email`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const adminResponse = await axios.get(
+        `/api/admin/${adminEmail}/admin-email`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const fetchedAdminEmail = adminResponse.data.email;
       if (!fetchedAdminEmail) {
         console.error("Admin email is not found.");
         return;
       }
       console.log("Fetched Admin Email:", fetchedAdminEmail);
-  
+
       // Prepare FormData for upcoming interview submission
       const formDataWithFile = new FormData();
       // In this example, assume there is no resume file for approval flow
@@ -122,14 +126,19 @@ const PendingApprovals = () => {
         linkedin: candidateLinkedIn ? candidateLinkedIn.trim() : "",
         details: jobDescription ? jobDescription.trim() : "",
         scheduledTime: scheduledTime ? scheduledTime.trim() : "",
-        specialization: Array.isArray(specialization) ? specialization : [specialization],
+        specialization: Array.isArray(specialization)
+          ? specialization
+          : [specialization],
         interviewTime: interviewTime ? interviewTime.trim() : "",
       };
-  
-      formDataWithFile.append("upcomingInterviews", JSON.stringify([interviewObj]));
-  
+
+      formDataWithFile.append(
+        "upcomingInterviews",
+        JSON.stringify([interviewObj])
+      );
+
       const encodedEmail = encodeURIComponent(email.trim());
-  
+
       // Submit interview data
       await axios.post(
         `/api/interviewers/${encodedEmail}/upcoming-interviews`,
@@ -141,7 +150,7 @@ const PendingApprovals = () => {
           },
         }
       );
-  
+
       // Prepare email payloads
       const emailPayloadAdmin = {
         recipient: fetchedAdminEmail,
@@ -158,7 +167,7 @@ const PendingApprovals = () => {
         jobDescription,
         candidateLinkedIn,
       };
-  
+
       const emailPayloadInterviewer = {
         recipient: email, // interviewer email
         subject: `New Interview Scheduled for ${candidateName}`,
@@ -174,22 +183,41 @@ const PendingApprovals = () => {
         jobDescription,
         candidateLinkedIn,
       };
-  
+
+      const emailPayloadCandidate = {
+        recipient: candidateEmail, // interviewer email
+        subject: `New Interview Scheduled for ${candidateName}`,
+        candidateName,
+        interviewerEmail: email,
+        jobTitle,
+        scheduledDate,
+        interviewTime,
+        scheduledTime,
+        specialization,
+        startTime,
+        endTime,
+        jobDescription,
+        candidateLinkedIn,
+      };
+
       // Send emails to Admin and Interviewer
       await Promise.allSettled([
         axios.post(`/api/email/send-email`, emailPayloadAdmin),
         axios.post(`/api/email/send-email`, emailPayloadInterviewer),
+        axios.post(`/api/email/send-email`, emailPayloadCandidate),
       ]);
-  
+
       alert("Interview scheduled successfully! Emails sent.");
       setPopup({ isOpen: true, message: "Interview confirmed successfully!" });
     } catch (err) {
-      console.error("Error submitting details:", err.response?.data || err.message);
+      console.error(
+        "Error submitting details:",
+        err.response?.data || err.message
+      );
       alert("Failed to schedule interview. Please try again.");
       setPopup({ isOpen: true, message: "Failed to confirm the interview." });
     }
   };
-  
 
   // Handler to reject an interview
   // const handleReject = async (interviewId) => {
@@ -368,9 +396,9 @@ const PendingApprovals = () => {
                         </span>
                       </div>
                       <div className="flex items-center text-gray-700">
-                        <Calendar className="mr-3 text-blue-500" size={18} />
-                        <span className="text-sm">
-                          {interview.scheduledDate}
+                        <Clock className="mr-3 text-blue-500" size={18} />
+                        <span className="text-bold">
+                          {interview.interviewTime}
                         </span>
                       </div>
 

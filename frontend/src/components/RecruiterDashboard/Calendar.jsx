@@ -33,7 +33,6 @@ const CustomBigCalendar = () => {
   const [filter, setFilter] = useState({ name: "", specialization: [] });
   const [showPopup, setShowPopup] = useState(null);
   const [formData, setFormData] = useState({
-    scheduledTime: "",
     candidateName: "",
     candidateEmail: "",
     interviewerEmail: "",
@@ -49,7 +48,6 @@ const CustomBigCalendar = () => {
     specialization: "",
     startTime: "",
     endTime: "",
-    time: "",
   });
 
   const interviewersListRef = useRef(null);
@@ -327,9 +325,10 @@ const CustomBigCalendar = () => {
       startTime: candidate?.startTime || "",
       endTime: candidate?.endTime || "",
       timeZone: candidate?.timeZone || "",
-      scheduledTime: candidate
-        ? `${candidate.startTime} - ${candidate.endTime}`
-        : "",
+
+      // scheduledTime: candidate
+      //   ? `${candidate.startTime} - ${candidate.endTime}`
+      //   : "",
     }));
   };
 
@@ -459,7 +458,8 @@ const CustomBigCalendar = () => {
       !candidateName ||
       !specialization ||
       !jobTitle ||
-      !scheduledDate
+      !scheduledDate ||
+      !interviewTime
     ) {
       console.error("Missing required fields");
       alert("Please fill in all required fields.");
@@ -491,6 +491,7 @@ const CustomBigCalendar = () => {
       }
 
       console.log("Fetched Admin Email:", fetchedAdminEmail);
+      console.log("Candidate Email:", candidateEmail);
 
       // Step 2: Prepare Form Data
       const formDataWithFile = new FormData();
@@ -501,7 +502,6 @@ const CustomBigCalendar = () => {
         jobTitle: jobTitle.trim(),
         linkedin: candidateLinkedIn.trim(),
         details: jobDescription.trim(), // Updated to match schema
-        scheduledTime: `${startTime} - ${endTime}`,
         specialization: Array.isArray(specialization)
           ? specialization
           : [specialization], // Ensure it's an array
@@ -518,6 +518,8 @@ const CustomBigCalendar = () => {
       }
 
       const encodedEmail = encodeURIComponent(interviewerEmail.trim());
+
+      console.log("Encoded Email:", encodedEmail);
 
       // Step 3: Submit Interview Data
       await axios.post(
@@ -542,8 +544,6 @@ const CustomBigCalendar = () => {
           scheduledDate,
           interviewTime,
           specialization,
-          startTime,
-          endTime,
           jobDescription,
           candidateLinkedIn,
         }),
@@ -557,8 +557,6 @@ const CustomBigCalendar = () => {
           scheduledDate,
           interviewTime,
           specialization,
-          startTime,
-          endTime,
           jobDescription,
           candidateLinkedIn,
         }),

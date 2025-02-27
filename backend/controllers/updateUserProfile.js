@@ -94,7 +94,7 @@ const addUpcomingInterview = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  user.upcomingInterviews.push({ email, scheduledDate, scheduledTime, details });
+  user.upcomingInterviews.push({ email, scheduledDate,interviewTime, scheduledTime, details });
   await user.save();
 
   res.status(201).json({
