@@ -376,10 +376,10 @@ const CustomBigCalendar = () => {
       timeZone: candidate?.timeZone || "",
     }));
   };
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
-
 
     if (value === "All") {
       setFilteredEvents(events);
@@ -434,29 +434,6 @@ const CustomBigCalendar = () => {
 
         console.log(`Users matching "${value}":`, filteredUsers);
 
-
-    if (!events || events.length === 0) return;
-  
-    const predefinedSpecializations = ["Cloud", "AI", "Language", "Domain"];
-  
-    const filtered = events
-      .map((event) => {
-        const filteredUsers = event.users.filter((user) => {
-          const userSpecialization = user.specialization || "";
-  
-          // If filtering for "Others", include users with multiple specializations or undefined specialization
-          if (value === "Others") {
-            return (
-              userSpecialization &&
-              (!predefinedSpecializations.includes(userSpecialization) || userSpecialization.includes(","))
-            );
-          }
-  
-          // Ensure exact match for selected specialization and exclude unrelated specializations
-          return value ? userSpecialization === value : true;
-        });
-  
-
         return filteredUsers.length > 0
           ? {
               ...event,
@@ -465,7 +442,6 @@ const CustomBigCalendar = () => {
             }
           : null;
       })
-
       .filter(Boolean); // Remove null values
 
     console.log("Final Filtered Events:", filtered);
@@ -526,13 +502,7 @@ const CustomBigCalendar = () => {
     } else {
       setSelectedDateInterviewers([]);
     }
-
-      .filter(Boolean);
-  
-    setFilteredEvents(filtered);
-
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -716,10 +686,6 @@ const CustomBigCalendar = () => {
         px: { xs: 2, sm: 4, md: 6 },
       }}
     >
-     
-  
-      {/* Filter Section - Refined professional styling */}
-
       <Paper
         sx={{
           width: "100%",
