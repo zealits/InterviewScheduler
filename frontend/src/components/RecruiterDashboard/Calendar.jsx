@@ -137,6 +137,20 @@ const CustomBigCalendar = () => {
     return { startTime, endTime, timeZone };
   };
 
+  // Function to get color based on specialization
+  const getSpecializationColor = (specialization) => {
+    const colors = {
+      Frontend: "#f43f5e", // Red
+      Backend: "#10b981", // Green
+      Fullstack: "#0ea5e9", // Blue
+      Mobile: "#f97316", // Orange
+      DevOps: "#8b5cf6", // Purple
+      QA: "#fbbf24", // Yellow
+      default: "#6b7280", // Gray
+    };
+    return colors[specialization] || colors.default;
+  };
+
   // --- Data Fetching and Event Creation ---
   useEffect(() => {
     const formatLocalDate = (dateInput) => {
@@ -603,7 +617,7 @@ const CustomBigCalendar = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "#ffffff",
+        background: "#f8fafc",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -631,7 +645,7 @@ const CustomBigCalendar = () => {
         {/* Header Section - Elegant neutral gradient */}
         <Box
           sx={{
-            background: "#1f2937",
+            background: "#1e293b",
             p: { xs: 3.5, md: 4.5 },
             display: "flex",
             alignItems: "center",
@@ -643,9 +657,9 @@ const CustomBigCalendar = () => {
         >
           <CalendarDays
             size={42}
-            color="#10b981"
+            color="#06b6d4"
             style={{
-              filter: "drop-shadow(0 3px 6px rgba(16,185,129,0.2))",
+              filter: "drop-shadow(0 3px 6px rgba(6,182,212,0.2))",
               opacity: 0.95,
             }}
           />
@@ -671,7 +685,7 @@ const CustomBigCalendar = () => {
             m: { xs: 2.5, md: 3.5 },
             borderRadius: 3,
             bgcolor: "#ffffff",
-            border: "1px solid #e5e7eb",
+            border: "1px solid #e2e8f0",
             boxShadow: "0 6px 18px rgba(0,0,0,0.03)",
             transition: "transform 0.2s ease, box-shadow 0.2s ease",
             "&:hover": {
@@ -680,10 +694,16 @@ const CustomBigCalendar = () => {
             },
           }}
         >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth variant="outlined" size="medium">
-                <InputLabel sx={{ color: "#4b5563", fontWeight: 500 }}>
+          <Typography
+            variant="h6"
+            sx={{ mb: 3, color: "#1e293b", fontWeight: 600 }}
+          >
+            Filter Interviewers
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: "#475569", fontWeight: 500 }}>
                   Filter by Specialization
                 </InputLabel>
                 <Select
@@ -692,28 +712,28 @@ const CustomBigCalendar = () => {
                   onChange={handleFilterChange}
                   label="Filter by Specialization"
                   sx={{
-                    color: "#1f2937",
+                    color: "#1e293b",
                     fontWeight: 500,
                     "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#d1d5db",
+                      borderColor: "#cbd5e1",
                       borderWidth: "1.5px",
                       transition: "all 0.2s ease",
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#9ca3af",
+                      borderColor: "#94a3b8",
                       borderWidth: "1.5px",
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#4b5563",
+                      borderColor: "#475569",
                       borderWidth: "2px",
                     },
                     "& .MuiSvgIcon-root": {
-                      color: "#4b5563",
+                      color: "#475569",
                       transition: "transform 0.2s ease",
                     },
                     "&:hover .MuiSvgIcon-root": {
                       transform: "translateY(-1px)",
-                      color: "#1f2937",
+                      color: "#1e293b",
                     },
                   }}
                 >
@@ -737,7 +757,7 @@ const CustomBigCalendar = () => {
             bgcolor: "#ffffff",
             borderRadius: { xs: 3, md: 4 },
             overflow: "hidden",
-            border: "1px solid #e5e7eb",
+            border: "1px solid #e2e8f0",
             boxShadow: "0 6px 30px rgba(0,0,0,0.03)",
             transition: "box-shadow 0.3s ease",
             "&:hover": {
@@ -753,29 +773,29 @@ const CustomBigCalendar = () => {
               "& .rbc-calendar": {
                 borderRadius: 2,
                 overflow: "hidden",
-                border: "1px solid #e5e7eb",
-                color: "#1f2937",
+                border: "1px solid #e2e8f0",
+                color: "#1e293b",
                 fontFamily: "'Inter', 'Roboto', sans-serif",
                 backgroundColor: "#ffffff",
               },
               "& .rbc-toolbar": {
                 marginBottom: "1.75rem",
                 "& button": {
-                  color: "#4b5563",
-                  borderColor: "#e5e7eb",
+                  color: "#475569",
+                  borderColor: "#e2e8f0",
                   fontSize: "0.925rem",
                   fontWeight: 500,
                   transition: "all 0.2s ease",
                   backgroundColor: "#ffffff",
                   "&:hover": {
-                    backgroundColor: "#f9fafb",
-                    borderColor: "#9ca3af",
+                    backgroundColor: "#f8fafc",
+                    borderColor: "#94a3b8",
                     transform: "translateY(-1px)",
-                    color: "#1f2937",
+                    color: "#1e293b",
                   },
                   "&.rbc-active": {
-                    backgroundColor: "#1f2937",
-                    borderColor: "#111827",
+                    backgroundColor: "#1e293b",
+                    borderColor: "#0f172a",
                     color: "#ffffff",
                     boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
                   },
@@ -784,51 +804,51 @@ const CustomBigCalendar = () => {
               "& .rbc-header": {
                 padding: "14px 8px",
                 fontWeight: 600,
-                background: "#f9fafb",
-                borderBottom: "1px solid #e5e7eb",
-                color: "#4b5563",
+                background: "#f8fafc",
+                borderBottom: "1px solid #e2e8f0",
+                color: "#475569",
                 fontSize: "0.95rem",
                 textTransform: "uppercase",
                 letterSpacing: "0.05em",
               },
               "& .rbc-month-view": {
                 borderRadius: 2,
-                border: "1px solid #e5e7eb",
+                border: "1px solid #e2e8f0",
                 backgroundColor: "#ffffff",
               },
               "& .rbc-day-bg": {
-                borderRight: "1px solid #e5e7eb",
-                borderBottom: "1px solid #e5e7eb",
+                borderRight: "1px solid #e2e8f0",
+                borderBottom: "1px solid #e2e8f0",
                 transition: "background-color 0.2s",
-                "&:hover": { backgroundColor: "#f9fafb" },
+                "&:hover": { backgroundColor: "#f8fafc" },
               },
               "& .rbc-today": {
-                backgroundColor: "rgba(31,41,55,0.05)",
-                border: "1px solid rgba(31,41,55,0.1)",
+                backgroundColor: "rgba(30,41,59,0.05)",
+                border: "1px solid rgba(30,41,59,0.1)",
               },
               "& .rbc-off-range-bg": {
-                backgroundColor: "#f9fafb",
+                backgroundColor: "#f8fafc",
               },
               "& .rbc-date-cell": {
                 padding: "10px",
                 fontWeight: 500,
                 fontSize: "0.9rem",
-                color: "#4b5563",
-                "&.rbc-now": { color: "#1f2937", fontWeight: 700 },
+                color: "#475569",
+                "&.rbc-now": { color: "#1e293b", fontWeight: 700 },
               },
               "& .rbc-event": {
-                backgroundColor: "#1f2937",
+                backgroundColor: "#06b6d4",
                 borderRadius: "20px",
                 color: "#ffffff",
                 fontWeight: 500,
-                boxShadow: "0 3px 6px rgba(0,0,0,0.15)",
+                boxShadow: "0 3px 6px rgba(6,182,212,0.15)",
                 border: "none",
                 padding: "4px 10px",
                 transition: "all 0.2s ease",
                 "&:hover": {
-                  backgroundColor: "#111827",
+                  backgroundColor: "#0891b2",
                   transform: "translateY(-1px) scale(1.02)",
-                  boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                  boxShadow: "0 4px 8px rgba(6,182,212,0.2)",
                 },
               },
             }}
@@ -910,7 +930,7 @@ const CustomBigCalendar = () => {
               bgcolor: "#ffffff",
               borderRadius: 3,
               boxShadow: "0 6px 20px rgba(0,0,0,0.03)",
-              border: "1px solid #e5e7eb",
+              border: "1px solid #e2e8f0",
               transition: "transform 0.3s ease, box-shadow 0.3s ease",
               "&:hover": {
                 transform: "translateY(-3px)",
@@ -918,12 +938,12 @@ const CustomBigCalendar = () => {
               },
             }}
           >
-            <UserCheck size={65} color="#f43f5e" style={{ opacity: 0.9 }} />
+            <UserCheck size={65} color="#f97316" style={{ opacity: 0.9 }} />
             <Typography
               variant="h6"
               sx={{
                 mt: 2.5,
-                color: "#1f2937",
+                color: "#1e293b",
                 fontWeight: 600,
               }}
             >
@@ -958,7 +978,7 @@ const CustomBigCalendar = () => {
                     gap: 2.5,
                     borderRadius: 3,
                     bgcolor: "#ffffff",
-                    border: "1px solid #e5e7eb",
+                    border: "1px solid #e2e8f0",
                     boxShadow: "0 15px 35px rgba(0,0,0,0.08)",
                     transition: "all 0.3s ease",
                     "&:hover": {
@@ -970,19 +990,19 @@ const CustomBigCalendar = () => {
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <Box
                       sx={{
-                        bgcolor: "#f0fdfa",
+                        bgcolor: "#ecfeff",
                         p: 1.2,
                         borderRadius: "50%",
                         boxShadow: "0 3px 10px rgba(0, 0, 0, 0.08)",
                       }}
                     >
-                      <UserCheck size={24} color="#10b981" />
+                      <UserCheck size={24} color="#06b6d4" />
                     </Box>
                     <Typography
                       variant="h6"
                       fontWeight="700"
                       sx={{
-                        color: "#1f2937",
+                        color: "#1e293b",
                       }}
                     >
                       {interviewer.name}
@@ -1000,7 +1020,7 @@ const CustomBigCalendar = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "#4b5563",
+                        color: "#475569",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
@@ -1010,14 +1030,14 @@ const CustomBigCalendar = () => {
                       <Box
                         component="span"
                         sx={{
-                          bgcolor: "#f43f5e",
+                          bgcolor: getSpecializationColor(interviewer.specialization),
                           borderRadius: 10,
                           px: 1.5,
                           py: 0.5,
                           color: "#ffffff",
                           fontWeight: 600,
                           fontSize: "0.8rem",
-                          boxShadow: "0 2px 4px rgba(244,63,94,0.2)",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                           textTransform: "uppercase",
                           letterSpacing: "0.03em",
                         }}
@@ -1028,7 +1048,7 @@ const CustomBigCalendar = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "#4b5563",
+                        color: "#475569",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
@@ -1039,7 +1059,7 @@ const CustomBigCalendar = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "#4b5563",
+                        color: "#475569",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
@@ -1070,19 +1090,19 @@ const CustomBigCalendar = () => {
                       mt: 2,
                       textTransform: "none",
                       borderRadius: 2.5,
-                      bgcolor: "#0ea5e9",
+                      bgcolor: "#06b6d4",
                       color: "#ffffff",
                       fontWeight: 600,
                       py: 1.5,
-                      boxShadow: "0 6px 15px rgba(14,165,233,0.15)",
+                      boxShadow: "0 6px 15px rgba(6,182,212,0.15)",
                       transition: "all 0.2s ease",
                       "&:hover": {
-                        bgcolor: "#0284c7",
+                        bgcolor: "#0891b2",
                         transform: "translateY(-2px)",
-                        boxShadow: "0 8px 20px rgba(14,165,233,0.2)",
+                        boxShadow: "0 8px 20px rgba(6,182,212,0.2)",
                       },
                     }}
-                    startIcon={<CheckCircle size={20} color="#ffffff" />}
+                    startIcon={<CheckCircle size={20} />}
                     onClick={() => handleViewDetails(interviewer)}
                   >
                     Schedule Interview
