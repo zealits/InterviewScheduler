@@ -5,18 +5,13 @@ import Sidebar from "./Sidebar";
 import { Menu } from "lucide-react";
 
 const UserDashboard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Initially Closed
   const userEmail = localStorage.getItem("userEmail");
 
   return (
-    <div className="flex h-screen bg-black-500">
+    <div className="flex h-screen bg-white">
       {/* Sidebar */}
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-      />
-
-      {/* Toggle Sidebar Button */}
+      <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
       {/* Main Content Area */}
       <main
@@ -24,16 +19,19 @@ const UserDashboard = () => {
           isSidebarOpen ? "md:ml-64" : "ml-0"
         } overflow-y-auto`}
       >
+        {/* Sidebar Toggle Button */}
         {!isSidebarOpen && (
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="fixed top-4 left-4 z-40 p-4  bg-blue-500 text-white  shadow-lg  transition-all duration-300 ease-in-out rounded-full"
+            className="fixed top-4 left-4 z-40 p-3 bg-white shadow-lg transition-all duration-300 ease-in-out rounded-full hover:bg-gray-200"
           >
-            <Menu size={24} />
+            <Menu size={26} className="text-gray-800" /> {/* Icon Color Applied */}
           </button>
         )}
-        <div className="max-w-8xl  ">
-          <div className=" shadow-md rounded-lg backdrop-blur-lg">
+
+        <div className="max-w-8xl">
+          <Navbar title={`Welcome ${userEmail}`} onLogout={() => {}} />
+          <div className="mt-7">
             {/* Render Nested Routes */}
             <div className="mx-auto">
               <Outlet />
