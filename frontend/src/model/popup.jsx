@@ -6,17 +6,18 @@ function Popup({ message, onClose }) {
     const handleEscape = (e) => {
       if (e.key === "Escape") onClose();
     };
-    
+
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-md animate-fadeIn z-50">
-      <div 
+      <div
         className="bg-white rounded-2xl p-8 shadow-2xl transform scale-100 transition-all duration-300 ease-out w-fit max-w-md border border-indigo-100"
         style={{
-          boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.1)"
+          boxShadow:
+            "0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.1)",
         }}
       >
         <div className="flex flex-col items-center space-y-6">

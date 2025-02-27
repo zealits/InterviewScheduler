@@ -20,12 +20,15 @@ import moment from "moment";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import InterviewerDetails from "./InterviewerDetails";
+import Popup from "../../model/popup";
 
 const localizer = momentLocalizer(moment);
 
 const CustomBigCalendar = () => {
+  // const CalendarComponent = React.lazy(() => import("Calender"));
   // Track the current view (week, day, or month)
   const [currentView, setCurrentView] = useState("week");
+  const [popup, setPopup] = useState({ show: false, message: "" });
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedDateInterviewers, setSelectedDateInterviewers] = useState([]);
@@ -54,6 +57,10 @@ const CustomBigCalendar = () => {
   });
 
   const interviewersListRef = useRef(null);
+
+  const handleClosePopup = () => {
+    setPopup({ show: false, message: "" });
+  };
 
   useEffect(() => {
     const fetchAdminEmail = async () => {
@@ -174,7 +181,7 @@ const CustomBigCalendar = () => {
 
               const datesArray = [];
               while (current.isSameOrBefore(endDate, "day")) {
-                datesArray.push(formatLocalDate(current)); // Ensure local format
+                datesArray.push(formatLocalDate(current));
                 current.add(1, "day");
               }
               return datesArray;
@@ -212,19 +219,23 @@ const CustomBigCalendar = () => {
             }
 
             return {
-              title: `${users.length}`,
+              title: `${users.length}`, // this is the count displayed on the calendar
               start: eventStart,
               end: eventEnd,
               users,
               availability,
             };
-          });
+          })
+          // Filter out events that are in the past
+          .filter((event) =>
+            moment(event.start).isSameOrAfter(moment().startOf("day"))
+          );
 
         setEvents(combinedEvents);
         setFilteredEvents(combinedEvents);
       } catch (error) {
         console.error("Error fetching data:", error);
-        alert("Failed to fetch calendar data.");
+        setPopup({ show: true, message: "Failed to fetch calendar data." });
       }
     };
 
@@ -234,6 +245,14 @@ const CustomBigCalendar = () => {
   // --- Handlers ---
   const handleSelectSlot = (slotInfo) => {
     const clickedDate = moment(slotInfo.start).startOf("day").toDate();
+
+    // Prevent past dates from being selected
+    if (moment(clickedDate).isBefore(moment().startOf("day"))) {
+      setSelectedDate(null);
+      setSelectedDateInterviewers([]); // Clear the interviewers list
+      return;
+    }
+
     setSelectedDate(clickedDate);
 
     const selectedDateString = moment(clickedDate).format("YYYY-MM-DD");
@@ -242,55 +261,60 @@ const CustomBigCalendar = () => {
       (event) => moment(event.start).format("YYYY-MM-DD") === selectedDateString
     );
 
-    const interviewersOnDate = eventsOnDate.flatMap((event) =>
-      event.users.map((user) => {
-        // Look for a custom availability entry that has the selected date in its dates array
-        const customEntry = user.customAvailability?.find((entry) =>
-          entry.dates.some(
-            (date) => moment(date).format("YYYY-MM-DD") === selectedDateString
-          )
-        );
+    const interviewersOnDate = eventsOnDate
+      .flatMap((event) =>
+        event.users.map((user) => {
+          // Look for a custom availability entry that has the selected date in its dates array
+          const customEntry = user.customAvailability?.find((entry) =>
+            entry.dates.some(
+              (date) => moment(date).format("YYYY-MM-DD") === selectedDateString
+            )
+          );
 
-        // Look for an availability range that covers the clicked date
-        const rangeEntry = user.availabilityRange?.find(
-          (range) =>
-            moment(range.startDate).isSameOrBefore(clickedDate, "day") &&
-            moment(range.endDate).isSameOrAfter(clickedDate, "day")
-        );
+          // Look for an availability range that covers the clicked date
+          const rangeEntry = user.availabilityRange?.find(
+            (range) =>
+              moment(range.startDate).isSameOrBefore(clickedDate, "day") &&
+              moment(range.endDate).isSameOrAfter(clickedDate, "day")
+          );
 
-        const startTime = customEntry
-          ? customEntry.startTime
-          : rangeEntry
-          ? rangeEntry.startTime
-          : "Not Specified";
+          if (!customEntry && !rangeEntry) {
+            return null; // Skip users who are not available on the selected date
+          }
 
-        const endTime = customEntry
-          ? customEntry.endTime
-          : rangeEntry
-          ? rangeEntry.endTime
-          : "Not Specified";
+          const startTime = customEntry
+            ? customEntry.startTime
+            : rangeEntry
+            ? rangeEntry.startTime
+            : "Not Specified";
 
-        // Use the timezone from customEntry if available, otherwise from rangeEntry
-        const timeZone = customEntry
-          ? customEntry.timezone
-          : rangeEntry
-          ? rangeEntry.timezone
-          : "Not Specified";
+          const endTime = customEntry
+            ? customEntry.endTime
+            : rangeEntry
+            ? rangeEntry.endTime
+            : "Not Specified";
 
-        return {
-          name: user.name,
-          specialization: user.specialization,
-          availableTime: `${startTime} - ${endTime}`,
-          timeZone,
-          experience: user.yearOfExperience
-            ? `${user.yearOfExperience} years`
-            : "N/A",
-          startTime,
-          endTime,
-          user,
-        };
-      })
-    );
+          const timeZone = customEntry
+            ? customEntry.timezone
+            : rangeEntry
+            ? rangeEntry.timezone
+            : "Not Specified";
+
+          return {
+            name: user.name,
+            specialization: user.specialization,
+            availableTime: `${startTime} - ${endTime}`,
+            timeZone,
+            experience: user.yearOfExperience
+              ? `${user.yearOfExperience} years`
+              : "N/A",
+            startTime,
+            endTime,
+            user,
+          };
+        })
+      )
+      .filter(Boolean); // Remove null values
 
     setSelectedDateInterviewers(interviewersOnDate);
 
@@ -316,6 +340,24 @@ const CustomBigCalendar = () => {
   };
 
   const handleViewDetails = (candidate) => {
+    // Ensure selected date is not in the past
+    if (
+      selectedDate &&
+      moment(selectedDate).isBefore(moment().startOf("day"))
+    ) {
+      setSelectedCandidate(null);
+      setFormData({
+        interviewerName: "",
+        interviewerEmail: "",
+        scheduledDate: "",
+        specialization: "",
+        startTime: "",
+        endTime: "",
+        timeZone: "",
+      });
+      return;
+    }
+
     setSelectedCandidate(candidate);
     setFormData((prev) => ({
       ...prev,
@@ -334,28 +376,60 @@ const CustomBigCalendar = () => {
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
-  
-    if (!events || events.length === 0) return;
-  
+
+    if (value === "All") {
+      setFilteredEvents(events);
+      setSelectedDateInterviewers([]);
+      return;
+    }
+
     const predefinedSpecializations = ["Cloud", "AI", "Language", "Domain"];
-  
+    const filterValue = value.trim().toLowerCase();
+
+    console.log("Selected Filter Value:", value);
+    console.log("Events Data:", events);
+
     const filtered = events
       .map((event) => {
+        if (!event.users || event.users.length === 0) return null; // Ensure users exist
+
+        console.log(
+          "Checking Event Users:",
+          event.users.map((u) => u.specialization || "No Specialization")
+        );
+
         const filteredUsers = event.users.filter((user) => {
-          const userSpecialization = user.specialization || "";
-  
-          // If filtering for "Others", include users with multiple specializations or undefined specialization
+          // Convert user.specialization to an array of strings
+          let userSpecs = [];
+          if (Array.isArray(user.specialization)) {
+            userSpecs = user.specialization.map((spec) =>
+              spec.trim().toLowerCase()
+            );
+          } else if (typeof user.specialization === "string") {
+            // In case the string contains comma-separated values
+            userSpecs = user.specialization
+              .split(",")
+              .map((s) => s.trim().toLowerCase());
+          } else {
+            return false;
+          }
+
           if (value === "Others") {
-            return (
-              userSpecialization &&
-              (!predefinedSpecializations.includes(userSpecialization) || userSpecialization.includes(","))
+            // Consider user as "Others" if none of their specs match the predefined ones
+            return userSpecs.every(
+              (spec) =>
+                !predefinedSpecializations
+                  .map((s) => s.toLowerCase())
+                  .includes(spec)
             );
           }
-  
-          // Ensure exact match for selected specialization and exclude unrelated specializations
-          return value ? userSpecialization === value : true;
+
+          // Otherwise, return true if any of the user's specializations match the filter
+          return userSpecs.includes(filterValue);
         });
-  
+
+        console.log(`Users matching "${value}":`, filteredUsers);
+
         return filteredUsers.length > 0
           ? {
               ...event,
@@ -364,9 +438,66 @@ const CustomBigCalendar = () => {
             }
           : null;
       })
-      .filter(Boolean);
-  
+      .filter(Boolean); // Remove null values
+
+    console.log("Final Filtered Events:", filtered);
     setFilteredEvents(filtered);
+
+    // **Handle Interviewers for the Selected Date**
+    if (selectedDate) {
+      const selectedDateString = selectedDate.toISOString().split("T")[0];
+
+      const eventsOnDate = filtered.filter(
+        (event) =>
+          event.start &&
+          event.start.toISOString().split("T")[0] === selectedDateString
+      );
+
+      console.log("Events on Selected Date:", eventsOnDate);
+
+      const interviewersOnDate = eventsOnDate.flatMap((event) =>
+        event.users.map((user) => {
+          const customEntry = user.customAvailability?.find((entry) =>
+            entry.dates.some(
+              (date) =>
+                new Date(date).toISOString().split("T")[0] ===
+                selectedDateString
+            )
+          );
+
+          const rangeEntry = user.availabilityRange?.find(
+            (range) =>
+              new Date(range.startDate) <= selectedDate &&
+              new Date(range.endDate) >= selectedDate
+          );
+
+          const startTime =
+            customEntry?.startTime || rangeEntry?.startTime || "Not Specified";
+          const endTime =
+            customEntry?.endTime || rangeEntry?.endTime || "Not Specified";
+          const timeZone =
+            customEntry?.timezone || rangeEntry?.timezone || "Not Specified";
+
+          return {
+            name: user.name,
+            specialization: user.specialization || "Unknown",
+            availableTime: `${startTime} - ${endTime}`,
+            timeZone,
+            experience: user.yearOfExperience
+              ? `${user.yearOfExperience} years`
+              : "N/A",
+            startTime,
+            endTime,
+            user,
+          };
+        })
+      );
+
+      console.log("Interviewers on Selected Date:", interviewersOnDate);
+      setSelectedDateInterviewers(interviewersOnDate);
+    } else {
+      setSelectedDateInterviewers([]);
+    }
   };
 
   const handleChange = (e) => {
@@ -418,7 +549,7 @@ const CustomBigCalendar = () => {
       !interviewEndTime
     ) {
       console.error("Missing required fields");
-      alert("Please fill in all required fields.");
+      setError("Please fill in all required fields.");
       return;
     }
 
@@ -426,7 +557,7 @@ const CustomBigCalendar = () => {
       const token = localStorage.getItem("adminAuthToken");
       if (!token) {
         console.error("No auth token found");
-        alert("You are not authorized! Please log in.");
+        setError("You are not authorized! Please log in.");
         return;
       }
 
@@ -521,16 +652,19 @@ const CustomBigCalendar = () => {
         }),
       ];
 
-      await Promise.allSettled(emailPromises);
+      // Trigger emails without blocking the user response
+      Promise.allSettled(emailPromises).then((results) => {
+        console.log("Emails processed:", results);
+      });
 
-      alert("Interview scheduled successfully! Emails sent.");
+      setPopup({ show: true, message: "Interview scheduled successfully!" });
       setShowPopup(true);
     } catch (error) {
       console.error(
         "Error submitting details:",
         error.response?.data || error.message
       );
-      alert("Failed to schedule interview. Please try again.");
+      setPopup({ show: true, message: "Failed to schedule interview." });
       setShowPopup(false);
     }
   };

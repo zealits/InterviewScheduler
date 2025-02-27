@@ -52,8 +52,6 @@ const InterviewerDetails = ({
       return;
     }
 
-    
-
     // Pass the resumeFile along with the event to handleSubmit
     handleSubmit(event, resumeFile);
     setShowSuccess(true);
@@ -113,7 +111,7 @@ const InterviewerDetails = ({
               </div>
             </div>
 
-            <div className="p-6 max-h-[80vh] overflow-y-auto">
+            <div className="p-6 max-h-[80vh]  ">
               <form onSubmit={handleFormSubmit}>
                 {/* Interviewer Information */}
                 <div className="mb-8">
