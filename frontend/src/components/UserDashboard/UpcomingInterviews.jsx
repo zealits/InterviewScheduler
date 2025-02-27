@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 
-import Popup from "../../model/Popup";
+import Popup from "../../model/popup";
 
 const UpcomingInterviews = () => {
   const [interviews, setInterviews] = useState([]);

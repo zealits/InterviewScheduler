@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { User, Mail, Calendar, Check, XCircle, Clock } from "lucide-react";
-import Popup from "../../model/Popup";
+import Popup from "../../model/popup";
 import Navbar from "./Navbar";
 
 const PendingApprovals = () => {

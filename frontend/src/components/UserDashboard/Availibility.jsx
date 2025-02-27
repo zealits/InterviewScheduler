@@ -1,6 +1,6 @@
 import React, { useState, Suspense } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import Popup from "../../model/Popup";
+import Popup from "../../model/popup";
 import {
   Calendar,
   Clock,
