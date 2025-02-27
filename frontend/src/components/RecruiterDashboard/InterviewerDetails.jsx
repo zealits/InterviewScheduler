@@ -186,11 +186,10 @@ const InterviewerDetails = ({
                           name="candidateName"
                           value={formData.candidateName}
                           onChange={handleChange}
-                          className={`w-full px-4 py-2 rounded-lg border ${
-                            formErrors.candidateName
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full px-4 py-2 rounded-lg border ${formErrors.candidateName
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         {formErrors.candidateName && (
                           <p className="text-sm text-red-500">
@@ -206,11 +205,10 @@ const InterviewerDetails = ({
                           name="candidateEmail"
                           value={formData.candidateEmail}
                           onChange={handleChange}
-                          className={`w-full px-4 py-2 rounded-lg border ${
-                            formErrors.candidateEmail
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full px-4 py-2 rounded-lg border ${formErrors.candidateEmail
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         {formErrors.candidateEmail && (
                           <p className="text-sm text-red-500">
@@ -242,11 +240,10 @@ const InterviewerDetails = ({
                           name="jobTitle"
                           value={formData.jobTitle}
                           onChange={handleChange}
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-                            formErrors.jobTitle
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.jobTitle
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                       </div>
@@ -257,29 +254,45 @@ const InterviewerDetails = ({
                       )}
                     </div>
                     <div className="space-y-2">
+                      {/* Start Time Input */}
                       <div className="relative">
                         <input
                           type="time"
-                          placeholder="Slot Time"
-                          name="interviewTime"
-                          value={formData.interviewTime}
+                          placeholder="StartTime"
+                          name="interviewStartTime"
+                          value={formData.interviewStartTime}
                           onChange={handleChange}
-                          min="09:00"
-                          max="18:00"
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-                            formErrors.time
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          min={formData.startTime}
+                          max={formData.endTime}
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.interviewStartTime ? "border-red-500" : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                       </div>
-                      {formErrors.interviewTime && (
-                        <p className="text-sm text-red-500">
-                          {formErrors.interviewTime}
-                        </p>
+                      {formErrors.interviewStartTime && (
+                        <p className="text-sm text-red-500">{formErrors.interviewStartTime}</p>
+                      )}
+
+                      {/* End Time Input */}
+                      <div className="relative">
+                        <input
+                          type="time"
+                          placeholder="End Time"
+                          name="interviewEndTime"
+                          value={formData.interviewEndTime}
+                          onChange={handleChange}
+                          min={formData.interviewStartTime} // Ensure it starts from the selected start time
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.interviewEndTime   ? "border-red-500" : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
+                      {formErrors.interviewEndTime && (
+                        <p className="text-sm text-red-500">{formErrors.interviewEndTime}</p>
                       )}
                     </div>
+
+
 
                     <div className="space-y-2">
                       <textarea
@@ -287,11 +300,10 @@ const InterviewerDetails = ({
                         name="jobDescription"
                         value={formData.jobDescription}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2 rounded-lg border ${
-                          formErrors.jobDescription
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        } focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]`}
+                        className={`w-full px-4 py-2 rounded-lg border ${formErrors.jobDescription
+                          ? "border-red-500"
+                          : "border-gray-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]`}
                       />
                       {formErrors.jobDescription && (
                         <p className="text-sm text-red-500">
@@ -342,11 +354,10 @@ const InterviewerDetails = ({
                           name="specialization"
                           value={formData.specialization}
                           onChange={handleChange}
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-                            formErrors.specialization
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.specialization
+                            ? "border-red-500"
+                            : "border-gray-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                       </div>
@@ -448,7 +459,8 @@ const InterviewerDetails = ({
                 <div className="flex items-center space-x-2">
                   <Clock className="h-4 w-4 text-gray-500" />
                   <span className="font-medium">Time:</span>
-                  <span>{formData.scheduledTime}</span>
+                  <span>{formData.startTime}</span>-
+                  <span>{formData.endTime}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Briefcase className="h-4 w-4 text-gray-500" />

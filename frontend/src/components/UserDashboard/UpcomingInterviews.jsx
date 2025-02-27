@@ -1,7 +1,18 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import ical from "ical-generator";
-import { User, Mail, Calendar, Clock, Linkedin, FileText, Download, ArrowUp, ArrowDown, X } from 'lucide-react';
+import {
+  User,
+  Mail,
+  Calendar,
+  Clock,
+  Linkedin,
+  FileText,
+  Download,
+  ArrowUp,
+  ArrowDown,
+  X,
+} from "lucide-react";
 import PopupData from "../../model/PopupData";
 
 const UpcomingInterviews = () => {
@@ -35,17 +46,16 @@ const UpcomingInterviews = () => {
         const { data } = await axios.get(
           `/api/interviewers/${email}/upcoming-interviews`
         );
-        setInterviews(data.upcomingInterviews || []);  // Ensure it's always an array
+        setInterviews(data.upcomingInterviews || []); // Ensure it's always an array
       } catch (err) {
         setError("Failed to fetch interviews. Please try again later.");
-        setInterviews([]);  // Set to empty array on error
+        setInterviews([]); // Set to empty array on error
       } finally {
         setLoading(false);
       }
     };
     fetchInterviews();
   }, [email]);
-
 
   // Reset visible count when filters or sort order change
   useEffect(() => {
@@ -130,7 +140,6 @@ const UpcomingInterviews = () => {
 
   // Handle adding interview to calendar and downloading the .ics file
 
-
   const handleAddToCalendar = useCallback((interview) => {
     const calendar = ical({
       name: `${interview.jobTitle} Interview`,
@@ -149,16 +158,23 @@ const UpcomingInterviews = () => {
       end: endTime,
       timestamp: new Date(),
       summary: `${interview.jobTitle} Interview`,
-      description: `Interview with ${interview.name}. ${interview.details || ""}`.trim(),
+      description: `Interview with ${interview.name}. ${
+        interview.details || ""
+      }`.trim(),
       location: interview.location || "Online",
       organizer: { name: "Recruiter", email: "recruiter@example.com" },
       attendees: [
-        { name: interview.name, email: interview.email || "candidate@example.com" },
+        {
+          name: interview.name,
+          email: interview.email || "candidate@example.com",
+        },
       ],
     });
 
     const icsContent = calendar.toString();
-    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+    const blob = new Blob([icsContent], {
+      type: "text/calendar;charset=utf-8",
+    });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
@@ -170,7 +186,6 @@ const UpcomingInterviews = () => {
     URL.revokeObjectURL(url);
   }, []);
 
-
   // Memoized filtered and sorted interviews
   const filteredInterviews = useMemo(() => {
     return interviews
@@ -178,7 +193,8 @@ const UpcomingInterviews = () => {
         (interview) =>
           interview.confirmation === true &&
           (filterDate
-            ? new Date(interview.scheduledDate).toISOString().split("T")[0] === filterDate
+            ? new Date(interview.scheduledDate).toISOString().split("T")[0] ===
+              filterDate
             : true)
       )
       .sort((a, b) => {
@@ -223,8 +239,12 @@ const UpcomingInterviews = () => {
         {/* Dashboard Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 sticky top-0 bg-white z-10 shadow-md p-4">
           <div className=" mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Upcoming Interviews</h2>
-            <p className="mt-2 text-gray-600">Manage and track your scheduled interviews</p>
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+              Upcoming Interviews
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Manage and track your scheduled interviews
+            </p>
           </div>
 
           {/* Controls Section */}
@@ -251,9 +271,15 @@ const UpcomingInterviews = () => {
               <button
                 onClick={handleSort}
                 className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 rounded-lg transition-all duration-200"
-                aria-label={`Sort by date (${sortOrder === "asc" ? "ascending" : "descending"})`}
+                aria-label={`Sort by date (${
+                  sortOrder === "asc" ? "ascending" : "descending"
+                })`}
               >
-                {sortOrder === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+                {sortOrder === "asc" ? (
+                  <ArrowUp size={16} />
+                ) : (
+                  <ArrowDown size={16} />
+                )}
                 Sort by Date
               </button>
             </div>
@@ -286,19 +312,22 @@ const UpcomingInterviews = () => {
                       <div className="flex items-center text-gray-700">
                         <Mail className="mr-3 text-blue-500" size={18} />
                         <span className="text-sm font-medium">
-                          {interview.name?.charAt(0).toUpperCase() + interview.name?.slice(1)}
+                          {interview.name?.charAt(0).toUpperCase() +
+                            interview.name?.slice(1)}
                         </span>
                       </div>
                       <div className="flex items-center text-gray-700">
                         <Calendar className="mr-3 text-blue-500" size={18} />
                         <span className="text-sm">
-                          {new Date(interview.scheduledDate).toLocaleDateString()}
+                          {new Date(
+                            interview.scheduledDate
+                          ).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="flex items-center text-gray-700">
                         <Clock className="mr-3 text-blue-500" size={18} />
                         <span className="text-sm">
-                          {interview.scheduledTime}
+                          {interview.interviewTime}
                         </span>
                       </div>
                       {interview.details && (
@@ -353,7 +382,8 @@ const UpcomingInterviews = () => {
                   onClick={handleViewMore}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
                 >
-                  View More ({filteredInterviews.length - visibleCount} remaining)
+                  View More ({filteredInterviews.length - visibleCount}{" "}
+                  remaining)
                 </button>
               </div>
             )}
@@ -363,8 +393,12 @@ const UpcomingInterviews = () => {
             <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
               <Calendar className="text-gray-400" size={28} />
             </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">No Upcoming Interviews</h3>
-            <p className="text-gray-500">There are no interviews scheduled for the selected date.</p>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">
+              No Upcoming Interviews
+            </h3>
+            <p className="text-gray-500">
+              There are no interviews scheduled for the selected date.
+            </p>
           </div>
         )}
 
@@ -392,7 +426,9 @@ const UpcomingInterviews = () => {
                     className="w-full h-[70vh] rounded-lg"
                   />
                 ) : (
-                  <div className="text-gray-600 text-center py-8">PDF data unavailable</div>
+                  <div className="text-gray-600 text-center py-8">
+                    PDF data unavailable
+                  </div>
                 )}
               </div>
             </div>

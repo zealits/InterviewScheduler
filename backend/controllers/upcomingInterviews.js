@@ -25,7 +25,8 @@ exports.getAllPending = async (req, res) => {
       email: interview.email,
       name: interview.name,
       scheduledDate: interview.scheduledDate,
-      interviewTime: interview.interviewTime,
+      interviewStartTime: interview.interviewStartTime,
+      interviewEndTime: interview.interviewEndTime,
       confirmation: interview.confirmation,
       specialization: interview.specialization,
     }));
