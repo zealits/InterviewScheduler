@@ -332,31 +332,31 @@ const CustomBigCalendar = () => {
       //   : "",
     }));
   };
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
-
-    if (!events || events.length === 0) return; // Prevent filtering empty data
-
+  
+    if (!events || events.length === 0) return;
+  
     const predefinedSpecializations = ["Cloud", "AI", "Language", "Domain"];
-
-    // **Filter events based on specialization**
+  
     const filtered = events
       .map((event) => {
-        const filteredUsers =
-          value === "Others"
-            ? event.users.filter(
-                (user) =>
-                  user.specialization &&
-                  !predefinedSpecializations.includes(user.specialization)
-              )
-            : value
-            ? event.users.filter(
-                (user) => user.specialization && user.specialization === value
-              )
-            : event.users;
-
+        const filteredUsers = event.users.filter((user) => {
+          const userSpecialization = user.specialization || "";
+  
+          // If filtering for "Others", include users with multiple specializations or undefined specialization
+          if (value === "Others") {
+            return (
+              userSpecialization &&
+              (!predefinedSpecializations.includes(userSpecialization) || userSpecialization.includes(","))
+            );
+          }
+  
+          // Ensure exact match for selected specialization and exclude unrelated specializations
+          return value ? userSpecialization === value : true;
+        });
+  
         return filteredUsers.length > 0
           ? {
               ...event,
@@ -365,71 +365,11 @@ const CustomBigCalendar = () => {
             }
           : null;
       })
-      .filter(Boolean); // Remove null values
-
+      .filter(Boolean);
+  
     setFilteredEvents(filtered);
-
-    // **Handle Interviewers for the Selected Date**
-    if (selectedDate) {
-      const selectedDateString = selectedDate.toISOString().slice(0, 10);
-
-      const eventsOnDate = filtered.filter(
-        (event) => event.start.toISOString().slice(0, 10) === selectedDateString
-      );
-
-      const interviewersOnDate = eventsOnDate.flatMap((event) =>
-        event.users.map((user) => {
-          const customEntry = user.customAvailability?.find((entry) =>
-            entry.dates.some(
-              (date) =>
-                new Date(date).toISOString().slice(0, 10) === selectedDateString
-            )
-          );
-
-          const rangeEntry = user.availabilityRange?.find(
-            (range) =>
-              new Date(range.startDate) <= selectedDate &&
-              new Date(range.endDate) >= selectedDate
-          );
-
-          const startTime = customEntry
-            ? customEntry.startTime
-            : rangeEntry
-            ? rangeEntry.startTime
-            : "Not Specified";
-
-          const endTime = customEntry
-            ? customEntry.endTime
-            : rangeEntry
-            ? rangeEntry.endTime
-            : "Not Specified";
-
-          const timeZone = customEntry
-            ? customEntry.timezone
-            : rangeEntry
-            ? rangeEntry.timezone
-            : "Not Specified";
-
-          return {
-            name: user.name,
-            specialization: user.specialization || "Unknown",
-            availableTime: `${startTime} - ${endTime}`,
-            timeZone,
-            experience: user.yearOfExperience
-              ? `${user.yearOfExperience} years`
-              : "N/A",
-            startTime,
-            endTime,
-            user,
-          };
-        })
-      );
-
-      setSelectedDateInterviewers(interviewersOnDate);
-    } else {
-      setSelectedDateInterviewers([]);
-    }
   };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -630,7 +570,7 @@ const CustomBigCalendar = () => {
       {/* Header Section - Free Speech Blue gradient */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #4797ff 0%, #0052cc 100%)",
+          background: "blue",
           p: { xs: 3.5, md: 4.5 },
           display: "flex",
           alignItems: "center",
