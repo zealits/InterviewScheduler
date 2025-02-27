@@ -1,15 +1,5 @@
 import React, { useState } from "react";
 import {
-  Box,
-  Typography,
-  Button,
-  Paper,
-  Grid,
-  TextField,
-  IconButton,
-  Divider,
-} from "@mui/material";
-import {
   AlertCircle,
   Upload,
   X,
@@ -62,6 +52,8 @@ const InterviewerDetails = ({
       return;
     }
 
+    
+
     // Pass the resumeFile along with the event to handleSubmit
     handleSubmit(event, resumeFile);
     setShowSuccess(true);
@@ -100,69 +92,93 @@ const InterviewerDetails = ({
   return (
     <>
       {!showSuccess && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-hidden">
-          <div className="w-full max-w-2xl h-screen max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-xl">
-            <div className="border-b p-4">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
+            <div className="border-b border-gray-100 p-4 bg-gradient-to-r from-indigo-50 to-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <Calendar className="h-6 w-6 text-blue-600" />
+                  <div className="bg-indigo-600 p-2 rounded-full">
+                    <Calendar className="h-6 w-6 text-white" />
                   </div>
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-xl font-semibold text-gray-800">
                     Meeting Slot Details
                   </h2>
                 </div>
                 <button
                   onClick={closeDetails}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-gray-50 rounded-full transition-colors"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-5 w-5 text-gray-500" />
                 </button>
               </div>
             </div>
 
-            <div className="p-6">
+            <div className="p-6 max-h-[80vh] overflow-y-auto">
               <form onSubmit={handleFormSubmit}>
                 {/* Interviewer Information */}
                 <div className="mb-8">
                   <div className="flex items-center space-x-2 mb-4">
-                    <div className="bg-blue-50 p-1.5 rounded-full">
-                      <UserCheck className="h-5 w-5 text-blue-600" />
+                    <div className="bg-green-600 p-1.5 rounded-full">
+                      <UserCheck className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="font-semibold text-lg">
+                    <h3 className="font-semibold text-lg text-gray-800">
                       Interviewer Information
                     </h3>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg border p-4">
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Name:</span>
-                        <span>{formData.interviewerName}</span>
+                        <User className="h-4 w-4 text-green-600" />
+                        <span className="font-medium text-gray-700">Name:</span>
+                        <span className="text-gray-800">
+                          {formData.interviewerName}
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Mail className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Email:</span>
-                        <span>{formData.interviewerEmail}</span>
+                        <Mail className="h-4 w-4 text-green-600" />
+                        <span className="font-medium text-gray-700">
+                          Email:
+                        </span>
+                        <span className="text-gray-800">
+                          {formData.interviewerEmail}
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Date:</span>
-                        <span>{formData.scheduledDate}</span>
+                        <Calendar className="h-4 w-4 text-green-600" />
+                        <span className="font-medium text-gray-700">Date:</span>
+                        <span className="text-gray-800">
+                          {formData.scheduledDate}
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Time:</span>
-                        <span>
-                          {formData.startTime} - {formData.endTime}(
+                        <Clock className="h-4 w-4 text-green-600" />
+                        <span className="font-medium text-gray-700">Time:</span>
+                        <span className="text-gray-800">
+                          {formData.startTime} - {formData.endTime} (
                           {formData.timeZone})
                         </span>
                       </div>
-                      <div className="flex justify-end items-center space-x-2">
-                        <Briefcase className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Specialization:</span>
-                        <span>{formData.specialization || "N/A"}</span>
+                      <div className="flex items-center space-x-2">
+                        <Briefcase className="h-4 w-4 text-green-600" />
+                        <span className="font-medium text-gray-700">
+                          Specialization:
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {Array.isArray(formData.specialization) &&
+                        formData.specialization.length > 0 ? (
+                          formData.specialization.map((spec, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-lg"
+                            >
+                              {spec}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-gray-800">N/A</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -171,10 +187,12 @@ const InterviewerDetails = ({
                 {/* Candidate Details */}
                 <div className="mb-8">
                   <div className="flex items-center space-x-2 mb-6">
-                    <div className="bg-blue-50 p-1.5 rounded-full">
-                      <User className="h-5 w-5 text-blue-600" />
+                    <div className="bg-blue-600 p-1.5 rounded-full">
+                      <User className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="font-semibold text-lg">Candidate Details</h3>
+                    <h3 className="font-semibold text-lg text-gray-800">
+                      Candidate Details
+                    </h3>
                   </div>
 
                   <div className="space-y-6">
@@ -186,10 +204,11 @@ const InterviewerDetails = ({
                           name="candidateName"
                           value={formData.candidateName}
                           onChange={handleChange}
-                          className={`w-full px-4 py-2 rounded-lg border ${formErrors.candidateName
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full px-4 py-2.5 rounded-lg border ${
+                            formErrors.candidateName
+                              ? "border-red-500 ring-1 ring-red-500"
+                              : "border-gray-200 hover:border-blue-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
                         />
                         {formErrors.candidateName && (
                           <p className="text-sm text-red-500">
@@ -205,10 +224,11 @@ const InterviewerDetails = ({
                           name="candidateEmail"
                           value={formData.candidateEmail}
                           onChange={handleChange}
-                          className={`w-full px-4 py-2 rounded-lg border ${formErrors.candidateEmail
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full px-4 py-2.5 rounded-lg border ${
+                            formErrors.candidateEmail
+                              ? "border-red-500 ring-1 ring-red-500"
+                              : "border-gray-200 hover:border-blue-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
                         />
                         {formErrors.candidateEmail && (
                           <p className="text-sm text-red-500">
@@ -226,9 +246,9 @@ const InterviewerDetails = ({
                           name="candidateLinkedIn"
                           value={formData.candidateLinkedIn}
                           onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200"
                         />
-                        <Linkedin className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                        <Linkedin className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
                       </div>
                     </div>
 
@@ -240,12 +260,13 @@ const InterviewerDetails = ({
                           name="jobTitle"
                           value={formData.jobTitle}
                           onChange={handleChange}
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.jobTitle
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
+                            formErrors.jobTitle
+                              ? "border-red-500 ring-1 ring-red-500"
+                              : "border-gray-200 hover:border-blue-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
                         />
-                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
                       </div>
                       {formErrors.jobTitle && (
                         <p className="text-sm text-red-500">
@@ -253,46 +274,65 @@ const InterviewerDetails = ({
                         </p>
                       )}
                     </div>
-                    <div className="space-y-2">
+
+                    <div className="space-y-4">
                       {/* Start Time Input */}
-                      <div className="relative">
-                        <input
-                          type="time"
-                          placeholder="StartTime"
-                          name="interviewStartTime"
-                          value={formData.interviewStartTime}
-                          onChange={handleChange}
-                          min={formData.startTime}
-                          max={formData.endTime}
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.interviewStartTime ? "border-red-500" : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                        />
-                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <div className="relative bg-gray-50 rounded-lg p-4 border border-gray-200 shadow-sm">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Interview Start Time
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="time"
+                            placeholder="Start Time"
+                            name="interviewStartTime"
+                            value={formData.interviewStartTime}
+                            onChange={handleChange}
+                            min={formData.startTime}
+                            max={formData.endTime}
+                            className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
+                              formErrors.interviewStartTime
+                                ? "border-red-500 ring-1 ring-red-500"
+                                : "border-gray-200 hover:border-blue-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
+                          />
+                          <Clock className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
+                        </div>
+                        {formErrors.interviewStartTime && (
+                          <p className="text-sm text-red-500 mt-1">
+                            {formErrors.interviewStartTime}
+                          </p>
+                        )}
                       </div>
-                      {formErrors.interviewStartTime && (
-                        <p className="text-sm text-red-500">{formErrors.interviewStartTime}</p>
-                      )}
 
                       {/* End Time Input */}
-                      <div className="relative">
-                        <input
-                          type="time"
-                          placeholder="End Time"
-                          name="interviewEndTime"
-                          value={formData.interviewEndTime}
-                          onChange={handleChange}
-                          min={formData.interviewStartTime} // Ensure it starts from the selected start time
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.interviewEndTime   ? "border-red-500" : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                        />
-                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <div className="relative bg-gray-50 rounded-lg p-4 border border-gray-200 shadow-sm">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Interview End Time
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="time"
+                            placeholder="End Time"
+                            name="interviewEndTime"
+                            value={formData.interviewEndTime}
+                            onChange={handleChange}
+                            min={formData.interviewStartTime}
+                            className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
+                              formErrors.interviewEndTime
+                                ? "border-red-500 ring-1 ring-red-500"
+                                : "border-gray-200 hover:border-blue-300"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
+                          />
+                          <Clock className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
+                        </div>
+                        {formErrors.interviewEndTime && (
+                          <p className="text-sm text-red-500 mt-1">
+                            {formErrors.interviewEndTime}
+                          </p>
+                        )}
                       </div>
-                      {formErrors.interviewEndTime && (
-                        <p className="text-sm text-red-500">{formErrors.interviewEndTime}</p>
-                      )}
                     </div>
-
-
 
                     <div className="space-y-2">
                       <textarea
@@ -300,10 +340,11 @@ const InterviewerDetails = ({
                         name="jobDescription"
                         value={formData.jobDescription}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2 rounded-lg border ${formErrors.jobDescription
-                          ? "border-red-500"
-                          : "border-gray-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]`}
+                        className={`w-full px-4 py-2.5 rounded-lg border ${
+                          formErrors.jobDescription
+                            ? "border-red-500 ring-1 ring-red-500"
+                            : "border-gray-200 hover:border-blue-300"
+                        } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm min-h-[120px] transition-all duration-200`}
                       />
                       {formErrors.jobDescription && (
                         <p className="text-sm text-red-500">
@@ -312,54 +353,21 @@ const InterviewerDetails = ({
                       )}
                     </div>
 
-                    {/* Specialization as multiple checkboxes */}
-                    {/* <div className="space-y-2">
-                      <label className="font-medium">Specialization:</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {formData.specialization.map((option) => (
-                          <label
-                            key={option}
-                            className="flex items-center space-x-2"
-                          >
-                            <input
-                              type="checkbox"
-                              name="specialization"
-                              value={option}
-                              checked={formData.specialization}
-                              onChange={handleSpecializationChange}
-                              className="w-5 h-10"
-                            />
-                            <span>{option}</span>
-                          </label>
-                        ))}
-                      </div>
-                      {error && (
-                        <p className="text-sm text-red-500 flex items-center">
-                          <AlertCircle className="h-4 w-4 mr-1" />
-                          {error}
-                        </p>
-                      )}
-                      {formData.specialization.length > 0 && (
-                        <p className="text-sm text-gray-700">
-                          Selected: {formData.specialization.join(", ")}
-                        </p>
-                      )}
-                    </div> */}
-
                     <div className="space-y-2">
                       <div className="relative">
                         <input
                           type="text"
-                          placeholder="specialization"
+                          placeholder="Specialization"
                           name="specialization"
                           value={formData.specialization}
                           onChange={handleChange}
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.specialization
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
+                            formErrors.specialization
+                              ? "border-red-500 ring-1 ring-red-500"
+                              : "border-gray-200 hover:border-blue-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
                         />
-                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
                       </div>
                       {formErrors.specialization && (
                         <p className="text-sm text-red-500">
@@ -374,7 +382,7 @@ const InterviewerDetails = ({
                         onClick={() =>
                           document.getElementById("resume-upload").click()
                         }
-                        className="flex items-center px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                        className="flex items-center px-4 py-2.5 rounded-lg border border-blue-300 bg-blue-50 hover:bg-blue-100 transition-colors text-blue-700 shadow-sm"
                       >
                         <Upload className="h-4 w-4 mr-2" />
                         Upload Resume
@@ -387,7 +395,8 @@ const InterviewerDetails = ({
                         onChange={handleResumeChange}
                       />
                       {resumeFile && (
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 flex items-center">
+                          <FileText className="h-4 w-4 mr-2 text-blue-600" />
                           {resumeFile.name}
                         </p>
                       )}
@@ -396,10 +405,10 @@ const InterviewerDetails = ({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
                   <button
                     type="submit"
-                    className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex items-center justify-center px-6 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors shadow-md hover:shadow-lg"
                   >
                     <Send className="h-4 w-4 mr-2" />
                     Submit
@@ -407,7 +416,7 @@ const InterviewerDetails = ({
                   <button
                     type="button"
                     onClick={closeDetails}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 shadow-sm hover:shadow-md"
                   >
                     Cancel
                   </button>
@@ -420,59 +429,99 @@ const InterviewerDetails = ({
 
       {/* Success Popup */}
       {showSuccess && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-6">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
-                <div className="bg-green-100 p-2 rounded-full">
-                  <div className="h-6 w-6 text-green-600">✓</div>
+                <div className="bg-green-600 p-2 rounded-full">
+                  <div className="flex items-center justify-center h-6 w-6 text-white">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      className="h-5 w-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold">
+                <h3 className="text-xl font-semibold text-gray-800">
                   Request Sent Successfully!
                 </h3>
               </div>
               <button
                 onClick={handleClosePopup}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-50 rounded-full transition-colors"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5 text-gray-500" />
               </button>
             </div>
 
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium">Interviewer:</span>
-                  <span>{formData.interviewerName}</span>
+                  <User className="h-4 w-4 text-green-600" />
+                  <span className="font-medium text-gray-700">
+                    Interviewer:
+                  </span>
+                  <span className="text-gray-800">
+                    {formData.interviewerName}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium">Email:</span>
-                  <span>{formData.interviewerEmail}</span>
+                  <Mail className="h-4 w-4 text-green-600" />
+                  <span className="font-medium text-gray-700">Email:</span>
+                  <span className="text-gray-800">
+                    {formData.interviewerEmail}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium">Date:</span>
-                  <span>{formData.scheduledDate}</span>
+                  <Calendar className="h-4 w-4 text-green-600" />
+                  <span className="font-medium text-gray-700">Date:</span>
+                  <span className="text-gray-800">
+                    {formData.scheduledDate}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium">Time:</span>
-                  <span>{formData.startTime}</span>-
-                  <span>{formData.endTime}</span>
+                  <Clock className="h-4 w-4 text-green-600" />
+                  <span className="font-medium text-gray-700">Time:</span>
+                  <span className="text-gray-800">
+                    {formData.startTime} - {formData.endTime}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Briefcase className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium">Specialization:</span>
-                  <span>{formData.specialization || "N/A"}</span>
+                  <Briefcase className="h-4 w-4 text-green-600" />
+                  <span className="font-medium text-gray-700">
+                    Specialization:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.specialization &&
+                    formData.specialization.length > 0 ? (
+                      formData.specialization.map((spec, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 text-sm font-medium bg-indigo-100 text-indigo-700 rounded-full shadow-sm"
+                        >
+                          {spec}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-800">N/A</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
             <button
               onClick={handleClosePopup}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
             >
               OK
             </button>

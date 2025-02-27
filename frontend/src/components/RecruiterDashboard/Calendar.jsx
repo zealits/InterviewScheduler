@@ -12,7 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useState, useEffect, useRef } from "react";
-import { CheckCircle, UserCheck, CalendarDays } from "lucide-react";
+import { CheckCircle, UserCheck, CalendarDays,Clock,Calendar } from "lucide-react";
 import axios from "axios";
 import moment from "moment";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
@@ -433,24 +433,23 @@ const CustomBigCalendar = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     setFormData((prev) => {
       if (name === "interviewStartTime") {
         return {
           ...prev,
           interviewStartTime: value,
-          interviewEndTime: "" // Reset end time when start time changes
+          interviewEndTime: "", // Reset end time when start time changes
         };
       }
-  
+
       if (name === "interviewEndTime" && value <= prev.interviewStartTime) {
         return prev; // Prevent setting end time earlier than start time
       }
-  
+
       return { ...prev, [name]: value };
     });
   };
-  
 
   const handleSubmit = async (event, resumeFile) => {
     event.preventDefault();
@@ -559,7 +558,7 @@ const CustomBigCalendar = () => {
           recipient: fetchedAdminEmail,
           subject: `New Interview Scheduled for ${candidateName}`,
           candidateName,
-          interviewerEmail, // 
+          interviewerEmail, //
           jobTitle,
           scheduledDate,
           interviewStartTime,
@@ -601,508 +600,587 @@ const CustomBigCalendar = () => {
   // --- Render ---
   return (
     <Box
+    sx={{
+      minHeight: "100vh",
+      background: "#f8f9fa",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      py: 8,
+      px: { xs: 2, sm: 4, md: 6 },
+    }}
+  >
+    <Paper
       sx={{
-        minHeight: "100vh",
-        background: "#ffffff",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        py: 8,
-        px: { xs: 2, sm: 4, md: 6 },
+        width: "100%",
+        maxWidth: 1280,
+        mx: "auto",
+        p: 0,
+        mb: 4,
+        borderRadius: { xs: 2, md: 3 },
+        bgcolor: "#ffffff",
+        boxShadow: "0 20px 60px -15px rgba(0,0,0,0.1)",
+        overflow: "hidden",
+        transition: "box-shadow 0.3s ease",
+        "&:hover": {
+          boxShadow: "0 25px 70px -15px rgba(0,0,0,0.15)",
+        },
       }}
     >
-      <Paper
+      {/* Header Section - Free Speech Blue gradient */}
+      <Box
         sx={{
-          width: "100%",
-          maxWidth: 1280,
-          mx: "auto",
-          p: 0,
-          mb: 4,
-          borderRadius: { xs: 3, md: 4 },
+          background: "linear-gradient(135deg, #4797ff 0%, #0052cc 100%)",
+          p: { xs: 3.5, md: 4.5 },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 3,
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          position: "relative",
+        }}
+      >
+        <CalendarDays
+          size={42}
+          color="#ffffff"
+          style={{
+            filter: "drop-shadow(0 3px 6px rgba(0,82,204,0.3))",
+            opacity: 0.95,
+          }}
+        />
+        <Typography
+          variant="h4"
+          fontWeight="700"
+          sx={{
+            color: "#ffffff",
+            textShadow: "0 2px 4px rgba(0,0,0,0.15)",
+            letterSpacing: "0.01em",
+            fontFamily: "'Inter', 'Roboto', sans-serif",
+          }}
+        >
+          Interviewer Availability Calendar
+        </Typography>
+      </Box>
+  
+      {/* Filter Section - Refined professional styling */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 3, md: 4 },
+          m: { xs: 2.5, md: 3.5 },
+          borderRadius: 2,
           bgcolor: "#ffffff",
-          boxShadow: "0 20px 60px -15px rgba(0,0,0,0.07)",
-          overflow: "hidden",
-          transition: "box-shadow 0.3s ease",
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.04)",
+          transition: "transform 0.2s ease, box-shadow 0.2s ease",
           "&:hover": {
-            boxShadow: "0 25px 70px -15px rgba(0,0,0,0.09)",
+            transform: "translateY(-2px)",
+            boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
           },
         }}
       >
-        {/* Header Section - Elegant neutral gradient */}
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth variant="outlined" size="medium">
+              <InputLabel sx={{ color: "#4a5568", fontWeight: 500 }}>
+                Filter by Specialization
+              </InputLabel>
+              <Select
+                name="specialization"
+                value={filter.specialization}
+                onChange={handleFilterChange}
+                label="Filter by Specialization"
+                sx={{
+                  color: "#2d3748",
+                  fontWeight: 500,
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#e2e8f0",
+                    borderWidth: "1.5px",
+                    transition: "all 0.2s ease",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0052cc",
+                    borderWidth: "1.5px",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0052cc",
+                    borderWidth: "2px",
+                  },
+                  "& .MuiSvgIcon-root": {
+                    color: "#4a5568",
+                    transition: "transform 0.2s ease",
+                  },
+                  "&:hover .MuiSvgIcon-root": {
+                    transform: "translateY(-1px)",
+                    color: "#0052cc",
+                  },
+                }}
+              >
+                <MenuItem value="">All Specializations</MenuItem>
+                <MenuItem value="Cloud">Cloud</MenuItem>
+                <MenuItem value="AI">AI</MenuItem>
+                <MenuItem value="Language">Language</MenuItem>
+                <MenuItem value="Domain">Domain</MenuItem>
+                <MenuItem value="Others">Others</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </Paper>
+  
+      {/* Enhanced Calendar Box - Professional styling */}
+      <Box
+        sx={{
+          mx: { xs: 2.5, md: 3.5 },
+          mb: 3.5,
+          bgcolor: "#ffffff",
+          borderRadius: 2,
+          overflow: "hidden",
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 6px 30px rgba(0,0,0,0.04)",
+          transition: "box-shadow 0.3s ease",
+          "&:hover": {
+            boxShadow: "0 8px 35px rgba(0,0,0,0.06)",
+          },
+        }}
+      >
         <Box
           sx={{
-            background: "#1f2937",
-            p: { xs: 3.5, md: 4.5 },
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 3,
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-            position: "relative",
-          }}
-        >
-          <CalendarDays
-            size={42}
-            color="#10b981"
-            style={{
-              filter: "drop-shadow(0 3px 6px rgba(16,185,129,0.2))",
-              opacity: 0.95,
-            }}
-          />
-          <Typography
-            variant="h4"
-            fontWeight="700"
-            sx={{
-              color: "#ffffff",
-              textShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              letterSpacing: "0.01em",
+            height: { xs: 650, md: 750 },
+            p: { xs: 2, md: 3 },
+            overflowX: "auto",
+            "& .rbc-calendar": {
+              borderRadius: 2,
+              overflow: "hidden",
+              border: "1px solid #e2e8f0",
+              color: "#2d3748",
               fontFamily: "'Inter', 'Roboto', sans-serif",
-            }}
-          >
-            Interviewer Availability Calendar
-          </Typography>
-        </Box>
-
-        {/* Filter Section - Refined neutral styling */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 3, md: 4 },
-            m: { xs: 2.5, md: 3.5 },
-            borderRadius: 3,
-            bgcolor: "#ffffff",
-            border: "1px solid #e5e7eb",
-            boxShadow: "0 6px 18px rgba(0,0,0,0.03)",
-            transition: "transform 0.2s ease, box-shadow 0.2s ease",
-            "&:hover": {
-              transform: "translateY(-2px)",
-              boxShadow: "0 8px 25px rgba(0,0,0,0.04)",
+              backgroundColor: "#ffffff",
+            },
+            "& .rbc-toolbar": {
+              marginBottom: "1.75rem",
+              "& button": {
+                color: "#4a5568",
+                borderColor: "#e2e8f0",
+                fontSize: "0.925rem",
+                fontWeight: 500,
+                transition: "all 0.2s ease",
+                backgroundColor: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#f7fafc",
+                  borderColor: "#0052cc",
+                  transform: "translateY(-1px)",
+                  color: "#0052cc",
+                },
+                "&.rbc-active": {
+                  backgroundColor: "#0052cc",
+                  borderColor: "#0052cc",
+                  color: "#ffffff",
+                  boxShadow: "0 3px 8px rgba(0,82,204,0.15)",
+                },
+              },
+            },
+            "& .rbc-header": {
+              padding: "14px 8px",
+              fontWeight: 600,
+              background: "#f7fafc",
+              borderBottom: "1px solid #e2e8f0",
+              color: "#4a5568",
+              fontSize: "0.95rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            },
+            "& .rbc-month-view": {
+              borderRadius: 2,
+              border: "1px solid #e2e8f0",
+              backgroundColor: "#ffffff",
+            },
+            "& .rbc-day-bg": {
+              borderRight: "1px solid #e2e8f0",
+              borderBottom: "1px solid #e2e8f0",
+              transition: "background-color 0.2s",
+              "&:hover": { backgroundColor: "#f7fafc" },
+            },
+            "& .rbc-today": {
+              backgroundColor: "rgba(0,82,204,0.08)",
+              border: "1px solid rgba(0,82,204,0.15)",
+            },
+            "& .rbc-off-range-bg": {
+              backgroundColor: "#f7fafc",
+            },
+            "& .rbc-date-cell": {
+              padding: "10px",
+              fontWeight: 500,
+              fontSize: "0.9rem",
+              color: "#4a5568",
+              "&.rbc-now": { color: "#0052cc", fontWeight: 700 },
+            },
+            "& .rbc-event": {
+              backgroundColor: "#0052cc",
+              borderRadius: "20px",
+              color: "#ffffff",
+              fontWeight: 500,
+              boxShadow: "0 3px 6px rgba(0,82,204,0.15)",
+              border: "none",
+              padding: "4px 10px",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                backgroundColor: "#0046ad",
+                transform: "translateY(-1px) scale(1.02)",
+                boxShadow: "0 4px 8px rgba(0,82,204,0.2)",
+              },
             },
           }}
         >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth variant="outlined" size="medium">
-                <InputLabel sx={{ color: "#4b5563", fontWeight: 500 }}>
-                  Filter by Specialization
-                </InputLabel>
-                <Select
-                  name="specialization"
-                  value={filter.specialization}
-                  onChange={handleFilterChange}
-                  label="Filter by Specialization"
+          <BigCalendar
+            localizer={localizer}
+            events={filteredEvents.map((event) => ({
+              ...event,
+              title: event.title,
+            }))}
+            startAccessor="start"
+            endAccessor="end"
+            selectable
+            onSelectSlot={handleSelectSlot}
+            defaultView="month"
+            views={["month", "week", "day"]}
+            onView={(view) => setCurrentView(view)}
+            components={{
+              event: ({ event }) => (
+                <Box
+                  onClick={() => handleSelectSlot({ start: event.start })}
                   sx={{
-                    color: "#1f2937",
-                    fontWeight: 500,
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#d1d5db",
-                      borderWidth: "1.5px",
-                      transition: "all 0.2s ease",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#9ca3af",
-                      borderWidth: "1.5px",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#4b5563",
-                      borderWidth: "2px",
-                    },
-                    "& .MuiSvgIcon-root": {
-                      color: "#4b5563",
-                      transition: "transform 0.2s ease",
-                    },
-                    "&:hover .MuiSvgIcon-root": {
-                      transform: "translateY(-1px)",
-                      color: "#1f2937",
-                    },
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    "&:hover": { opacity: 0.9 },
                   }}
                 >
-                  <MenuItem value="">All Specializations</MenuItem>
-                  <MenuItem value="Cloud">Cloud</MenuItem>
-                  <MenuItem value="AI">AI</MenuItem>
-                  <MenuItem value="Language">Language</MenuItem>
-                  <MenuItem value="Domain">Domain</MenuItem>
-                  <MenuItem value="Others">Others</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Paper>
-
-        {/* Enhanced Calendar Box - Professional neutral styling */}
+                  <Box
+                    sx={{
+                      alignItems: "center",
+                      gap: 1,
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <CheckCircle size={14} />
+                    <Typography variant="body2" fontWeight="600" noWrap>
+                      {event.title}
+                    </Typography>
+                  </Box>
+                </Box>
+              ),
+            }}
+          />
+        </Box>
+      </Box>
+  
+      {/* Selected Date Section - Professional styling */}
+      {selectedDate && (
+        <Typography
+          variant="h5"
+          fontWeight="700"
+          sx={{
+            mt: 3,
+            mb: 2,
+            px: 3,
+            color: "#0052cc",
+            borderLeft: "4px solid #0052cc",
+            pl: 2,
+            ml: { xs: 2, md: 3 },
+          }}
+        >
+          Schedule of {moment(selectedDate).format("DD MMMM YYYY")}
+        </Typography>
+      )}
+  
+      {/* No Interviewers Message - Elegant empty state */}
+      {selectedDateInterviewers.length === 0 ? (
         <Box
           sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            py: { xs: 6, md: 7 },
             mx: { xs: 2.5, md: 3.5 },
             mb: 3.5,
             bgcolor: "#ffffff",
-            borderRadius: { xs: 3, md: 4 },
-            overflow: "hidden",
-            border: "1px solid #e5e7eb",
-            boxShadow: "0 6px 30px rgba(0,0,0,0.03)",
-            transition: "box-shadow 0.3s ease",
+            borderRadius: 2,
+            boxShadow: "0 6px 20px rgba(0,0,0,0.04)",
+            border: "1px solid #e2e8f0",
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
             "&:hover": {
-              boxShadow: "0 8px 35px rgba(0,0,0,0.04)",
+              transform: "translateY(-3px)",
+              boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
             },
           }}
         >
-          <Box
-            sx={{
-              height: { xs: 650, md: 750 },
-              p: { xs: 2, md: 3 },
-              overflowX: "auto",
-              "& .rbc-calendar": {
-                borderRadius: 2,
-                overflow: "hidden",
-                border: "1px solid #e5e7eb",
-                color: "#1f2937",
-                fontFamily: "'Inter', 'Roboto', sans-serif",
-                backgroundColor: "#ffffff",
-              },
-              "& .rbc-toolbar": {
-                marginBottom: "1.75rem",
-                "& button": {
-                  color: "#4b5563",
-                  borderColor: "#e5e7eb",
-                  fontSize: "0.925rem",
-                  fontWeight: 500,
-                  transition: "all 0.2s ease",
-                  backgroundColor: "#ffffff",
-                  "&:hover": {
-                    backgroundColor: "#f9fafb",
-                    borderColor: "#9ca3af",
-                    transform: "translateY(-1px)",
-                    color: "#1f2937",
-                  },
-                  "&.rbc-active": {
-                    backgroundColor: "#1f2937",
-                    borderColor: "#111827",
-                    color: "#ffffff",
-                    boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
-                  },
-                },
-              },
-              "& .rbc-header": {
-                padding: "14px 8px",
-                fontWeight: 600,
-                background: "#f9fafb",
-                borderBottom: "1px solid #e5e7eb",
-                color: "#4b5563",
-                fontSize: "0.95rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              },
-              "& .rbc-month-view": {
-                borderRadius: 2,
-                border: "1px solid #e5e7eb",
-                backgroundColor: "#ffffff",
-              },
-              "& .rbc-day-bg": {
-                borderRight: "1px solid #e5e7eb",
-                borderBottom: "1px solid #e5e7eb",
-                transition: "background-color 0.2s",
-                "&:hover": { backgroundColor: "#f9fafb" },
-              },
-              "& .rbc-today": {
-                backgroundColor: "rgba(31,41,55,0.05)",
-                border: "1px solid rgba(31,41,55,0.1)",
-              },
-              "& .rbc-off-range-bg": {
-                backgroundColor: "#f9fafb",
-              },
-              "& .rbc-date-cell": {
-                padding: "10px",
-                fontWeight: 500,
-                fontSize: "0.9rem",
-                color: "#4b5563",
-                "&.rbc-now": { color: "#1f2937", fontWeight: 700 },
-              },
-              "& .rbc-event": {
-                backgroundColor: "#1f2937",
-                borderRadius: "20px",
-                color: "#ffffff",
-                fontWeight: 500,
-                boxShadow: "0 3px 6px rgba(0,0,0,0.15)",
-                border: "none",
-                padding: "4px 10px",
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  backgroundColor: "#111827",
-                  transform: "translateY(-1px) scale(1.02)",
-                  boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-                },
-              },
-            }}
-          >
-            <BigCalendar
-              localizer={localizer}
-              events={filteredEvents.map((event) => ({
-                ...event,
-                title: event.title,
-              }))}
-              startAccessor="start"
-              endAccessor="end"
-              selectable
-              onSelectSlot={handleSelectSlot}
-              defaultView="month"
-              views={["month", "week", "day"]}
-              onView={(view) => setCurrentView(view)}
-              components={{
-                event: ({ event }) => (
-                  <Box
-                    onClick={() => handleSelectSlot({ start: event.start })}
-                    sx={{
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      "&:hover": { opacity: 0.9 },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        alignItems: "center",
-                        gap: 1,
-                        display: "flex",
-                        flexDirection: "row",
-                      }}
-                    >
-                      <CheckCircle size={14} />
-                      <Typography variant="body2" fontWeight="600" noWrap>
-                        {event.title}
-                      </Typography>
-                    </Box>
-                  </Box>
-                ),
-              }}
-            />
-          </Box>
-        </Box>
-
-        {/* Selected Date Section - Professional styling */}
-        {selectedDate && (
+          <UserCheck size={65} color="#0052cc" style={{ opacity: 0.9 }} />
           <Typography
-            variant="h5"
-            fontWeight="700"
+            variant="h6"
             sx={{
-              mt: 3,
-              mb: 2,
-              px: 3,
-              color: "#1f2937",
-              borderLeft: "4px solid #0ea5e9",
-              pl: 2,
-              ml: { xs: 2, md: 3 },
+              mt: 2.5,
+              color: "#2d3748",
+              fontWeight: 600,
             }}
           >
-            Schedule of {moment(selectedDate).format("DD MMMM YYYY")}
+            No Interviewers available on this date
           </Typography>
-        )}
-
-        {/* No Interviewers Message - Elegant empty state */}
-        {selectedDateInterviewers.length === 0 ? (
-          <Box
+          <Typography
+            variant="body2"
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-              py: { xs: 6, md: 7 },
-              mx: { xs: 2.5, md: 3.5 },
-              mb: 3.5,
-              bgcolor: "#ffffff",
-              borderRadius: 3,
-              boxShadow: "0 6px 20px rgba(0,0,0,0.03)",
-              border: "1px solid #e5e7eb",
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              "&:hover": {
-                transform: "translateY(-3px)",
-                boxShadow: "0 8px 25px rgba(0,0,0,0.04)",
-              },
+              mt: 1,
+              color: "#4a5568",
+              maxWidth: "80%",
             }}
           >
-            <UserCheck size={65} color="#f43f5e" style={{ opacity: 0.9 }} />
-            <Typography
-              variant="h6"
+            Please select a different date from the calendar to see available
+            interviewers
+          </Typography>
+        </Box>
+      ) : (
+        <Grid
+        container
+        spacing={4}
+        sx={{ mt: 2, px: { xs: 2, md: 4 }, mb: 5 }}
+        ref={interviewersListRef}
+      >
+        {selectedDateInterviewers.map((interviewer, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Paper
               sx={{
-                mt: 2.5,
-                color: "#1f2937",
-                fontWeight: 600,
+                p: { xs: 3.5, md: 4 },
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+                borderRadius: 3,
+                bgcolor: "#ffffff",
+                border: "1px solid #eeeeee",
+                boxShadow: "0 18px 40px rgba(0,0,0,0.06)",
+                transition: "all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1)",
+                "&:hover": {
+                  transform: "translateY(-8px)",
+                  boxShadow: "0 25px 50px rgba(0,0,0,0.1)",
+                  borderColor: "#e6e6e6"
+                },
               }}
+              elevation={0}
             >
-              No Interviewers available on this date
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                mt: 1,
-                color: "#4b5563",
-                maxWidth: "80%",
-              }}
-            >
-              Please select a different date from the calendar to see available
-              interviewers
-            </Typography>
-          </Box>
-        ) : (
-          <Grid
-            container
-            spacing={3}
-            sx={{ mt: 1, px: { xs: 2, md: 3 }, mb: 4 }}
-            ref={interviewersListRef}
-          >
-            {selectedDateInterviewers.map((interviewer, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Paper
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Box
                   sx={{
-                    p: { xs: 3, md: 3.5 },
+                    bgcolor: "#eef5ff",
+                    p: 1.4,
+                    borderRadius: "14px",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
                     display: "flex",
-                    flexDirection: "column",
-                    gap: 2.5,
-                    borderRadius: 3,
-                    bgcolor: "#ffffff",
-                    border: "1px solid #e5e7eb",
-                    boxShadow: "0 15px 35px rgba(0,0,0,0.08)",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      transform: "translateY(-6px)",
-                      boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
-                    },
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                    <Box
-                      sx={{
-                        bgcolor: "#f0fdfa",
-                        p: 1.2,
-                        borderRadius: "50%",
-                        boxShadow: "0 3px 10px rgba(0, 0, 0, 0.08)",
-                      }}
-                    >
-                      <UserCheck size={24} color="#10b981" />
-                    </Box>
-                    <Typography
-                      variant="h6"
-                      fontWeight="700"
-                      sx={{
-                        color: "#1f2937",
-                      }}
-                    >
-                      {interviewer.name}
-                    </Typography>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 1.5,
-                      mt: 0.5,
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: "#4b5563",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <strong>Specialization:</strong>{" "}
-                      <Box
-                        component="span"
-                        sx={{
-                          bgcolor: "#f43f5e",
-                          borderRadius: 10,
-                          px: 1.5,
-                          py: 0.5,
-                          color: "#ffffff",
-                          fontWeight: 600,
-                          fontSize: "0.8rem",
-                          boxShadow: "0 2px 4px rgba(244,63,94,0.2)",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.03em",
-                        }}
-                      >
-                        {interviewer.specialization}
-                      </Box>
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: "#4b5563",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <strong>Experience:</strong> {interviewer.experience}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: "#4b5563",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <strong>Availability:</strong> {interviewer.availableTime}{" "}
-                      <Box
-                        component="span"
-                        sx={{
-                          opacity: 0.9,
-                          fontSize: "0.85rem",
-                          bgcolor: "#f1f5f9",
-                          borderRadius: 10,
-                          px: 1,
-                          py: 0.3,
-                          color: "#64748b"
-                        }}
-                      >
-                        {interviewer.timeZone}
-                      </Box>
-                    </Typography>
-                  </Box>
-
-                  <Button
-                    variant="contained"
-                    size="large"
-                    sx={{
-                      mt: 2,
-                      textTransform: "none",
-                      borderRadius: 2.5,
-                      bgcolor: "#0ea5e9",
-                      color: "#ffffff",
-                      fontWeight: 600,
-                      py: 1.5,
-                      boxShadow: "0 6px 15px rgba(14,165,233,0.15)",
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        bgcolor: "#0284c7",
-                        transform: "translateY(-2px)",
-                        boxShadow: "0 8px 20px rgba(14,165,233,0.2)",
-                      },
-                    }}
-                    startIcon={<CheckCircle size={20} color="#ffffff" />}
-                    onClick={() => handleViewDetails(interviewer)}
-                  >
-                    Schedule Interview
-                  </Button>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        )}
-
-        {/* Interviewer Details Modal - Keeping the same functionality */}
-        <InterviewerDetails
-          selectedCandidate={selectedCandidate}
-          formData={formData}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          closeDetails={() => setSelectedCandidate(null)}
-        />
-      </Paper>
+                  <UserCheck size={26} color="#0052cc" />
+                </Box>
+                <Typography
+                  variant="h6"
+                  fontWeight="700"
+                  sx={{
+                    color: "#2c3e50",
+                    letterSpacing: "-0.01em"
+                  }}
+                >
+                  {interviewer.name}
+                </Typography>
+              </Box>
+      
+              <Box
+                sx={{
+                  py: 0.5,
+                  px: 0.5,
+                  borderRadius: 2,
+                  backgroundColor: "rgba(245, 247, 250, 0.7)",
+                  border: "1px solid rgba(230, 235, 240, 0.8)"
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#546e7a",
+                    fontWeight: 500,
+                    mb: 1.5,
+                    px: 1.5,
+                    pt: 1.5
+                  }}
+                >
+                  Specialization
+                </Typography>
+                
+                <Box 
+  sx={{ 
+    display: "flex", 
+    flexWrap: "wrap", 
+    gap: 1,
+    px: 1.5,
+    pb: 1.5
+  }}
+  >
+  {/* Ensure specialization is always an array and map through it */}
+  {(Array.isArray(interviewer.specialization) 
+    ? interviewer.specialization 
+    : [interviewer.specialization]
+  ).map((spec, index) => (
+    <Box
+      key={index}
+      component="span"
+      sx={{
+        bgcolor: "#0052cc",
+        borderRadius: 10,
+        px: 1.5,
+        py: 0.6,
+        color: "#ffffff",
+        fontWeight: 600,
+        fontSize: "0.8rem",
+        boxShadow: "0 2px 8px rgba(0,82,204,0.25)",
+        textTransform: "uppercase",
+        letterSpacing: "0.04em",
+        display: "inline-flex",
+        alignItems: "center"
+      }}
+    >
+      {spec}
     </Box>
+  ))}
+  </Box>
+  
+              </Box>
+      
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
+                <Box sx={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: 1.5 
+                }}>
+                  <Box 
+                    sx={{ 
+                      p: 1, 
+                      bgcolor: "rgba(0,82,204,0.1)", 
+                      borderRadius: 1.5,
+                      display: "flex"
+                    }}
+                  >
+                    <Clock size={18} color="#0052cc" />
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#455a64",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      fontWeight: 500
+                    }}
+                  >
+                    <strong>Experience:</strong> {interviewer.experience}
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: 1.5 
+                }}>
+                  <Box 
+                    sx={{ 
+                      p: 1, 
+                      bgcolor: "rgba(0,82,204,0.1)", 
+                      borderRadius: 1.5,
+                      display: "flex"
+                    }}
+                  >
+                    <Calendar size={18} color="#0052cc" />
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#455a64",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      fontWeight: 500,
+                      flexWrap: "wrap"
+                    }}
+                  >
+                    <strong>Availability:</strong> {interviewer.availableTime}{" "}
+                    <Box
+                      component="span"
+                      sx={{
+                        opacity: 0.9,
+                        fontSize: "0.85rem",
+                        bgcolor: "#f5f5f5",
+                        borderRadius: 10,
+                        px: 1.5,
+                        py: 0.4,
+                        color: "#546e7a",
+                        border: "1px solid #e0e0e0"
+                      }}
+                    >
+                      {interviewer.timeZone}
+                    </Box>
+                  </Typography>
+                </Box>
+              </Box>
+      
+              <Button
+                variant="contained"
+                size="large"
+                sx={{
+                  mt: 1.5,
+                  textTransform: "none",
+                  borderRadius: 2,
+                  bgcolor: "#0052cc",
+                  color: "#ffffff",
+                  fontWeight: 600,
+                  py: 1.5,
+                  boxShadow: "0 8px 20px rgba(0,82,204,0.18)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    bgcolor: "#0046ad",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 10px 25px rgba(0,82,204,0.25)",
+                  },
+                  "&:active": {
+                    transform: "translateY(0)",
+                    boxShadow: "0 5px 15px rgba(0,82,204,0.2)",
+                  },
+                }}
+                startIcon={<CheckCircle size={20} color="#ffffff" />}
+                onClick={() => handleViewDetails(interviewer)}
+              >
+                Schedule Interview
+              </Button>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+      )}
+  
+      {/* Interviewer Details Modal - Keeping the same functionality */}
+      <InterviewerDetails
+        selectedCandidate={selectedCandidate}
+        formData={formData}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        closeDetails={() => setSelectedCandidate(null)}
+      />
+    </Paper>
+  </Box>
   );
 };
 
