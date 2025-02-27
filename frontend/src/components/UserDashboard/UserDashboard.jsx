@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import { Menu } from "lucide-react";
+// import the new component
 
 const UserDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Initially Closed

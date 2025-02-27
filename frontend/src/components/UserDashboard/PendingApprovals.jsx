@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { User, Mail, Calendar, Check, XCircle, Clock } from "lucide-react";
-import PopupData from "../../model/PopupData";
+import Popup from "../../model/Popup";
 import Navbar from "./Navbar";
 
 const PendingApprovals = () => {
@@ -11,7 +11,6 @@ const PendingApprovals = () => {
   const [sortOrder, setSortOrder] = useState("newest"); // Default sort order: newest first
   const [filterDate, setFilterDate] = useState(""); // For date filtering
   const [visibleCount, setVisibleCount] = useState(6); // For lazy loading
-  // Popup state for showing messages instead of alerts
   const [popup, setPopup] = useState({ isOpen: false, message: "" });
 
   const userEmail = localStorage.getItem("userEmail");
@@ -30,10 +29,23 @@ const PendingApprovals = () => {
         const response = await axios.get(
           `/api/interviewers/${email}/pending-interviews`
         );
+
+        const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize to avoid time mismatches
+
+      // Filter out interviews that are in the past
+      const filteredInterviews = response.data.upcomingInterviews.filter(
+        (interview) => {
+          const interviewDate = new Date(interview.scheduledDate);
+          interviewDate.setHours(0, 0, 0, 0);
+          return interviewDate >= today && !interview.confirmation;
+        }
+      );
         // Only include pending (non-confirmed) interviews
         setPendingInterviews(
           response.data.upcomingInterviews.filter(
-            (interview) => !interview.confirmation
+            (interview) => !interview.confirmation,
+            filteredInterviews
           )
         );
         console.log("Fetched Pending Approvals:", response.data);
@@ -72,7 +84,8 @@ const PendingApprovals = () => {
       jobDescription,
       scheduledTime, // e.g., "10:00 - 11:00"
       specialization,
-      interviewTime,
+      interviewStartTime,
+      interviewEndTime,
       linkedin: candidateLinkedIn,
     } = interview;
 
@@ -95,7 +108,10 @@ const PendingApprovals = () => {
       const token = localStorage.getItem("adminAuthToken");
       if (!token) {
         console.error("No auth token found");
-        alert("You are not authorized! Please log in.");
+        setPopup({
+          isOpen: true,
+          message: "You are not authorized! Please log in.",
+        });
         return;
       }
 
@@ -129,7 +145,8 @@ const PendingApprovals = () => {
         specialization: Array.isArray(specialization)
           ? specialization
           : [specialization],
-        interviewTime: interviewTime ? interviewTime.trim() : "",
+        interviewStartTime: interviewStartTime ? interviewStartTime.trim() : "",
+        interviewEndTime: interviewEndTime ? interviewEndTime.trim() : "",
       };
 
       formDataWithFile.append(
@@ -159,7 +176,8 @@ const PendingApprovals = () => {
         interviewerEmail: email, // interviewer email from local storage
         jobTitle,
         scheduledDate,
-        interviewTime,
+        interviewStartTime,
+        interviewEndTime,
         scheduledTime,
         specialization, // send as is (or format if needed)
         startTime,
@@ -175,7 +193,8 @@ const PendingApprovals = () => {
         interviewerEmail: email,
         jobTitle,
         scheduledDate,
-        interviewTime,
+        interviewStartTime,
+        interviewEndTime,
         scheduledTime,
         specialization,
         startTime,
@@ -191,7 +210,8 @@ const PendingApprovals = () => {
         interviewerEmail: email,
         jobTitle,
         scheduledDate,
-        interviewTime,
+        interviewStartTime,
+        interviewEndTime,   
         scheduledTime,
         specialization,
         startTime,
@@ -206,15 +226,16 @@ const PendingApprovals = () => {
         axios.post(`/api/email/send-email`, emailPayloadInterviewer),
         axios.post(`/api/email/send-email`, emailPayloadCandidate),
       ]);
+      setPopup({ isOpen: true, message: "email sent successfully!" });
 
-      alert("Interview scheduled successfully! Emails sent.");
+
       setPopup({ isOpen: true, message: "Interview confirmed successfully!" });
+      
     } catch (err) {
       console.error(
         "Error submitting details:",
         err.response?.data || err.message
       );
-      alert("Failed to schedule interview. Please try again.");
       setPopup({ isOpen: true, message: "Failed to confirm the interview." });
     }
   };
@@ -395,15 +416,13 @@ const PendingApprovals = () => {
                     <div className="flex items-center text-gray-700">
                       <Clock className="mr-3 text-purple-500" size={16} />
                       <span className="text-sm font-medium">
-                        {interview.interviewTime}{" "}
-                        {
-                          Intl.DateTimeFormat(undefined, {
-                            timeZoneName: "short",
-                          })
-                            .formatToParts(new Date(interview.scheduledDate))
-                            .find((part) => part.type === "timeZoneName")
-                            .value
-                        }
+                        <span className="font-semibold">
+                          {interview.interviewStartTime}
+                        </span>{" "}
+                        -{" "}
+                        <span className="font-semibold">
+                          {interview.interviewEndTime}
+                        </span>
                       </span>
                     </div>
   
@@ -463,7 +482,7 @@ const PendingApprovals = () => {
       )}
   
       {popup.isOpen && (
-        <PopupData
+        <Popup
           isOpen={popup.isOpen}
           onClose={handleClosePopup}
           message={popup.message}
