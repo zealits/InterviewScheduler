@@ -27,6 +27,7 @@ const AdminDashboard = () => {
     <div className="bg-gradient-to-br from-blue-50 to-blue-100">
       <div className=" mx-auto ">
         <Navbar title={title}  />  
+        
         {/* Calendar Section */}
         <div className="bg-white shadow-lg rounded-lg p-6">
           <div className="flex items-center justify-between ">

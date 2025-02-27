@@ -22,6 +22,7 @@ import InterviewerDetails from "./InterviewerDetails";
 const localizer = momentLocalizer(moment);
 
 const CustomBigCalendar = () => {
+  // const CalendarComponent = React.lazy(() => import("Calender"));
   // Track the current view (week, day, or month)
   const [currentView, setCurrentView] = useState("week");
   const [events, setEvents] = useState([]);
