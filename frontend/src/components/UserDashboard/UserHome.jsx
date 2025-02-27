@@ -136,19 +136,7 @@ const UserHome = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center">
-      <header className="bg-gradient-to-r from-blue-600 to-blue-800 w-full text-white p-6 shadow-lg">
-        <div className="max-w-8xl flex justify-between items-center">
-          <h1 className="text-3xl mx-auto font-bold">Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="rounded-full bg-white/20 flex items-center justify-center">
-                <User size={20} className="text-white" />
-              </div>
-              <span className="text-white font-medium">{formData.interviewerName}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+   
 
       <main className="w-full max-w-7xl p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

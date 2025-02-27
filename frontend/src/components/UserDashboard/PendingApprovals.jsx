@@ -288,183 +288,189 @@ const PendingApprovals = () => {
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="relative">
-        {/* Static Navbar */}
-        <div className="  w-full bg-white shadow-md z-50">
-          <Navbar />
-        </div>
-
-        {/* Main Content with Padding to Prevent Overlap */}
-        <div className=" sticky top-0 bg-white z-10 shadow-md p-4  pt-16">
-          <div>
-            <div className="mb-1">
-              <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-4">
+    <div className="min-h-screen bg-gray-100">
+    {/* Static Navbar */}
+  
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header Section with Fixed Position */}
+      <div className="sticky top-0 bg-gray-100 pt-2 pb-6 z-10">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="mb-4 md:mb-0">
+              <h2 className="text-2xl font-bold text-gray-800">
                 Pending Approvals
               </h2>
-              <p className="mt-2 text-gray-600">
+              <p className="text-gray-600 mt-1">
                 Review and manage interview requests
               </p>
             </div>
-
-            {/* Filters Section */}
-            <div className="mb-1 bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="dateFilter"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Filter by Date
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      id="dateFilter"
-                      value={filterDate}
-                      onChange={handleDateFilter}
-                      className="w-full px-4 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label
-                    htmlFor="sortOrder"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Sort by Date
-                  </label>
-                  <select
-                    id="sortOrder"
-                    value={sortOrder}
-                    onChange={(e) => handleSortChange(e.target.value)}
-                    className="w-full px-4 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
-                  >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                  </select>
-                </div>
+  
+            {/* Filters Section - Redesigned as horizontal in the header */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="w-full sm:w-48">
+                <label
+                  htmlFor="dateFilter"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Filter by Date
+                </label>
+                <input
+                  type="date"
+                  id="dateFilter"
+                  value={filterDate}
+                  onChange={handleDateFilter}
+                  className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-200"
+                />
+              </div>
+              <div className="w-full sm:w-48">
+                <label
+                  htmlFor="sortOrder"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Sort by Date
+                </label>
+                <select
+                  id="sortOrder"
+                  value={sortOrder}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-200"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
               </div>
             </div>
           </div>
         </div>
-
-        {sortedInterviews.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {interviewsToDisplay.map((interview) => (
-                <div
-                  key={interview._id}
-                  className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition duration-300"
-                >
-                  {/* Card Header */}
-                  <div className="p-6 border-b border-gray-100">
+      </div>
+  
+      {sortedInterviews.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {interviewsToDisplay.map((interview) => (
+              <div
+                key={interview._id}
+                className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition duration-300"
+              >
+                {/* Card Header with modern design */}
+                <div className="p-5 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <User className="text-blue-600" size={24} />
+                      <div className="bg-gray-800 p-2 rounded-full">
+                        <User className="text-white" size={20} />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-lg font-medium text-gray-800 uppercase">
                         {interview.jobTitle}
                       </h3>
                     </div>
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                      Pending
+                    </span>
                   </div>
-
-                  {/* Card Content */}
-                  <div className="p-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center text-gray-700">
-                        <Mail className="mr-3 text-blue-500" size={18} />
-                        <span className="text-sm">
-                          {interview.name.charAt(0).toUpperCase() +
-                            interview.name.slice(1)}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-gray-700">
-                        <Calendar className="mr-3 text-blue-500" size={18} />
-                        <span className="text-sm">
-                          {new Date(
-                            interview.scheduledDate
-                          ).toLocaleDateString()}{" "}
+                </div>
+  
+                {/* Card Content with cleaner layout */}
+                <div className="p-5">
+                  <div className="space-y-3">
+                    <div className="flex items-center text-gray-700">
+                      <Mail className="mr-3 text-blue-500" size={16} />
+                      <span className="text-sm font-medium">
+                        {interview.name.charAt(0).toUpperCase() +
+                          interview.name.slice(1)}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <Calendar className="mr-3 text-green-500" size={16} />
+                      <span className="text-sm">
+                        {new Date(interview.scheduledDate).toLocaleDateString(
+                          "en-US",
                           {
-                            Intl.DateTimeFormat(undefined, {
-                              timeZoneName: "short",
-                            })
-                              .formatToParts(new Date(interview.scheduledDate))
-                              .find((part) => part.type === "timeZoneName")
-                              .value
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
                           }
-                        </span>
-                      </div>
-                      <div className="flex items-center text-gray-700">
-                        <Clock className="mr-3 text-blue-500" size={18} />
-                        <span className="text-bold">
-                          {interview.interviewTime}
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between pt-4 mt-4 border-t border-gray-100">
-                        <button
-                          onClick={() => handleApproval(interview._id)}
-                          className="inline-flex items-center px-4 py-2 rounded-md bg-green-50 text-green-700 hover:bg-green-100 transition duration-200"
-                        >
-                          <Check size={18} className="mr-2" />
-                          Approve
-                        </button>
-                        <button
-                          onClick={() =>
-                            setPopup({
-                              message:
-                                "Are you sure you want to Decline this Interview?",
-                              isOpen: true,
-                              onClose: () => setPopup(null),
-                            })
-                          }
-                          className="inline-flex items-center px-4 py-2 rounded-md bg-red-50 text-red-700 hover:bg-red-100 transition duration-200"
-                        >
-                          <XCircle size={18} className="mr-2" />
-                          Decline
-                        </button>
-                      </div>
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <Clock className="mr-3 text-purple-500" size={16} />
+                      <span className="text-sm font-medium">
+                        {interview.interviewTime}{" "}
+                        {
+                          Intl.DateTimeFormat(undefined, {
+                            timeZoneName: "short",
+                          })
+                            .formatToParts(new Date(interview.scheduledDate))
+                            .find((part) => part.type === "timeZoneName")
+                            .value
+                        }
+                      </span>
+                    </div>
+  
+                    <div className="flex justify-between pt-4 mt-4 border-t border-gray-100">
+                      <button
+                        onClick={() => handleApproval(interview._id)}
+                        className="inline-flex items-center px-3 py-2 rounded-md bg-gray-800 text-white hover:bg-gray-600 transition duration-200"
+                      >
+                        <Check size={16} className="mr-2" />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() =>
+                          setPopup({
+                            message:
+                              "Are you sure you want to decline this interview?",
+                            isOpen: true,
+                            onClose: () => setPopup(null),
+                          })
+                        }
+                        className="inline-flex items-center px-3 py-2 rounded-md border border-red-500 text-yellow-600 hover:bg-red-50 transition duration-200"
+                      >
+                        <XCircle size={16} className="mr-2 text-yellow-500" />
+                        Decline
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {visibleCount < sortedInterviews.length && (
-              <div className="flex justify-center mt-8">
-                <button
-                  onClick={handleViewMore}
-                  className="px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900  text-white rounded-lg hover:bg-blue-700 transition duration-200 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  View More ({remainingCount} remaining)
-                </button>
               </div>
-            )}
-          </>
-        ) : (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center shadow-sm">
-            <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-              <Calendar className="text-gray-400" size={24} />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-1">
-              No Pending Approvals
-            </h3>
-            <p className="text-gray-500">
-              There are currently no interviews waiting for approval.
-            </p>
+            ))}
           </div>
-        )}
-
-        {popup.isOpen && (
-          <PopupData
-            isOpen={popup.isOpen}
-            onClose={handleClosePopup}
-            message={popup.message}
-          />
-        )}
-      </div>
+  
+          {visibleCount < sortedInterviews.length && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleViewMore}
+                className="px-5 py-2 bg-gray-600 text-white rounded-md hover:bg-black transition duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                View More ({remainingCount} remaining)
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center shadow-sm">
+          <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+            <Calendar className="text-indigo-500" size={28} />
+          </div>
+          <h3 className="text-xl font-medium text-gray-800 mb-2">
+            No Pending Approvals
+          </h3>
+          <p className="text-gray-600 max-w-md mx-auto">
+            There are currently no interviews waiting for approval. New
+            requests will appear here when they are submitted.
+          </p>
+        </div>
+      )}
+  
+      {popup.isOpen && (
+        <PopupData
+          isOpen={popup.isOpen}
+          onClose={handleClosePopup}
+          message={popup.message}
+        />
+      )}
     </div>
+  </div>
   );
 };
 

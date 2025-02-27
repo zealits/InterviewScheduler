@@ -21,6 +21,7 @@ const UpdateProfile = () => {
   const [popup, setPopup] = useState({ show: false, message: "" });
   const [customSpecialization, setCustomSpecialization] = useState("");
   const [specialization, setSpecialization] = useState([""]);
+  const [newSpecialization, setNewSpecialization] = useState("");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -68,24 +69,32 @@ const UpdateProfile = () => {
   }, [userData]);
 
   const handleAddSpecialization = () => {
-    setSpecialization([...specialization, ""]);
+    if (
+      newSpecialization.trim() !== "" &&
+      !specialization.includes(newSpecialization.trim())
+    ) {
+      setSpecialization([...specialization, newSpecialization.trim()]);
+      setNewSpecialization(""); // Reset input field after adding
+    }
   };
 
   const handleRemoveSpecialization = (index) => {
-    const updatedSpecialization = specialization.filter((_, i) => i !== index);
-    setSpecialization(updatedSpecialization);
+    setSpecialization(specialization.filter((_, i) => i !== index));
   };
 
   const handleChangeSpecialization = (index, value) => {
-    const updatedSpecialization = [...specialization];
-    updatedSpecialization[index] = value;
-    setSpecialization(updatedSpecialization);
+    const trimmedValue = value.trim();
+    if (trimmedValue !== "" && !specialization.includes(trimmedValue)) {
+      const updatedSpecialization = [...specialization];
+      updatedSpecialization[index] = trimmedValue;
+      setSpecialization(updatedSpecialization);
+    }
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    setPopup({ show: true, message: "Updating profile..."});
+    setPopup({ show: true, message: "Updating profile..." });
 
     // Create the payload with the specialization array directly.
     const updatedData = {
@@ -128,15 +137,14 @@ const UpdateProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 py-12 px-4 sm:px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 py-12 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        
         {/* Header */}
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text text-transparent mb-3">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 bg-clip-text text-transparent mb-3">
             Update Profile
           </h1>
-          <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-blue-600 mx-auto rounded-full mb-3"></div>
+          <div className="w-20 h-1 bg-gradient-to-r from-gray-500 to-gray-600 mx-auto rounded-full mb-3"></div>
         </div>
 
         <form onSubmit={handleUpdate}>
@@ -144,11 +152,11 @@ const UpdateProfile = () => {
             {/* Left Column */}
             <div className="lg:col-span-4 space-y-6">
               <div className="bg-white rounded-2xl shadow-xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-blue-50 rounded-full -mr-20 -mt-20"></div>
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gray-50 rounded-full -mr-20 -mt-20"></div>
                 <div className="relative space-y-4">
                   <div className="flex items-center justify-center mb-6">
-                    <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-50 rounded-full flex items-center justify-center">
-                      <User size={48} className="text-blue-500" />
+                    <div className="w-32 h-32 bg-gradient-to-br from-blue-200 via-blue-400 to-blue-600  rounded-full flex items-center justify-center">
+                      <User size={48} className="text-black" />
                     </div>
                   </div>
                   <div className="group">
@@ -162,7 +170,7 @@ const UpdateProfile = () => {
                         handleInputChange("name", e.target.value)
                       }
                       required
-                      className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-0 transition-all"
+                      className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-gray-500 focus:ring-0 transition-all"
                     />
                   </div>
                   <div>
@@ -170,7 +178,7 @@ const UpdateProfile = () => {
                       Email
                     </label>
                     <div className="px-4 py-3 bg-gray-100 rounded-xl text-gray-500 flex items-center space-x-2">
-                      <span className="text-blue-600">✓</span>
+                      <span className="text-gray-600">✓</span>
                       <span>{userData.email}</span>
                     </div>
                   </div>
@@ -185,7 +193,7 @@ const UpdateProfile = () => {
                         handleInputChange("password", e.target.value)
                       }
                       required
-                      className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-0 transition-all"
+                      className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-gray-500 focus:ring-0 transition-all"
                     />
                   </div>
                 </div>
@@ -195,7 +203,7 @@ const UpdateProfile = () => {
             {/* Right Column */}
             <div className="lg:col-span-8 space-y-6">
               <div className="bg-white rounded-2xl shadow-xl p-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-60 h-60 bg-blue-50 rounded-full -mr-32 -mt-32"></div>
+                <div className="absolute top-0 right-0 w-60 h-60 bg-gray-50 rounded-full -mr-32 -mt-32"></div>
                 <div className="relative">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">
                     Professional Experience
@@ -206,7 +214,7 @@ const UpdateProfile = () => {
                         <div className="flex items-center mb-2">
                           <LinkedinIcon
                             size={20}
-                            className="text-blue-600 mr-2"
+                            className="text-green-600 mr-2"
                           />
                           <label className="text-sm font-medium text-gray-700">
                             LinkedIn URL
@@ -219,12 +227,12 @@ const UpdateProfile = () => {
                             handleInputChange("linkedinProfile", e.target.value)
                           }
                           required
-                          className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-0 transition-all"
+                          className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-gray-500 focus:ring-0 transition-all"
                         />
                       </div>
                       <div>
                         <div className="flex items-center mb-2">
-                          <Users size={18} className="text-blue-600 mr-2" />
+                          <Users size={18} className="text-yellow-600 mr-2" />
                           <label className="text-sm font-medium text-gray-700">
                             Experience as Interviewer
                           </label>
@@ -239,7 +247,7 @@ const UpdateProfile = () => {
                             )
                           }
                           required
-                          className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-0 transition-all"
+                          className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-gray-500 focus:ring-0 transition-all"
                         />
                       </div>
                     </div>
@@ -255,15 +263,21 @@ const UpdateProfile = () => {
                           type="number"
                           value={userData.yearOfExperience || ""}
                           onChange={(e) =>
-                            handleInputChange("yearOfExperience", e.target.value)
+                            handleInputChange(
+                              "yearOfExperience",
+                              e.target.value
+                            )
                           }
                           required
-                          className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-0 transition-all"
+                          className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-gray-500 focus:ring-0 transition-all"
                         />
                       </div>
                       <div>
                         <div className="flex items-center mb-2">
-                          <BookOpen size={18} className="text-blue-600 mr-2" />
+                          <BookOpen
+                            size={18}
+                            className="text-orange-600 mr-2"
+                          />
                           <label className="text-sm font-medium text-gray-700">
                             Candidates Interviewed
                           </label>
@@ -278,7 +292,7 @@ const UpdateProfile = () => {
                             )
                           }
                           required
-                          className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-0 transition-all"
+                          className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:border-gray-500 focus:ring-0 transition-all"
                         />
                       </div>
                     </div>
@@ -287,41 +301,46 @@ const UpdateProfile = () => {
                   {/* Specialization Inputs */}
                   <div className="mt-8">
                     <div className="flex items-center mb-4">
-                      <Brain size={20} className="text-blue-600 mr-2" />
+                      <Brain size={20} className="text-gray-600 mr-2" />
                       <label className="text-lg font-semibold text-gray-900">
-                        Specialization
+                        Specialization (Please enter your password first)
                       </label>
                     </div>
-                    <div className="space-y-2">
+
+                    {/* Specialization List */}
+                    <div className="flex flex-wrap gap-2">
                       {specialization.map((spec, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <input
-                            type="text"
-                            value={spec}
-                            onChange={(e) =>
-                              handleChangeSpecialization(index, e.target.value)
-                            }
-                            placeholder="Enter specialization"
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                          />
-                          {index > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveSpecialization(index)}
-                              className="bg-red-500 text-white px-3 py-1 rounded-lg"
-                            >
-                              Remove
-                            </button>
-                          )}
+                        <div
+                          key={index}
+                          className="flex items-center bg-gray-200 text-gray-900 px-3 py-1 rounded-lg"
+                        >
+                          <span>{spec}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSpecialization(index)}
+                            className="ml-1 text-red-600 hover:text-red-800"
+                          >
+                            ❌
+                          </button>
                         </div>
                       ))}
+                    </div>
+
+                    {/* Input & Add Button */}
+                    <div className="mt-3 flex space-x-2">
+                      <input
+                        type="text"
+                        value={newSpecialization}
+                        onChange={(e) => setNewSpecialization(e.target.value)}
+                        placeholder="Enter specialization"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500"
+                      />
                       <button
                         type="button"
                         onClick={handleAddSpecialization}
-                        className="mt-2 bg-green-500 text-white px-3 py-2 rounded-lg"
+                        className="bg-gray-700 text-white px-3 py-2 rounded-lg"
                       >
-                        Add Specialization
+                        Add
                       </button>
                     </div>
                   </div>
@@ -330,7 +349,7 @@ const UpdateProfile = () => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-4 rounded-xl font-medium shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 group"
+                className="w-full bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white px-6 py-4 rounded-xl font-medium shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 group"
               >
                 <span>Update Professional Profile</span>
                 <Check
@@ -342,11 +361,11 @@ const UpdateProfile = () => {
           </div>
         </form>
         {popup.show && (
-        <Popup
-          message={popup.message}
-          onClose={() => setPopup({ show: false, message: "" })}
-        />
-      )}
+          <Popup
+            message={popup.message}
+            onClose={() => setPopup({ show: false, message: "" })}
+          />
+        )}
       </div>
     </div>
   );
