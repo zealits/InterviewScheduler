@@ -28,7 +28,9 @@ exports.getAllPending = async (req, res) => {
       interviewStartTime: interview.interviewStartTime,
       interviewEndTime: interview.interviewEndTime,
       confirmation: interview.confirmation,
-      specialization: interview.specialization,
+      specialization: Array.isArray(interview.specialization) 
+      ? interview.specialization 
+      : [interview.specialization], // Ensure it's always an array
     }));
 
     res.status(200).json({ upcomingInterviews: updatedInterviews });
