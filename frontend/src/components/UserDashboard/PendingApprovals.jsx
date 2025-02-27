@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { User, Mail, Calendar, Check, XCircle, Clock } from "lucide-react";
-import Popup from "../../model/Popup";
+import Popup from "../../model/popup";
 import Navbar from "./Navbar";
-// import Loader from "../Loader"; // Import your custom Loader
 
 const PendingApprovals = () => {
   const [pendingInterviews, setPendingInterviews] = useState([]);
@@ -223,7 +222,6 @@ const PendingApprovals = () => {
       ]);
 
       setPopup({ isOpen: true, message: "Interview confirmed successfully!" });
-      
     } catch (err) {
       console.error(
         "Error submitting details:",
@@ -271,13 +269,6 @@ const PendingApprovals = () => {
   // Calculate how many items remain to be loaded
   const remainingCount = sortedInterviews.length - visibleCount;
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-48">
-        <Loader />
-      </div>
-    );
-
   if (error)
     return (
       <div className="bg-red-100 text-red-700 border border-red-400 p-4 rounded-md text-center">
@@ -301,7 +292,7 @@ const PendingApprovals = () => {
                   Review and manage interview requests
                 </p>
               </div>
-  
+
               {/* Filters Section - Redesigned as horizontal in the header */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="w-full sm:w-48">
@@ -340,7 +331,7 @@ const PendingApprovals = () => {
             </div>
           </div>
         </div>
-  
+
         {sortedInterviews.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -365,7 +356,7 @@ const PendingApprovals = () => {
                       </span>
                     </div>
                   </div>
-  
+
                   {/* Card Content with cleaner layout */}
                   <div className="p-5">
                     <div className="space-y-3">
@@ -401,7 +392,7 @@ const PendingApprovals = () => {
                           </span>
                         </span>
                       </div>
-  
+
                       <div className="flex justify-between pt-4 mt-4 border-t border-gray-100">
                         <button
                           onClick={() => handleApproval(interview._id)}
@@ -430,7 +421,7 @@ const PendingApprovals = () => {
                 </div>
               ))}
             </div>
-  
+
             {visibleCount < sortedInterviews.length && (
               <div className="flex justify-center mt-8">
                 <button
@@ -456,7 +447,7 @@ const PendingApprovals = () => {
             </p>
           </div>
         )}
-  
+
         {popup.isOpen && (
           <Popup
             isOpen={popup.isOpen}
