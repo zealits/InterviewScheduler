@@ -24,6 +24,7 @@ import moment from "moment";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import InterviewerDetails from "./InterviewerDetails";
+import Popup from "../../model/popup";
 
 const localizer = momentLocalizer(moment);
 
@@ -31,6 +32,7 @@ const CustomBigCalendar = () => {
   // const CalendarComponent = React.lazy(() => import("Calender"));
   // Track the current view (week, day, or month)
   const [currentView, setCurrentView] = useState("week");
+  const [popup, setPopup] = useState({ show: false, message: "" });
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedDateInterviewers, setSelectedDateInterviewers] = useState([]);
@@ -59,6 +61,10 @@ const CustomBigCalendar = () => {
   });
 
   const interviewersListRef = useRef(null);
+
+  const handleClosePopup = () => {
+    setPopup({ show: false, message: "" });
+  };
 
   useEffect(() => {
     const fetchAdminEmail = async () => {
@@ -233,7 +239,7 @@ const CustomBigCalendar = () => {
         setFilteredEvents(combinedEvents);
       } catch (error) {
         console.error("Error fetching data:", error);
-        alert("Failed to fetch calendar data.");
+        setPopup({ show: true, message: "Failed to fetch calendar data." });
       }
     };
 
@@ -547,7 +553,7 @@ const CustomBigCalendar = () => {
       !interviewEndTime
     ) {
       console.error("Missing required fields");
-      alert("Please fill in all required fields.");
+      setError("Please fill in all required fields.");
       return;
     }
 
@@ -555,7 +561,7 @@ const CustomBigCalendar = () => {
       const token = localStorage.getItem("adminAuthToken");
       if (!token) {
         console.error("No auth token found");
-        alert("You are not authorized! Please log in.");
+        setError("You are not authorized! Please log in.");
         return;
       }
 
@@ -650,16 +656,19 @@ const CustomBigCalendar = () => {
         }),
       ];
 
-      await Promise.allSettled(emailPromises);
+      // Trigger emails without blocking the user response
+      Promise.allSettled(emailPromises).then((results) => {
+        console.log("Emails processed:", results);
+      });
 
-      alert("Interview scheduled successfully! Emails sent.");
+      setPopup({ show: true, message: "Interview scheduled successfully!" });
       setShowPopup(true);
     } catch (error) {
       console.error(
         "Error submitting details:",
         error.response?.data || error.message
       );
-      alert("Failed to schedule interview. Please try again.");
+      setPopup({ show: true, message: "Failed to schedule interview." });
       setShowPopup(false);
     }
   };
@@ -1240,6 +1249,9 @@ const CustomBigCalendar = () => {
                 </Paper>
               </Grid>
             ))}
+            {popup?.show && (
+              <Popup message={popup.message} onClose={handleClosePopup} />
+            )}
           </Grid>
         )}
 

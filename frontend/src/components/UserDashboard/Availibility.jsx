@@ -1,6 +1,6 @@
 import React, { useState, Suspense } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import Popup from "../../model/Popup";
+import Popup from "../../model/popup";
 import {
   Calendar,
   Clock,
@@ -33,6 +33,7 @@ const Availibility = () => {
     endTime: "",
     timezone: "UTC+00:00",
   });
+
 
   const handleAddCustomDate = (date) => {
     if (date) {
@@ -344,7 +345,8 @@ const Availibility = () => {
                   <div className="h-8"></div>
                   {availabilityRange.startTime &&
                     availabilityRange.endTime &&
-                    availabilityRange.startTime >= availabilityRange.endTime && (
+                    availabilityRange.startTime >=
+                      availabilityRange.endTime && (
                       <p className="text-red-600 text-sm flex items-center">
                         <AlertCircle size={16} className="mr-1" />
                         Start time must be earlier than end time
@@ -518,7 +520,8 @@ const Availibility = () => {
 
                     {customAvailability.startTime &&
                       customAvailability.endTime &&
-                      customAvailability.startTime >= customAvailability.endTime && (
+                      customAvailability.startTime >=
+                        customAvailability.endTime && (
                         <p className="text-red-600 text-sm flex items-center">
                           <AlertCircle size={16} className="mr-1" />
                           Start time must be earlier than end time
