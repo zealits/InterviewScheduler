@@ -9,14 +9,13 @@ import {
   Brain,
   Briefcase,
   Check,
-  Loader2,
 } from "lucide-react";
-import Popup from "../../model/Popup";
+import Popup from "../../model/popup";
 
 const UpdateProfile = () => {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // If you need a separate custom specialization input, you can keep it;
   // otherwise, you can remove it.
   const [popup, setPopup] = useState({ show: false, message: "" });
@@ -28,7 +27,7 @@ const UpdateProfile = () => {
     const fetchUserDetails = async () => {
       const email = localStorage.getItem("userEmail");
       if (!email) {
-        setPopup({ show: true, message: "User Not found!"})
+        setPopup({ show: true, message: "User Not found!" });
         return;
       }
 
@@ -49,7 +48,7 @@ const UpdateProfile = () => {
         setUserData(fetchedData);
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setPopup({ show: true, message: "Failed to fetch user details."})
+        setPopup({ show: true, message: "Failed to fetch user details." });
       } finally {
         setIsLoading(false);
       }
@@ -120,7 +119,6 @@ const UpdateProfile = () => {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50">
         <div className="flex items-center space-x-3 bg-white px-6 py-3 rounded-xl shadow-lg">
-          <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
           <span className="text-gray-700 font-medium">Loading profile...</span>
         </div>
       </div>

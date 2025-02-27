@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 
-import Popup from "../../model/Popup";
+import Popup from "../../model/popup";
 
 const UpcomingInterviews = () => {
   const [interviews, setInterviews] = useState([]);
@@ -169,7 +169,6 @@ const UpcomingInterviews = () => {
           name: interview.name,
           email: interview.email || "candidate@example.com",
         },
-
       ],
     });
 
@@ -197,8 +196,7 @@ const UpcomingInterviews = () => {
           interview.confirmation === true &&
           (filterDate
             ? new Date(interview.scheduledDate).toISOString().split("T")[0] ===
-            filterDate
-
+              filterDate
             : true)
       )
       .sort((a, b) => {
@@ -329,26 +327,30 @@ const UpcomingInterviews = () => {
                       <div className="flex items-center text-gray-700">
                         <Mail className="mr-3 text-rose-500" size={18} />
                         <span className="text-sm font-medium">
-                          {interview.name?.charAt(0).toUpperCase() + interview.name?.slice(1)}
+                          {interview.name?.charAt(0).toUpperCase() +
+                            interview.name?.slice(1)}
                         </span>
                       </div>
                       <div className="flex items-center text-gray-700">
                         <Calendar className="mr-3 text-amber-500" size={18} />
                         <span className="text-sm">
-                          {new Date(interview.scheduledDate).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric"
-                          })}
+                          {new Date(interview.scheduledDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
                         </span>
                       </div>
                       <div className="flex items-center text-gray-700">
                         <Clock className="mr-3 text-blue-500" size={18} />
                         <span className="text-sm">
-                          {interview.interviewStartTime} - {interview.interviewEndTime}
+                          {interview.interviewStartTime} -{" "}
+                          {interview.interviewEndTime}
                         </span>
                       </div>
-
 
                       <div className="flex justify-between pt-4 mt-2 border-t border-gray-100">
                         <a
@@ -386,7 +388,6 @@ const UpcomingInterviews = () => {
                           <Download size={18} />
                         </button>
                       </div>
-
                     </div>
                   </div>
                 </div>
@@ -399,7 +400,10 @@ const UpcomingInterviews = () => {
                   onClick={handleViewMore}
                   className="px-6 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 font-medium flex items-center gap-2"
                 >
-                  <span>View More ({filteredInterviews.length - visibleCount} remaining)</span>
+                  <span>
+                    View More ({filteredInterviews.length - visibleCount}{" "}
+                    remaining)
+                  </span>
                 </button>
               </div>
             )}
@@ -453,9 +457,14 @@ const UpcomingInterviews = () => {
                   />
                 ) : (
                   <div className="text-gray-600 text-center py-12 bg-gray-50 rounded-lg">
-                    <FileText size={48} className="mx-auto text-gray-400 mb-4" />
+                    <FileText
+                      size={48}
+                      className="mx-auto text-gray-400 mb-4"
+                    />
                     <p className="font-medium">PDF data unavailable</p>
-                    <p className="text-sm text-gray-500 mt-2">The requested document could not be loaded</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      The requested document could not be loaded
+                    </p>
                   </div>
                 )}
               </div>
