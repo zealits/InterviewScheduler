@@ -137,20 +137,6 @@ const CustomBigCalendar = () => {
     return { startTime, endTime, timeZone };
   };
 
-  // Function to get color based on specialization
-  const getSpecializationColor = (specialization) => {
-    const colors = {
-      Frontend: "#f43f5e", // Red
-      Backend: "#10b981", // Green
-      Fullstack: "#0ea5e9", // Blue
-      Mobile: "#f97316", // Orange
-      DevOps: "#8b5cf6", // Purple
-      QA: "#fbbf24", // Yellow
-      default: "#6b7280", // Gray
-    };
-    return colors[specialization] || colors.default;
-  };
-
   // --- Data Fetching and Event Creation ---
   useEffect(() => {
     const formatLocalDate = (dateInput) => {
@@ -990,19 +976,19 @@ const CustomBigCalendar = () => {
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <Box
                       sx={{
-                        bgcolor: "#ecfeff",
+                        bgcolor: "#f0fdfa",
                         p: 1.2,
                         borderRadius: "50%",
                         boxShadow: "0 3px 10px rgba(0, 0, 0, 0.08)",
                       }}
                     >
-                      <UserCheck size={24} color="#06b6d4" />
+                      <UserCheck size={24} color="#10b981" />
                     </Box>
                     <Typography
                       variant="h6"
                       fontWeight="700"
                       sx={{
-                        color: "#1e293b",
+                        color: "#1f2937",
                       }}
                     >
                       {interviewer.name}
@@ -1020,7 +1006,7 @@ const CustomBigCalendar = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "#475569",
+                        color: "#4b5563",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
@@ -1030,14 +1016,14 @@ const CustomBigCalendar = () => {
                       <Box
                         component="span"
                         sx={{
-                          bgcolor: getSpecializationColor(interviewer.specialization),
+                          bgcolor: "#f43f5e",
                           borderRadius: 10,
                           px: 1.5,
                           py: 0.5,
                           color: "#ffffff",
                           fontWeight: 600,
                           fontSize: "0.8rem",
-                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                          boxShadow: "0 2px 4px rgba(244,63,94,0.2)",
                           textTransform: "uppercase",
                           letterSpacing: "0.03em",
                         }}
@@ -1048,7 +1034,7 @@ const CustomBigCalendar = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "#475569",
+                        color: "#4b5563",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
@@ -1059,7 +1045,7 @@ const CustomBigCalendar = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "#475569",
+                        color: "#4b5563",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
@@ -1090,19 +1076,19 @@ const CustomBigCalendar = () => {
                       mt: 2,
                       textTransform: "none",
                       borderRadius: 2.5,
-                      bgcolor: "#06b6d4",
+                      bgcolor: "#0ea5e9",
                       color: "#ffffff",
                       fontWeight: 600,
                       py: 1.5,
-                      boxShadow: "0 6px 15px rgba(6,182,212,0.15)",
+                      boxShadow: "0 6px 15px rgba(14,165,233,0.15)",
                       transition: "all 0.2s ease",
                       "&:hover": {
-                        bgcolor: "#0891b2",
+                        bgcolor: "#0284c7",
                         transform: "translateY(-2px)",
-                        boxShadow: "0 8px 20px rgba(6,182,212,0.2)",
+                        boxShadow: "0 8px 20px rgba(14,165,233,0.2)",
                       },
                     }}
-                    startIcon={<CheckCircle size={20} />}
+                    startIcon={<CheckCircle size={20} color="#ffffff" />}
                     onClick={() => handleViewDetails(interviewer)}
                   >
                     Schedule Interview
