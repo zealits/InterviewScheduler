@@ -16,8 +16,9 @@ const DatePicker = React.lazy(() => import("react-datepicker"));
 
 const Availibility = () => {
   const [availabilityType, setAvailabilityType] = useState("range");
-  const [popup, setPopup] = useState(null);
-  const [error, setError] = useState(null);
+  const [popup, setPopup] = useState({ show: false, message: "" });
+  // Using an object to store inline errors
+  const [error, setError] = useState({});
   const [availabilityRange, setAvailabilityRange] = useState({
     startDate: null,
     endDate: null,
@@ -39,12 +40,8 @@ const Availibility = () => {
     }
   };
 
-  const handlePopup = (data) => {
-    setPopup(data);
-  };
-
   const handleClosePopup = () => {
-    setPopup(null);
+    setPopup({ show: false, message: "" });
   };
 
   const handleRemoveCustomDate = (index) => {
@@ -97,6 +94,8 @@ const Availibility = () => {
   };
 
   const handleSubmit = async () => {
+    // Clear previous errors before submission
+    setError({});
     try {
       // Lazy load Axios when the submit button is clicked
       const { default: axios } = await import("axios");
@@ -135,7 +134,7 @@ const Availibility = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setPopup(onclose);
+      setPopup({ show: true, message: "Availability updated successfully!" });
 
       console.log(response.data);
 
@@ -161,7 +160,7 @@ const Availibility = () => {
         error.response?.data || error.message
       );
 
-      popup();
+      setPopup({ show: true, message: "Failed to update availability." });
     }
   };
 
@@ -263,6 +262,9 @@ const Availibility = () => {
                     placeholderText="Select date range"
                   />
                 </Suspense>
+                {error?.range && (
+                  <p className="text-red-600 text-sm mt-2">{error.range}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -316,7 +318,6 @@ const Availibility = () => {
                       }
                       className="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                     />
-                   
                   </div>
                 </div>
 
@@ -336,7 +337,6 @@ const Availibility = () => {
                       }
                       className="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                     />
-                    
                   </div>
                 </div>
 
@@ -344,13 +344,15 @@ const Availibility = () => {
                   <div className="h-8"></div>
                   {availabilityRange.startTime &&
                     availabilityRange.endTime &&
-                    availabilityRange.startTime >=
-                      availabilityRange.endTime && (
+                    availabilityRange.startTime >= availabilityRange.endTime && (
                       <p className="text-red-600 text-sm flex items-center">
                         <AlertCircle size={16} className="mr-1" />
                         Start time must be earlier than end time
                       </p>
                     )}
+                  {error?.time && (
+                    <p className="text-red-600 text-sm mt-2">{error.time}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -377,7 +379,7 @@ const Availibility = () => {
                             (d) => d.toDateString() === date.toDateString()
                           )
                         ) {
-                          alert("This date is already selected.");
+                          setError({ customDates: "Date already selected" });
                           return;
                         }
                         handleAddCustomDate(date);
@@ -387,6 +389,11 @@ const Availibility = () => {
                       inline
                     />
                   </Suspense>
+                  {error?.customDates && (
+                    <p className="text-red-600 text-sm mt-2">
+                      {error.customDates}
+                    </p>
+                  )}
                 </div>
 
                 <div className="border border-gray-200 rounded-lg p-4">
@@ -424,7 +431,7 @@ const Availibility = () => {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-6 text-gray-500 bg-gray-50 rounded-md">
-                      <Calendar size={24} className="mb-2 opacity-50" />
+                      <Calendar className="mb-2 opacity-50" size={24} />
                       <p className="text-sm">No dates selected yet</p>
                       <p className="text-xs mt-1">
                         Click on dates in the calendar to add them
@@ -467,6 +474,11 @@ const Availibility = () => {
                           <Clock size={16} />
                         </div>
                       </div>
+                      {error?.timezone && (
+                        <p className="text-red-600 text-sm mt-2">
+                          {error.timezone}
+                        </p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -506,13 +518,17 @@ const Availibility = () => {
 
                     {customAvailability.startTime &&
                       customAvailability.endTime &&
-                      customAvailability.startTime >=
-                        customAvailability.endTime && (
+                      customAvailability.startTime >= customAvailability.endTime && (
                         <p className="text-red-600 text-sm flex items-center">
                           <AlertCircle size={16} className="mr-1" />
                           Start time must be earlier than end time
                         </p>
                       )}
+                    {error?.customTime && (
+                      <p className="text-red-600 text-sm mt-2">
+                        {error.customTime}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -534,7 +550,9 @@ const Availibility = () => {
           </p>
         </div>
 
-        {popup && <Popup message={error} onClose={handleClosePopup} />}
+        {popup?.show && (
+          <Popup message={popup.message} onClose={handleClosePopup} />
+        )}
       </div>
     </div>
   );

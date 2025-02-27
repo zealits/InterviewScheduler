@@ -16,6 +16,7 @@ import Popup from "../../model/Popup";
 const UpdateProfile = () => {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
   // If you need a separate custom specialization input, you can keep it;
   // otherwise, you can remove it.
   const [popup, setPopup] = useState({ show: false, message: "" });
@@ -27,7 +28,7 @@ const UpdateProfile = () => {
     const fetchUserDetails = async () => {
       const email = localStorage.getItem("userEmail");
       if (!email) {
-        alert("No email found in localStorage");
+        setPopup({ show: true, message: "User Not found!"})
         return;
       }
 
@@ -48,7 +49,7 @@ const UpdateProfile = () => {
         setUserData(fetchedData);
       } catch (error) {
         console.error("Error fetching user data:", error);
-        alert("Failed to fetch user details.");
+        setPopup({ show: true, message: "Failed to fetch user details."})
       } finally {
         setIsLoading(false);
       }
