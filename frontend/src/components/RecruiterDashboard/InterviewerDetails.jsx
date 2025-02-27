@@ -91,7 +91,7 @@ const InterviewerDetails = ({
     <>
       {!showSuccess && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
+          <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-y-auto border border-gray-100">
             <div className="border-b border-gray-100 p-4 bg-gradient-to-r from-indigo-50 to-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">

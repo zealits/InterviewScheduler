@@ -37,7 +37,7 @@ const Navbar = () => {
               <div className="flex items-center">
                 <button className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                   <User size={18} className="mr-2 " />
-                  {interview.name || userEmail || "Guest"}
+                  {interview.name || userEmail }
                 </button>
               </div>
             </div>

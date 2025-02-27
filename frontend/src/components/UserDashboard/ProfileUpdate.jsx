@@ -30,22 +30,29 @@ const UpdateProfile = () => {
         setPopup({ show: true, message: "User Not found!" });
         return;
       }
-
+  
       try {
         const response = await axios.get(`/api/user?email=${email}`);
         const fetchedData = response.data;
-
-        // If fetched specialization is not one of the valid options,
-        // you might want to treat it as a custom value.
-        const validSpecializations = ["Cloud", "AI", "Language", "Domain"];
-        if (!validSpecializations.includes(fetchedData.specialization)) {
-          setCustomSpecialization(fetchedData.specialization);
-          // You can choose to set the fetchedData to "Other" or just use the custom value.
-          // For an array approach, we will use the custom value directly.
-          fetchedData.specialization = fetchedData.specialization;
+  
+        let fetchedSpecializations = fetchedData.specialization;
+  
+        // Ensure specialization is always an array
+        if (Array.isArray(fetchedSpecializations) && fetchedSpecializations.length > 0) {
+          // Split the first element if it contains comma-separated values
+          const firstElement = fetchedSpecializations[0];
+          if (typeof firstElement === "string" && firstElement.includes(",")) {
+            fetchedSpecializations = [
+              ...firstElement.split(",").map((spec) => spec.trim()),
+              ...fetchedSpecializations.slice(1),
+            ];
+          }
+        } else {
+          fetchedSpecializations = [];
         }
-
-        setUserData(fetchedData);
+  
+        setUserData({ ...fetchedData, specialization: fetchedSpecializations });
+        setSpecialization(fetchedSpecializations);
       } catch (error) {
         console.error("Error fetching user data:", error);
         setPopup({ show: true, message: "Failed to fetch user details." });
@@ -53,9 +60,11 @@ const UpdateProfile = () => {
         setIsLoading(false);
       }
     };
-
+  
     fetchUserDetails();
   }, []);
+  
+  
 
   // Once userData is fetched, update the specialization state.
   // This ensures that if the backend sends a specialization array, it’s loaded.
