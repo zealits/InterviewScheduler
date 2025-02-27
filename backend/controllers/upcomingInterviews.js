@@ -25,12 +25,13 @@ exports.getAllPending = async (req, res) => {
       email: interview.email,
       name: interview.name,
       scheduledDate: interview.scheduledDate,
+      interviewTime: interview.interviewTime,
       confirmation: interview.confirmation,
       specialization: interview.specialization,
-      interviewTime: interview.interviewTime,
     }));
 
     res.status(200).json({ upcomingInterviews: updatedInterviews });
+    console.log("Response:", updatedInterviews);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -46,6 +47,7 @@ exports.postAllUpcoming = async (req, res) => {
     const { email } = req.params;
     let { upcomingInterviews } = req.body;
 
+    // Ensure `upcomingInterviews` is an array
     if (typeof upcomingInterviews === "string") {
       try {
         upcomingInterviews = JSON.parse(upcomingInterviews);
@@ -66,18 +68,21 @@ exports.postAllUpcoming = async (req, res) => {
     }
 
     for (const interview of upcomingInterviews) {
-      // if (
-      //   !interview.email ||
-      //   // !interview.scheduledDate ||
-      //   !interview.interviewTime ||
-      //   !interview.specialization ||
-      //   !interview.name
-      // ) {
-      //   return res.status(400).json({
-      //     message: "Missing required fields in one or more interview entries",
-      //   });
-      // }
+      // Validate required fields
+      if (
+        !interview.email ||
+        // !interview.interviewTime ||
+        !interview.specialization ||
+        !interview.name
+      ) {
+        return res.status(400).json({
+          message: `Missing required fields for interview: ${JSON.stringify(
+            interview
+          )}`,
+        });
+      }
 
+      // Process Resume if attached
       if (req.file) {
         interview.hasResume = true;
         interview.resume = {
@@ -95,22 +100,21 @@ exports.postAllUpcoming = async (req, res) => {
 
     await user.save();
 
-    // **Send Email Notification after saving interview**
-    for (const interview of upcomingInterviews) {
-      await sendEmail(
-        email, // Interviewer email (from route param)
-        interview.name,
-        interview.email, // Candidate email
-        interview.jobTitle,
-        interview.jobDescription,
-        interview.scheduledDate,
-        interview.scheduledTime.split(" - ")[0],
-        interview.scheduledTime.split(" - ")[1],
-        interview.jobDescription,
-        interview.interviewTime,
-        process.env.ADMIN_EMAIL // Admin Email
-      );
-    }
+    // // **Send Email Notification after saving interview**
+    // for (const interview of upcomingInterviews) {
+    //   await sendEmail(
+    //      // Interviewer email (from route param)
+    //     interview.name,
+    //     // Candidate email
+    //     interview.jobTitle,
+    //     interview.jobDescription,
+    //     interview.scheduledDate,
+    //     interview.jobDescription,
+    //     interview.interviewTime,
+    //   );
+    // }
+    // console.log("sending email", email);
+    // console.log("upcomingInterviews", upcomingInterviews);
 
     res.status(201).json({ message: "Interviews added successfully", user });
   } catch (error) {

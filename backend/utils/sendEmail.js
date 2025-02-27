@@ -1,29 +1,35 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (to, subject, text, html) => {
+const sendEmail = async (options) => {
+  // Create transporter
   const transporter = nodemailer.createTransport({
-    service: "gmail", // You can use another service or a service like SendGrid
+    host: process.env.SMPT_HOST,
+    port: process.env.SMPT_PORT,
+    service: process.env.SMPT_SERVICE,
     auth: {
-      user: process.env.EMAIL_USER, // Your email address
-      pass: process.env.EMAIL_PASS, // Your email password or app-specific password
+      user: process.env.SMPT_MAIL,
+      pass: process.env.SMPT_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false, // Only for development
     },
   });
 
+  // Create email content with embedded image using cid
   const mailOptions = {
-    from: process.env.EMAIL_USER, 
-    to: to, 
-    subject: subject, 
-    text: text,
-    html: html,
+    from: process.env.SMPT_MAIL,
+    to: options.email,
+    subject: options.subject,
+    html: options.html,
+    attachments: options.attachments, // For QR code attachment
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully!");
   } catch (error) {
     console.error("Error sending email:", error);
+    throw error;
   }
 };
 
-
-module.exports= sendEmail;
+module.exports = sendEmail;

@@ -41,11 +41,12 @@ const userSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Scheduled Date is required"],
       },
-      scheduledTime: {
-        type: String,
-      },
+      // scheduledTime: {
+      //   type: String,
+      // },
       interviewTime: {
         type: String,
+       
       },
       specialization: [
         {

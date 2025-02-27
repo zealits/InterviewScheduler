@@ -155,10 +155,9 @@ const InterviewerDetails = ({
                         <Clock className="h-4 w-4 text-gray-500" />
                         <span className="font-medium">Time:</span>
                         <span>
-                          {formData.startTime} - {formData.endTime}({formData.timeZone})
-
+                          {formData.startTime} - {formData.endTime}(
+                          {formData.timeZone})
                         </span>
-
                       </div>
                       <div className="flex justify-end items-center space-x-2">
                         <Briefcase className="h-4 w-4 text-gray-500" />
@@ -187,10 +186,11 @@ const InterviewerDetails = ({
                           name="candidateName"
                           value={formData.candidateName}
                           onChange={handleChange}
-                          className={`w-full px-4 py-2 rounded-lg border ${formErrors.candidateName
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full px-4 py-2 rounded-lg border ${
+                            formErrors.candidateName
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         {formErrors.candidateName && (
                           <p className="text-sm text-red-500">
@@ -206,10 +206,11 @@ const InterviewerDetails = ({
                           name="candidateEmail"
                           value={formData.candidateEmail}
                           onChange={handleChange}
-                          className={`w-full px-4 py-2 rounded-lg border ${formErrors.candidateEmail
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full px-4 py-2 rounded-lg border ${
+                            formErrors.candidateEmail
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         {formErrors.candidateEmail && (
                           <p className="text-sm text-red-500">
@@ -241,10 +242,11 @@ const InterviewerDetails = ({
                           name="jobTitle"
                           value={formData.jobTitle}
                           onChange={handleChange}
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.jobTitle
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                            formErrors.jobTitle
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                       </div>
@@ -259,21 +261,22 @@ const InterviewerDetails = ({
                         <input
                           type="time"
                           placeholder="Slot Time"
-                          name="time"
-                          value={formData.time}
+                          name="interviewTime"
+                          value={formData.interviewTime}
                           onChange={handleChange}
                           min="09:00"
                           max="18:00"
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.time
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                            formErrors.time
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                       </div>
-                      {formErrors.time && (
+                      {formErrors.interviewTime && (
                         <p className="text-sm text-red-500">
-                          {formErrors.time}
+                          {formErrors.interviewTime}
                         </p>
                       )}
                     </div>
@@ -284,10 +287,11 @@ const InterviewerDetails = ({
                         name="jobDescription"
                         value={formData.jobDescription}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2 rounded-lg border ${formErrors.jobDescription
-                          ? "border-red-500"
-                          : "border-gray-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]`}
+                        className={`w-full px-4 py-2 rounded-lg border ${
+                          formErrors.jobDescription
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]`}
                       />
                       {formErrors.jobDescription && (
                         <p className="text-sm text-red-500">
@@ -338,10 +342,11 @@ const InterviewerDetails = ({
                           name="specialization"
                           value={formData.specialization}
                           onChange={handleChange}
-                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${formErrors.specialization
-                            ? "border-red-500"
-                            : "border-gray-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                            formErrors.specialization
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                       </div>
@@ -351,8 +356,6 @@ const InterviewerDetails = ({
                         </p>
                       )}
                     </div>
-
-
 
                     <div className="space-y-3">
                       <button
