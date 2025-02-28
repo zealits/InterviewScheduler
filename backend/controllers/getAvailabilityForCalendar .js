@@ -5,7 +5,7 @@ const getAvailabilityForCalendar = async (req, res) => {
     // Fetch only the required fields from all users
     const users = await User.find(
       {},
-      "name email linkedinProfile specialization customAvailability availabilityRange upcomingInterviews yearOfExperience experienceAsInterviewer interviewTime timeZone"
+      "name email linkedinProfile specialization customAvailability availabilityRange  yearOfExperience experienceAsInterviewer interviewTime timeZone"
     );
 
     // Map the data so that only the required fields are sent.
@@ -21,7 +21,7 @@ const getAvailabilityForCalendar = async (req, res) => {
       availabilityRange: user.availabilityRange, // Expected to be an array of ranges (each with startDate, endDate, startTime, endTime)
       interviewTime: user.interviewTime,
       timeZone: user.timeZone,
-      upcomingInterviews: user.upcomingInterviews,   // Only include if needed for calendar events
+        // Only include if needed for calendar events
     }));
 
     res.status(200).json({ data: userDetails });
