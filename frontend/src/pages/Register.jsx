@@ -27,10 +27,10 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br bg-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 py-6 px-8">
+          <div className="bg-gradient-to-r bg-gray-900 py-6 px-8">
             <h2 className="text-3xl font-bold text-center text-white">
               Create Account
             </h2>
@@ -80,14 +80,17 @@ const Register = () => {
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-300 transition duration-200"
+              className="w-full bg-gradient-to-r bg-gray-900 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:from-gray-700 hover:to-gray-700 focus:ring-4 focus:ring-gray-300 transition duration-200"
             >
               Sign Up
             </button>
 
             <p className="text-center text-sm text-gray-500 mt-4">
               Already have an account?{" "}
-              <a href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+              <a
+                href="/login"
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
                 Sign in
               </a>
             </p>

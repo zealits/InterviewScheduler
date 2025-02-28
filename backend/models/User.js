@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   linkedinProfile: { type: String, required: true },
   yearOfExperience: { type: Number, required: true },
   experienceAsInterviewer: { type: Number, required: true },
-  specialization: { type: [String], required: true }, // e.g., language, cloud, AI, domain
+  specialization: { type: Object, required: true }, // e.g., language, cloud, AI, domain
   candidatesInterviewed: { type: Number, required: true },
   availability: {
     type: String,
@@ -46,11 +46,9 @@ const userSchema = new mongoose.Schema({
       // },
       interviewStartTime: {
         type: String,
-       
       },
       interviewEndTime: {
         type: String,
-       
       },
       specialization: [
         {
