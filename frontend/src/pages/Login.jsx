@@ -15,14 +15,10 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-  
-    
     try {
       const response = await loginUser({ email, password });
       if (response && response.token) {
@@ -30,7 +26,7 @@ const Login = () => {
         localStorage.setItem("adminAuthToken", response.token);
         console.log("Login successful:", response);
         localStorage.setItem("adminEmail", response.email);
-          console.log("adminEmail", email);
+        console.log("adminEmail", email);
         setTimeout(() => {
           setModalOpen(false);
           navigate("/admin");
@@ -39,7 +35,9 @@ const Login = () => {
         setError("Invalid response from server.");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
     }
   };
 
@@ -58,7 +56,9 @@ const Login = () => {
           <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-8">
             <div className="flex items-center justify-center space-x-2">
               <Lock className="h-6 w-6 text-gray-100" />
-              <h3 className="text-xl font-semibold text-white">Recruiter Login</h3>
+              <h3 className="text-xl font-semibold text-white">
+                Recruiter Login
+              </h3>
             </div>
           </div>
 
@@ -100,7 +100,7 @@ const Login = () => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition duration-200"
+                className="w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white py-3 px-4 rounded-lg hover:to-gray-700 focus:ring-4 focus:ring-gray-300 font-semibold text-lg  transition duration-200"
               >
                 Sign in to Dashboard
               </button>

@@ -48,6 +48,7 @@ const CustomBigCalendar = () => {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedDateInterviewers, setSelectedDateInterviewers] = useState([]);
+  const [specializations, setSpecializations] = useState([]);
   const [adminEmail, setAdminEmail] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -389,31 +390,54 @@ const CustomBigCalendar = () => {
     }));
   };
 
+  const getUniqueSpecializations = (events) => {
+    const specSet = new Set();
+    events.forEach((event) => {
+      if (event.users && event.users.length > 0) {
+        event.users.forEach((user) => {
+          let specs = [];
+          if (Array.isArray(user.specialization)) {
+            specs = user.specialization;
+          } else if (typeof user.specialization === "string") {
+            specs = user.specialization.split(",");
+          }
+          specs.forEach((spec) => specSet.add(spec.trim()));
+        });
+      }
+    });
+    return Array.from(specSet);
+  };
+
+  // Update dynamic specialization list whenever events change
+  useEffect(() => {
+    if (events.length > 0) {
+      setSpecializations(getUniqueSpecializations(events));
+    }
+  }, [events]);
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
-  
+
     if (value === "All" || value === "") {
       setFilteredEvents(events);
       setSelectedDateInterviewers([]);
       return;
     }
-  
-    const predefinedSpecializations = ["Cloud", "AI", "Language", "Domain"];
+
     const filterValue = value.trim().toLowerCase();
-  
     console.log("Selected Filter Value:", value);
     console.log("Events Data:", events);
-  
+
     const filtered = events
       .map((event) => {
         if (!event.users || event.users.length === 0) return null; // Ensure users exist
-  
+
         console.log(
           "Checking Event Users:",
           event.users.map((u) => u.specialization || "No Specialization")
         );
-  
+
         const filteredUsers = event.users.filter((user) => {
           // Convert user.specialization to an array of strings
           let userSpecs = [];
@@ -429,23 +453,24 @@ const CustomBigCalendar = () => {
           } else {
             return false;
           }
-  
+
           if (value === "Others") {
-            // Consider user as "Others" if none of their specs match the predefined ones
+            // Consider a user as "Others" if none of their specializations match
+            // any of the dynamic specializations in state.
             return userSpecs.every(
               (spec) =>
-                !predefinedSpecializations
-                  .map((s) => s.toLowerCase())
+                !specializations
+                  .map((s) => s.trim().toLowerCase())
                   .includes(spec)
             );
           }
-  
+
           // Otherwise, return true if any of the user's specializations match the filter
           return userSpecs.includes(filterValue);
         });
-  
+
         console.log(`Users matching "${value}":`, filteredUsers);
-  
+
         return filteredUsers.length > 0
           ? {
               ...event,
@@ -455,7 +480,7 @@ const CustomBigCalendar = () => {
           : null;
       })
       .filter(Boolean); // Remove null values
-  
+
     console.log("Final Filtered Events:", filtered);
     setFilteredEvents(filtered);
   };
@@ -718,9 +743,7 @@ const CustomBigCalendar = () => {
               <FormControl
                 variant="outlined"
                 size="small"
-                sx={{
-                  width: "100%",
-                }}
+                sx={{ width: "100%" }}
               >
                 <InputLabel id="specialization-label">
                   Specialization
@@ -745,10 +768,11 @@ const CustomBigCalendar = () => {
                   }}
                 >
                   <MenuItem value="">All Specializations</MenuItem>
-                  <MenuItem value="Cloud">Cloud</MenuItem>
-                  <MenuItem value="AI">AI</MenuItem>
-                  <MenuItem value="Language">Language</MenuItem>
-                  <MenuItem value="Domain">Domain</MenuItem>
+                  {specializations.map((spec) => (
+                    <MenuItem key={spec} value={spec}>
+                      {spec}
+                    </MenuItem>
+                  ))}
                   <MenuItem value="Others">Others</MenuItem>
                 </Select>
               </FormControl>
@@ -758,10 +782,10 @@ const CustomBigCalendar = () => {
               <FormControl
                 variant="outlined"
                 size="small"
-                sx={{
-                  width: "100%",
-                }}
-              ></FormControl>
+                sx={{ width: "100%" }}
+              >
+                {/* Additional filter fields can be added here */}
+              </FormControl>
             </Grid>
           </Grid>
         </Box>
@@ -1079,45 +1103,33 @@ const CustomBigCalendar = () => {
                         </Typography>
 
                         <Box
-  sx={{
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 1,
-    mt: 1,
-  }}
->
-  {Array.isArray(interviewer.specialization)
-    ? interviewer.specialization.map((spec, i) => (
-        <Chip
-          key={i}
-          label={spec.trim()} // Trim whitespace
-          sx={{
-            bgcolor: "#f1f5f9",
-            color: "#1e293b",
-            fontWeight: 500,
-            fontSize: "0.75rem",
-            px: 1.5,
-            borderRadius: "6px",
-          }}
-        />
-      ))
-    : typeof interviewer.specialization === "string"
-    ? interviewer.specialization.split(",").map((spec, i) => (
-        <Chip
-          key={i}
-          label={spec.trim()} // Trim whitespace
-          sx={{
-            bgcolor: "#f1f5f9",
-            color: "#1e293b",
-            fontWeight: 500,
-            fontSize: "0.75rem",
-            px: 1.5,
-            borderRadius: "6px",
-          }}
-        />
-      ))
-    : null}
-</Box>
+                          sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 1,
+                            mt: 1,
+                          }}
+                        >
+                          {[]
+                            .concat(interviewer.specialization || []) // Ensure specialization is always an array
+                            .flatMap((spec) =>
+                              typeof spec === "string" ? spec.split(",") : spec
+                            ) // Handle both array and string cases
+                            .map((spec, i) => (
+                              <Chip
+                                key={i}
+                                label={spec.trim()} // Trim whitespace
+                                sx={{
+                                  bgcolor: "#f1f5f9",
+                                  color: "#1e293b",
+                                  fontWeight: 500,
+                                  fontSize: "0.75rem",
+                                  px: 1.5,
+                                  borderRadius: "6px",
+                                }}
+                              />
+                            ))}
+                        </Box>
 
                         {/* Availability */}
                         <Typography

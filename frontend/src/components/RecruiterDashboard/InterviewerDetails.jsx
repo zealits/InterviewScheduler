@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-
 const InterviewerDetails = ({
   selectedCandidate,
   formData,
@@ -32,7 +31,7 @@ const InterviewerDetails = ({
   const navigate = useNavigate();
 
   if (!selectedCandidate) return null;
-  
+
   // Validate required fields
   const validateForm = () => {
     const errors = {};
@@ -48,30 +47,28 @@ const InterviewerDetails = ({
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-  
+
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
-  
+
     handleSubmit(event, resumeFile);
     setShowSuccess(true);
     setResumeFile(null); // Reset file
-  
+
     // Reset form fields
     handleChange({ target: { name: "candidateName", value: "" } });
-    handleChange({ target: { name:"linkedinProfile", value: "" } });
-    
+    handleChange({ target: { name: "linkedinProfile", value: "" } });
+
     handleChange({ target: { name: "candidateEmail", value: "" } });
     handleChange({ target: { name: "jobTitle", value: "" } });
     handleChange({ target: { name: "jobDescription", value: "" } });
     handleChange({ target: { name: "specialization", value: "" } });
-  
+
     setFormErrors({}); // Clear error messages
   };
-  
-  
 
   const handleResumeChange = (event) => {
     const file = event.target.files[0];
@@ -86,28 +83,25 @@ const InterviewerDetails = ({
   const handleSpecializationChange = (event) => {
     const { value } = event.target;
     handleChange({ target: { name: "specialization", value } }); // Directly set value
-};
+  };
 
-  
-
-const handleClosePopup = () => {
-  setShowSuccess(false);
-  closeDetails();
-};
+  const handleClosePopup = () => {
+    setShowSuccess(false);
+    closeDetails();
+  };
 
   // Redirect to admin dashboard after success
-
 
   return (
     <>
       {!showSuccess && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-y-auto border border-gray-100">
-            <div className="border-b border-gray-100 p-4 bg-gradient-to-r from-indigo-50 to-white">
+            <div className="border-b border-gray-100 p-4 bg-gradient-to-r from-gray-50 to-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-indigo-600 p-2 rounded-full">
-                    <Calendar className="h-6 w-6 text-white" />
+                  <div className="bg-gray-800 p-2 rounded-full">
+                    <Calendar className="h-6 w-6 text-amber-400" />
                   </div>
                   <h2 className="text-xl font-semibold text-gray-800">
                     Meeting Slot Details
@@ -122,13 +116,13 @@ const handleClosePopup = () => {
               </div>
             </div>
 
-            <div className="p-6 max-h-[80vh]  ">
+            <div className="p-6 max-h-[80vh]">
               <form onSubmit={handleFormSubmit}>
                 {/* Interviewer Information */}
                 <div className="mb-8">
                   <div className="flex items-center space-x-2 mb-4">
-                    <div className="bg-green-600 p-1.5 rounded-full">
-                      <UserCheck className="h-5 w-5 text-white" />
+                    <div className="bg-gray-800 p-1.5 rounded-full">
+                      <UserCheck className="h-5 w-5 text-teal-400" />
                     </div>
                     <h3 className="font-semibold text-lg text-gray-800">
                       Interviewer Information
@@ -138,14 +132,14 @@ const handleClosePopup = () => {
                   <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4 text-green-600" />
+                        <User className="h-4 w-4 text-gray-800" />
                         <span className="font-medium text-gray-700">Name:</span>
                         <span className="text-gray-800">
                           {formData.interviewerName}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Mail className="h-4 w-4 text-green-600" />
+                        <Mail className="h-4 w-4 text-gray-800" />
                         <span className="font-medium text-gray-700">
                           Email:
                         </span>
@@ -154,14 +148,14 @@ const handleClosePopup = () => {
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4 text-green-600" />
+                        <Calendar className="h-4 w-4 text-gray-800" />
                         <span className="font-medium text-gray-700">Date:</span>
                         <span className="text-gray-800">
                           {formData.scheduledDate}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4 text-green-600" />
+                        <Clock className="h-4 w-4 text-gray-800" />
                         <span className="font-medium text-gray-700">Time:</span>
                         <span className="text-gray-800">
                           {formData.startTime} - {formData.endTime} (
@@ -169,22 +163,25 @@ const handleClosePopup = () => {
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Briefcase className="h-4 w-4 text-green-600" />
+                        <Briefcase className="h-4 w-4 text-gray-800" />
                         <span className="font-medium text-gray-700">
                           Specialization:
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {Array.isArray(formData.specialization) && formData.specialization.length > 0 ? (
-    formData.specialization.map((spec, index) => (
-        <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-lg">
-            {spec}
-        </span>
-    ))
-) : (
-    <span className="text-gray-800">N/A</span>
-)}
-
+                        {Array.isArray(formData.specialization) &&
+                        formData.specialization.length > 0 ? (
+                          formData.specialization.map((spec, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-gray-200 text-gray-800 text-sm font-medium rounded-lg"
+                            >
+                              {spec}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-gray-800">N/A</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -193,8 +190,8 @@ const handleClosePopup = () => {
                 {/* Candidate Details */}
                 <div className="mb-8">
                   <div className="flex items-center space-x-2 mb-6">
-                    <div className="bg-blue-600 p-1.5 rounded-full">
-                      <User className="h-5 w-5 text-white" />
+                    <div className="bg-gray-800 p-1.5 rounded-full">
+                      <User className="h-5 w-5 text-purple-400" />
                     </div>
                     <h3 className="font-semibold text-lg text-gray-800">
                       Candidate Details
@@ -213,8 +210,8 @@ const handleClosePopup = () => {
                           className={`w-full px-4 py-2.5 rounded-lg border ${
                             formErrors.candidateName
                               ? "border-red-500 ring-1 ring-red-500"
-                              : "border-gray-200 hover:border-blue-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
+                              : "border-gray-300 hover:border-gray-500"
+                          } focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white shadow-sm transition-all duration-200`}
                         />
                         {formErrors.candidateName && (
                           <p className="text-sm text-red-500">
@@ -233,8 +230,8 @@ const handleClosePopup = () => {
                           className={`w-full px-4 py-2.5 rounded-lg border ${
                             formErrors.candidateEmail
                               ? "border-red-500 ring-1 ring-red-500"
-                              : "border-gray-200 hover:border-blue-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
+                              : "border-gray-300 hover:border-gray-500"
+                          } focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white shadow-sm transition-all duration-200`}
                         />
                         {formErrors.candidateEmail && (
                           <p className="text-sm text-red-500">
@@ -252,9 +249,9 @@ const handleClosePopup = () => {
                           name="candidateLinkedIn"
                           value={formData.candidateLinkedIn}
                           onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white shadow-sm transition-all duration-200"
                         />
-                        <Linkedin className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
+                        <Linkedin className="absolute left-3 top-2.5 h-5 w-5 text-gray-800" />
                       </div>
                     </div>
 
@@ -269,10 +266,10 @@ const handleClosePopup = () => {
                           className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
                             formErrors.jobTitle
                               ? "border-red-500 ring-1 ring-red-500"
-                              : "border-gray-200 hover:border-blue-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
+                              : "border-gray-300 hover:border-gray-500"
+                          } focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white shadow-sm transition-all duration-200`}
                         />
-                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
+                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-800" />
                       </div>
                       {formErrors.jobTitle && (
                         <p className="text-sm text-red-500">
@@ -299,10 +296,10 @@ const handleClosePopup = () => {
                             className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
                               formErrors.interviewStartTime
                                 ? "border-red-500 ring-1 ring-red-500"
-                                : "border-gray-200 hover:border-blue-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
+                                : "border-gray-300 hover:border-gray-500"
+                            } focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white shadow-sm transition-all duration-200`}
                           />
-                          <Clock className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
+                          <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-800" />
                         </div>
                         {formErrors.interviewStartTime && (
                           <p className="text-sm text-red-500 mt-1">
@@ -327,10 +324,10 @@ const handleClosePopup = () => {
                             className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
                               formErrors.interviewEndTime
                                 ? "border-red-500 ring-1 ring-red-500"
-                                : "border-gray-200 hover:border-blue-300"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
+                                : "border-gray-300 hover:border-gray-500"
+                            } focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white shadow-sm transition-all duration-200`}
                           />
-                          <Clock className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
+                          <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-800" />
                         </div>
                         {formErrors.interviewEndTime && (
                           <p className="text-sm text-red-500 mt-1">
@@ -349,8 +346,8 @@ const handleClosePopup = () => {
                         className={`w-full px-4 py-2.5 rounded-lg border ${
                           formErrors.jobDescription
                             ? "border-red-500 ring-1 ring-red-500"
-                            : "border-gray-200 hover:border-blue-300"
-                        } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm min-h-[120px] transition-all duration-200`}
+                            : "border-gray-300 hover:border-gray-500"
+                        } focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white shadow-sm min-h-[120px] transition-all duration-200`}
                       />
                       {formErrors.jobDescription && (
                         <p className="text-sm text-red-500">
@@ -370,10 +367,10 @@ const handleClosePopup = () => {
                           className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
                             formErrors.specialization
                               ? "border-red-500 ring-1 ring-red-500"
-                              : "border-gray-200 hover:border-blue-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition-all duration-200`}
+                              : "border-gray-300 hover:border-gray-500"
+                          } focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white shadow-sm transition-all duration-200`}
                         />
-                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-blue-600" />
+                        <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-gray-800" />
                       </div>
                       {formErrors.specialization && (
                         <p className="text-sm text-red-500">
@@ -388,9 +385,9 @@ const handleClosePopup = () => {
                         onClick={() =>
                           document.getElementById("resume-upload").click()
                         }
-                        className="flex items-center px-4 py-2.5 rounded-lg border border-blue-300 bg-blue-50 hover:bg-blue-100 transition-colors text-blue-700 shadow-sm"
+                        className="flex items-center px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors text-gray-700 shadow-sm"
                       >
-                        <Upload className="h-4 w-4 mr-2" />
+                        <Upload className="h-4 w-4 mr-2 text-gray-800" />
                         Upload Resume
                       </button>
                       <input
@@ -402,7 +399,7 @@ const handleClosePopup = () => {
                       />
                       {resumeFile && (
                         <p className="text-sm text-gray-600 flex items-center">
-                          <FileText className="h-4 w-4 mr-2 text-blue-600" />
+                          <FileText className="h-4 w-4 mr-2 text-gray-800" />
                           {resumeFile.name}
                         </p>
                       )}
@@ -416,7 +413,7 @@ const handleClosePopup = () => {
                     type="submit"
                     className="flex items-center justify-center px-6 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors shadow-md hover:shadow-lg"
                   >
-                    <Send className="h-4 w-4 mr-2" />
+                    <Send className="h-4 w-4 mr-2 text-amber-400" />
                     Submit
                   </button>
                   <button
@@ -435,12 +432,12 @@ const handleClosePopup = () => {
 
       {/* Success Popup */}
       {showSuccess && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
-                <div className="bg-green-600 p-2 rounded-full">
-                  <div className="flex items-center justify-center h-6 w-6 text-white">
+                <div className="bg-gray-800 p-2 rounded-full">
+                  <div className="flex items-center justify-center h-6 w-6 text-green-400">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -472,7 +469,7 @@ const handleClosePopup = () => {
             <div className="space-y-4 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-green-600" />
+                  <User className="h-4 w-4 text-gray-800" />
                   <span className="font-medium text-gray-700">
                     Interviewer:
                   </span>
@@ -481,53 +478,32 @@ const handleClosePopup = () => {
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4 text-green-600" />
+                  <Mail className="h-4 w-4 text-gray-800" />
                   <span className="font-medium text-gray-700">Email:</span>
                   <span className="text-gray-800">
                     {formData.interviewerEmail}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-green-600" />
+                  <Calendar className="h-4 w-4 text-gray-800" />
                   <span className="font-medium text-gray-700">Date:</span>
                   <span className="text-gray-800">
                     {formData.scheduledDate}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-green-600" />
+                  <Clock className="h-4 w-4 text-gray-800" />
                   <span className="font-medium text-gray-700">Time:</span>
                   <span className="text-gray-800">
                     {formData.startTime} - {formData.endTime}
                   </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Briefcase className="h-4 w-4 text-green-600" />
-                  <span className="font-medium text-gray-700">
-                    Specialization:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.specialization &&
-                    formData.specialization.length > 0 ? (
-                      formData.specialization.map((spec, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 text-sm font-medium bg-indigo-100 text-indigo-700 rounded-full shadow-sm"
-                        >
-                          {spec}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-gray-800">N/A</span>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
 
             <button
               onClick={handleClosePopup}
-              className="w-full px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
+              className="w-full px-6 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors shadow-md hover:shadow-lg"
             >
               OK
             </button>
