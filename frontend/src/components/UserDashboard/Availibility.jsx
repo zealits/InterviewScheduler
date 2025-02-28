@@ -34,7 +34,6 @@ const Availibility = () => {
     timezone: "UTC+00:00",
   });
 
-
   const handleAddCustomDate = (date) => {
     if (date) {
       setCustomDates((prevDates) => [...prevDates, date]);
@@ -540,7 +539,7 @@ const Availibility = () => {
         </div>
 
         {/* Submit Section */}
-        <div className="pt-4 border-t border-gray-100">
+        <div className=" border-t border-gray-100">
           <button
             onClick={handleSubmit}
             className="w-full bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center font-medium"

@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import AdminDashboard from "./components/RecruiterDashboard/AdminDashboard";
 import InterviewerDetails from "./components/RecruiterDashboard/InterviewerDetails";
-import { ProtectedRoute, ProtectedRouteUser } from "./routes/ProtectedRoute"; 
+import { ProtectedRoute, ProtectedRouteUser } from "./routes/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Register";
 import RegisterUser from "./pages/UserLogin/Register";
@@ -13,13 +13,13 @@ import Availibility from "./components/UserDashboard/Availibility";
 import UpcomingInterviews from "./components/UserDashboard/UpcomingInterviews";
 import ProfileUpdate from "./components/UserDashboard/ProfileUpdate";
 import PendingApprovals from "./components/UserDashboard/PendingApprovals";
-import UserHome from "./components/UserDashboard/UserHome";   
+import UserHome from "./components/UserDashboard/UserHome";
+import Decline from "./components/RecruiterDashboard/Decline";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -40,15 +40,15 @@ function App() {
             {/* Nested Routes for User Dashboard */}
             <Route path="home" element={<UserHome />} />
             <Route path="availability" element={<Availibility />} />
-            <Route path="upcoming-interviews" element={<UpcomingInterviews />} />
+            <Route
+              path="upcoming-interviews"
+              element={<UpcomingInterviews />}
+            />
             <Route path="profile-update" element={<ProfileUpdate />} />
             <Route path="pending-approvals" element={<PendingApprovals />} />
             <Route
-
-
               path="logout"
               element={<div>You have been logged out. Redirecting...</div>}
-
             />
           </Route>
 
@@ -68,6 +68,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/decline" element={<Decline />} />
         </Routes>
       </AuthProvider>
     </Router>

@@ -43,7 +43,6 @@ const PendingApprovals = () => {
 
         // Only include pending (non-confirmed) interviews
         setPendingInterviews(filteredInterviews);
-        console.log("Fetched Pending Approvals:", response.data);
       } catch (err) {
         setError("Failed to fetch pending approvals.");
       } finally {

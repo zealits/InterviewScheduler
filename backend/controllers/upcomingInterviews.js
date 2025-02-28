@@ -34,7 +34,6 @@ exports.getAllPending = async (req, res) => {
     }));
 
     res.status(200).json({ upcomingInterviews: updatedInterviews });
-    console.log("Response:", updatedInterviews);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -102,22 +101,6 @@ exports.postAllUpcoming = async (req, res) => {
     }
 
     await user.save();
-
-    // // **Send Email Notification after saving interview**
-    // for (const interview of upcomingInterviews) {
-    //   await sendEmail(
-    //      // Interviewer email (from route param)
-    //     interview.name,
-    //     // Candidate email
-    //     interview.jobTitle,
-    //     interview.jobDescription,
-    //     interview.scheduledDate,
-    //     interview.jobDescription,
-    //     interview.interviewTime,
-    //   );
-    // }
-    // console.log("sending email", email);
-    // console.log("upcomingInterviews", upcomingInterviews);
 
     res.status(201).json({ message: "Interviews added successfully", user });
   } catch (error) {

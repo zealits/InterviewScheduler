@@ -3,9 +3,11 @@ const User = require("../models/User"); // Replace with the actual path to your 
 // Controller to update confirmation status
 exports.updateInterviewConfirmation = async (req, res) => {
   const { email, interviewId } = req.body;
-  console.log(email, interviewId);
+
   if (!email || !interviewId) {
-    return res.status(400).json({ message: "User email and Interview ID are required." });
+    return res
+      .status(400)
+      .json({ message: "User email and Interview ID are required." });
   }
 
   try {
@@ -29,7 +31,9 @@ exports.updateInterviewConfirmation = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "An error occurred while updating confirmation." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while updating confirmation." });
   }
 };
 
