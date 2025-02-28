@@ -13,7 +13,7 @@ router.get("/user", async (req, res) => {
 
     // Only select the fields needed for the UpdateProfile form
     const user = await User.findOne({ email }).select(
-      "name email linkedinProfile yearOfExperience experienceAsInterviewer candidatesInterviewed specialization"
+      "name email  linkedinProfile yearOfExperience experienceAsInterviewer candidatesInterviewed specialization"
     );
 
     if (!user) {
@@ -27,14 +27,15 @@ router.get("/user", async (req, res) => {
   }
 });
 
-
 // Update user profile
 router.put("/profile", async (req, res) => {
   try {
     const { email, password, specialization, ...otherFields } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,13 +45,20 @@ router.put("/profile", async (req, res) => {
       ? specialization
       : [specialization]; // Convert single value to array
 
-    console.log("Updating profile with specialization:", formattedSpecialization); // ✅ Debugging step
+    console.log(
+      "Updating profile with specialization:",
+      formattedSpecialization
+    ); // ✅ Debugging step
 
     const updatedUser = await User.findOneAndUpdate(
       { email },
-      { ...otherFields, password: hashedPassword, specialization: formattedSpecialization },
+      {
+        ...otherFields,
+        password: hashedPassword,
+        specialization: formattedSpecialization,
+      },
       { new: true }
-    ).select("-password"); // Exclude password from response
+    );
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -62,7 +70,5 @@ router.put("/profile", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
-
 
 module.exports = router;

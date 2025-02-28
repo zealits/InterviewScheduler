@@ -4,8 +4,6 @@ const Admin = require("../models/Admin"); // Ensure correct casing
 
 exports.sendEmail = async (req, res) => {
   try {
-    console.log("Email request body:", req.body); // Debugging
-
     const {
       recipient,
       subject,

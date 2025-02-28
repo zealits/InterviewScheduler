@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, User, ListChecks, Clock, Users, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import {
+  Calendar,
+  User,
+  ListChecks,
+  Clock,
+  Users,
+  CheckCircle,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
 import axios from "axios";
 
 const UserHome = () => {
@@ -86,7 +95,10 @@ const UserHome = () => {
         const pendingApprovals = pendingData.filter(
           (interview) => interview.confirmation === false
         );
-        setStats(prev => ({ ...prev, pendingInterviews: pendingApprovals.length }));
+        setStats((prev) => ({
+          ...prev,
+          pendingInterviews: pendingApprovals.length,
+        }));
       } catch (error) {
         console.error("Error fetching pending interviews:", error);
         alert("Failed to fetch pending interviews.");
@@ -102,10 +114,9 @@ const UserHome = () => {
     const fetchAvailabilityData = async () => {
       const token = localStorage.getItem("adminAuthToken");
       try {
-        const response = await axios.get(
-          `/api/user/availability`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await axios.get(`/api/user/availability`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         console.log("Fetched Availability Data:", response.data);
         const availability = Array.isArray(response.data?.availabilityRange)
           ? response.data.availabilityRange
@@ -136,8 +147,6 @@ const UserHome = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center">
-   
-
       <main className="w-full max-w-7xl p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Upcoming Interviews Section */}
@@ -150,14 +159,20 @@ const UserHome = () => {
                   <div className="p-2 bg-red-400/30 backdrop-blur-md rounded-xl">
                     <Users className="text-red-50" size={24} />
                   </div>
-                  <h2 className="text-xl font-bold text-red-50">Confirmed Availability</h2>
+                  <h2 className="text-xl font-bold text-red-50">
+                    Confirmed Availability
+                  </h2>
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center h-48">
-                <span className="text-7xl font-bold text-red-50">{upcomingInterviewCount}</span>
+                <span className="text-7xl font-bold text-red-50">
+                  {upcomingInterviewCount}
+                </span>
                 <div className="flex items-center gap-2 mt-4">
                   <Clock className="text-red-100" size={20} />
-                  <p className="text-red-50 text-xl font-medium">Scheduled Interviews</p>
+                  <p className="text-red-50 text-xl font-medium">
+                    Scheduled Interviews
+                  </p>
                 </div>
               </div>
             </div>
@@ -173,10 +188,13 @@ const UserHome = () => {
                   <div className="p-2 bg-blue-400/30 backdrop-blur-md rounded-xl">
                     <Calendar className="text-blue-50" size={24} />
                   </div>
-                  <h2 className="text-xl font-bold text-blue-50">Availability</h2>
+                  <h2 className="text-xl font-bold text-blue-50">
+                    Interview Information
+                  </h2>
                 </div>
                 <span className="text-blue-100 font-medium">
-                  {availabilityRanges.length} Slot{availabilityRanges.length !== 1 && "s"} Available
+                  {availabilityRanges.length} Slot
+                  {availabilityRanges.length !== 1 && "s"} Available
                 </span>
               </div>
               {/* Slider */}
@@ -209,7 +227,9 @@ const UserHome = () => {
                       </div>
                       <div className="mb-2">
                         <span className="font-bold">Start Time: </span>
-                        <span>{availabilityRanges[currentSlide].startTime}</span>
+                        <span>
+                          {availabilityRanges[currentSlide].startTime}
+                        </span>
                       </div>
                       <div className="mb-2">
                         <span className="font-bold">End Time: </span>
@@ -241,22 +261,36 @@ const UserHome = () => {
                   <div className="p-2 bg-purple-400/30 backdrop-blur-md rounded-xl">
                     <User className="text-purple-50" size={24} />
                   </div>
-                  <h2 className="text-xl font-bold text-purple-50">Interview Information</h2>
+                  <h2 className="text-xl font-bold text-purple-50">
+                    Interview Information
+                  </h2>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="bg-purple-400/30 backdrop-blur-md rounded-xl p-4 hover:bg-purple-400/40 transition-colors">
-                  <span className="text-purple-200 font-medium text-sm block mb-1">Full Name</span>
-                  <span className="text-purple-50 font-medium">{formData.interviewerName}</span>
+                  <span className="text-purple-200 font-medium text-sm block mb-1">
+                    Full Name
+                  </span>
+                  <span className="text-purple-50 font-medium">
+                    {formData.interviewerName}
+                  </span>
                 </div>
                 <div className="bg-purple-400/30 backdrop-blur-md rounded-xl p-4 hover:bg-purple-400/40 transition-colors">
-                  <span className="text-purple-200 font-medium text-sm block mb-1">Email Address</span>
-                  <span className="text-purple-50 font-medium">{formData.email}</span>
+                  <span className="text-purple-200 font-medium text-sm block mb-1">
+                    Email Address
+                  </span>
+                  <span className="text-purple-50 font-medium">
+                    {formData.email}
+                  </span>
                 </div>
                 <div className="bg-purple-400/30 backdrop-blur-md rounded-xl p-4 hover:bg-purple-400/40 transition-colors">
-                  <span className="text-purple-200 font-medium text-sm block mb-1">LinkedIn Interview</span>
+                  <span className="text-purple-200 font-medium text-sm block mb-1">
+                    LinkedIn Interview
+                  </span>
                   <a
-                    href={formData.linkedin ? `https://${formData.linkedin}` : "#"}
+                    href={
+                      formData.linkedin ? `https://${formData.linkedin}` : "#"
+                    }
                     className="text-purple-50 font-medium hover:text-white transition-colors"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -278,28 +312,35 @@ const UserHome = () => {
                   <div className="p-2 bg-yellow-400/30 backdrop-blur-md rounded-xl">
                     <ListChecks className="text-yellow-900" size={24} />
                   </div>
-                  <h2 className="text-xl font-bold text-yellow-900">Pending Approvals</h2>
+                  <h2 className="text-xl font-bold text-yellow-900">
+                    Pending Approvals
+                  </h2>
                 </div>
                 <button className="bg-yellow-400/30 hover:bg-yellow-400/40 transition-colors rounded-full px-3 py-1 text-yellow-900 font-medium text-sm flex items-center gap-2">
                   View All <ArrowRight size={14} />
                 </button>
               </div>
               <div className="flex flex-col items-center justify-center h-48">
-                <span className="text-7xl font-bold text-yellow-900">{stats.pendingInterviews}</span>
+                <span className="text-7xl font-bold text-yellow-900">
+                  {stats.pendingInterviews}
+                </span>
                 <div className="flex items-center gap-2 mt-4">
                   <CheckCircle className="text-yellow-900" size={20} />
-                  <p className="text-yellow-900 text-xl font-medium">Awaiting Feedback</p>
+                  <p className="text-yellow-900 text-xl font-medium">
+                    Awaiting Feedback
+                  </p>
                 </div>
               </div>
               <div className="mt-4 bg-yellow-400/30 rounded-xl p-4 backdrop-blur-md">
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-900 font-medium">Average Response Time</span>
+                  <span className="text-yellow-900 font-medium">
+                    Average Response Time
+                  </span>
                   <span className="text-yellow-900 font-bold">2.4 hrs</span>
                 </div>
               </div>
             </div>
           </div>
-          
         </div>
       </main>
 

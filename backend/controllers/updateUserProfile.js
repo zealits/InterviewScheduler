@@ -40,7 +40,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // Add a custom availability
 const addCustomAvailability = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const { customDate, note, startTime, endTime } = req.body;  // Destructure note along with customDate
+  const { customDate, note, startTime, endTime } = req.body; // Destructure note along with customDate
 
   const user = await User.findById(userId);
 
@@ -50,8 +50,7 @@ const addCustomAvailability = asyncHandler(async (req, res) => {
   }
 
   user.customAvailability.push({ customDate, note, startTime, endTime });
-    await user.save();  
-
+  await user.save();
 
   res.status(201).json({
     success: true,
@@ -94,7 +93,13 @@ const addUpcomingInterview = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  user.upcomingInterviews.push({ email, scheduledDate,interviewTime, scheduledTime, details });
+  user.upcomingInterviews.push({
+    email,
+    scheduledDate,
+    interviewTime,
+    scheduledTime,
+    details,
+  });
   await user.save();
 
   res.status(201).json({

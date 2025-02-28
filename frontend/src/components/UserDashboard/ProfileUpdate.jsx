@@ -30,15 +30,18 @@ const UpdateProfile = () => {
         setPopup({ show: true, message: "User Not found!" });
         return;
       }
-  
+
       try {
         const response = await axios.get(`/api/user?email=${email}`);
         const fetchedData = response.data;
-  
+
         let fetchedSpecializations = fetchedData.specialization;
-  
+
         // Ensure specialization is always an array
-        if (Array.isArray(fetchedSpecializations) && fetchedSpecializations.length > 0) {
+        if (
+          Array.isArray(fetchedSpecializations) &&
+          fetchedSpecializations.length > 0
+        ) {
           // Split the first element if it contains comma-separated values
           const firstElement = fetchedSpecializations[0];
           if (typeof firstElement === "string" && firstElement.includes(",")) {
@@ -50,7 +53,7 @@ const UpdateProfile = () => {
         } else {
           fetchedSpecializations = [];
         }
-  
+
         setUserData({ ...fetchedData, specialization: fetchedSpecializations });
         setSpecialization(fetchedSpecializations);
       } catch (error) {
@@ -60,11 +63,9 @@ const UpdateProfile = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchUserDetails();
   }, []);
-  
-  
 
   // Once userData is fetched, update the specialization state.
   // This ensures that if the backend sends a specialization array, it’s loaded.
@@ -325,6 +326,7 @@ const UpdateProfile = () => {
                           <span>{spec}</span>
                           <button
                             type="button"
+                            value={userData.specialization || ""}
                             onClick={() => handleRemoveSpecialization(index)}
                             className="ml-1 text-red-600 hover:text-red-800"
                           >

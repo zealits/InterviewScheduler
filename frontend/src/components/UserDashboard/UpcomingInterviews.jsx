@@ -47,11 +47,21 @@ const UpcomingInterviews = () => {
         const { data } = await axios.get(
           `/api/interviewers/${email}/upcoming-interviews`
         );
-        setInterviews(data.upcomingInterviews || []); // Ensure it's always an array
-        setInterviews(data.upcomingInterviews || []); // Ensure it's always an array
+        // Define today's date with time zeroed for comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Filter out interviews that are in the past and include only confirmed ones
+        const filteredInterviews = data.upcomingInterviews.filter(
+          (interview) => {
+            const interviewDate = new Date(interview.scheduledDate);
+            interviewDate.setHours(0, 0, 0, 0);
+            return interviewDate >= today && interview.confirmation === true;
+          }
+        );
+        setInterviews(filteredInterviews || []);
       } catch (err) {
         setError("Failed to fetch interviews. Please try again later.");
-        setInterviews([]); // Set to empty array on error
         setInterviews([]); // Set to empty array on error
       } finally {
         setLoading(false);
@@ -142,26 +152,24 @@ const UpcomingInterviews = () => {
   );
 
   // Handle adding interview to calendar and downloading the .ics file
-
   const handleAddToCalendar = useCallback((interview) => {
     const calendar = ical({
       name: `${interview.jobTitle} Interview`,
-      prodId: { company: "yourcompany.com", product: "InterviewScheduler" }, // Set PRODID for better compatibility
+      prodId: { company: "yourcompany.com", product: "InterviewScheduler" },
     });
 
-    calendar.method("PUBLISH"); // Helps with Microsoft Outlook compatibility
+    calendar.method("PUBLISH");
 
     const startTime = new Date(interview.scheduledDate);
     const endTime = new Date(interview.scheduledDate);
     endTime.setHours(endTime.getHours() + 1); // 1-hour interview duration
 
     calendar.createEvent({
-      id: interview.id || crypto.randomUUID(), // Ensure unique UID
+      id: interview._id || crypto.randomUUID(),
       start: startTime,
       end: endTime,
       timestamp: new Date(),
       summary: `${interview.jobTitle} Interview`,
-
       location: interview.location || "Online",
       organizer: { name: "Recruiter", email: "recruiter@example.com" },
       attendees: [
@@ -178,7 +186,6 @@ const UpcomingInterviews = () => {
     });
 
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
     a.href = url;
     a.download = `${interview.jobTitle}-Interview.ics`;
@@ -191,13 +198,11 @@ const UpcomingInterviews = () => {
   // Memoized filtered and sorted interviews
   const filteredInterviews = useMemo(() => {
     return interviews
-      .filter(
-        (interview) =>
-          interview.confirmation === true &&
-          (filterDate
-            ? new Date(interview.scheduledDate).toISOString().split("T")[0] ===
-              filterDate
-            : true)
+      .filter((interview) =>
+        filterDate
+          ? new Date(interview.scheduledDate).toISOString().split("T")[0] ===
+            filterDate
+          : true
       )
       .sort((a, b) => {
         const dateA = new Date(a.scheduledDate);
@@ -250,8 +255,7 @@ const UpcomingInterviews = () => {
                   Manage and track your scheduled interviews
                 </p>
               </div>
-
-              {/* Filters Section - Improved layout */}
+              {/* Filters Section */}
               <div className="flex flex-col sm:flex-row gap-3 items-end">
                 <div className="w-full sm:w-44">
                   <label
@@ -304,7 +308,7 @@ const UpcomingInterviews = () => {
                   key={index}
                   className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition duration-300 overflow-hidden"
                 >
-                  {/* Card Header with improved design */}
+                  {/* Card Header */}
                   <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
@@ -320,8 +324,7 @@ const UpcomingInterviews = () => {
                       </span>
                     </div>
                   </div>
-
-                  {/* Card Content with improved layout */}
+                  {/* Card Content */}
                   <div className="p-5">
                     <div className="space-y-4">
                       <div className="flex items-center text-gray-700">
@@ -357,7 +360,6 @@ const UpcomingInterviews = () => {
                           {interview.interviewEndTime}
                         </span>
                       </div>
-
                       <div className="flex justify-between pt-4 mt-2 border-t border-gray-100">
                         <a
                           href={interview.linkedin}
@@ -436,7 +438,7 @@ const UpcomingInterviews = () => {
           </div>
         )}
 
-        {/* PDF Modal - Improved design */}
+        {/* PDF Modal */}
         {selectedPdf && (
           <div className="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
             <div className="bg-white rounded-xl shadow-2xl relative max-w-4xl w-full max-h-[90vh] overflow-hidden">
