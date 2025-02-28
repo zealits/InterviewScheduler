@@ -14,6 +14,8 @@ import {
   Linkedin,
   CalendarHeartIcon,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 const InterviewerDetails = ({
   selectedCandidate,
@@ -27,9 +29,10 @@ const InterviewerDetails = ({
   const [formErrors, setFormErrors] = useState({});
   const [error, setError] = useState(""); // error is now a string
   const [resumeFile, setResumeFile] = useState(null);
+  const navigate = useNavigate();
 
   if (!selectedCandidate) return null;
-
+  
   // Validate required fields
   const validateForm = () => {
     const errors = {};
@@ -45,17 +48,30 @@ const InterviewerDetails = ({
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-
+  
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
-
-    // Pass the resumeFile along with the event to handleSubmit
+  
     handleSubmit(event, resumeFile);
     setShowSuccess(true);
+    setResumeFile(null); // Reset file
+  
+    // Reset form fields
+    handleChange({ target: { name: "candidateName", value: "" } });
+    handleChange({ target: { name:"linkedinProfile", value: "" } });
+    
+    handleChange({ target: { name: "candidateEmail", value: "" } });
+    handleChange({ target: { name: "jobTitle", value: "" } });
+    handleChange({ target: { name: "jobDescription", value: "" } });
+    handleChange({ target: { name: "specialization", value: "" } });
+  
+    setFormErrors({}); // Clear error messages
   };
+  
+  
 
   const handleResumeChange = (event) => {
     const file = event.target.files[0];
@@ -68,24 +84,19 @@ const InterviewerDetails = ({
 
   // Updated to handle single selection
   const handleSpecializationChange = (event) => {
-    const { value, checked } = event.target;
-    const updatedSpecialization = checked
-      ? [...specialization, value] // Add if checked
-      : specialization.filter((item) => item !== value);
+    const { value } = event.target;
+    handleChange({ target: { name: "specialization", value } }); // Directly set value
+};
 
-    if (updatedSpecialization.length === 0) {
-      setError("Please select at least one specialization.");
-    } else {
-      setError("");
-    }
+  
 
-    handleChange(updatedSpecialization);
-  };
+const handleClosePopup = () => {
+  setShowSuccess(false);
+  closeDetails();
+};
 
   // Redirect to admin dashboard after success
-  const handleClosePopup = () => {
-    window.location.href = "/admin";
-  };
+
 
   return (
     <>
@@ -164,19 +175,16 @@ const InterviewerDetails = ({
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {Array.isArray(formData.specialization) &&
-                        formData.specialization.length > 0 ? (
-                          formData.specialization.map((spec, index) => (
-                            <span
-                              key={index}
-                              className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-lg"
-                            >
-                              {spec}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-gray-800">N/A</span>
-                        )}
+                        {Array.isArray(formData.specialization) && formData.specialization.length > 0 ? (
+    formData.specialization.map((spec, index) => (
+        <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-lg">
+            {spec}
+        </span>
+    ))
+) : (
+    <span className="text-gray-800">N/A</span>
+)}
+
                       </div>
                     </div>
                   </div>

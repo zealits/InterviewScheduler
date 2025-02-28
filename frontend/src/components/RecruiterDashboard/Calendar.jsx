@@ -372,6 +372,7 @@ const CustomBigCalendar = () => {
       timeZone: candidate?.timeZone || "",
     }));
   };
+
   
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -442,62 +443,6 @@ const CustomBigCalendar = () => {
 
     console.log("Final Filtered Events:", filtered);
     setFilteredEvents(filtered);
-
-    // **Handle Interviewers for the Selected Date**
-    if (selectedDate) {
-      const selectedDateString = selectedDate.toISOString().split("T")[0];
-
-      const eventsOnDate = filtered.filter(
-        (event) =>
-          event.start &&
-          event.start.toISOString().split("T")[0] === selectedDateString
-      );
-
-      console.log("Events on Selected Date:", eventsOnDate);
-
-      const interviewersOnDate = eventsOnDate.flatMap((event) =>
-        event.users.map((user) => {
-          const customEntry = user.customAvailability?.find((entry) =>
-            entry.dates.some(
-              (date) =>
-                new Date(date).toISOString().split("T")[0] ===
-                selectedDateString
-            )
-          );
-
-          const rangeEntry = user.availabilityRange?.find(
-            (range) =>
-              new Date(range.startDate) <= selectedDate &&
-              new Date(range.endDate) >= selectedDate
-          );
-
-          const startTime =
-            customEntry?.startTime || rangeEntry?.startTime || "Not Specified";
-          const endTime =
-            customEntry?.endTime || rangeEntry?.endTime || "Not Specified";
-          const timeZone =
-            customEntry?.timezone || rangeEntry?.timezone || "Not Specified";
-
-          return {
-            name: user.name,
-            specialization: user.specialization || "Unknown",
-            availableTime: `${startTime} - ${endTime}`,
-            timeZone,
-            experience: user.yearOfExperience
-              ? `${user.yearOfExperience} years`
-              : "N/A",
-            startTime,
-            endTime,
-            user,
-          };
-        })
-      );
-
-      console.log("Interviewers on Selected Date:", interviewersOnDate);
-      setSelectedDateInterviewers(interviewersOnDate);
-    } else {
-      setSelectedDateInterviewers([]);
-    }
   };
 
   const handleChange = (e) => {
