@@ -368,6 +368,12 @@ const PendingApprovals = () => {
                         </span>
                       </div>
                       <div className="flex items-center text-gray-700">
+                        <User className="mr-3 text-blue-500" size={16} />
+                        <span className="text-sm font-medium">
+                          {interview.specialization}
+                        </span>
+                      </div>
+                      <div className="flex items-center text-gray-700">
                         <Calendar className="mr-3 text-green-500" size={16} />
                         <span className="text-sm">
                           {new Date(interview.scheduledDate).toLocaleDateString(

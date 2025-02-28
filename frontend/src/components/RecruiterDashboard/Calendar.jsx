@@ -9,12 +9,28 @@ import {
   Select,
   MenuItem,
   TextField,
-  IconButton,InputAdornment,Avatar
+  IconButton,
+  InputAdornment,
+  Avatar,
+  Chip,
 } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 
 import { useState, useEffect, useRef } from "react";
-import { CheckCircle, UserCheck, CalendarDays, Clock, Calendar, RefreshCw,BarChart3,Search,FilterIcon,Download,CalendarPlus,CalendarCheck} from "lucide-react";
+import {
+  CheckCircle,
+  UserCheck,
+  CalendarDays,
+  Clock,
+  Calendar,
+  RefreshCw,
+  BarChart3,
+  Search,
+  FilterIcon,
+  Download,
+  CalendarPlus,
+  CalendarCheck,
+} from "lucide-react";
 import axios from "axios";
 import moment from "moment";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
@@ -373,32 +389,31 @@ const CustomBigCalendar = () => {
     }));
   };
 
-  
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter((prev) => ({ ...prev, [name]: value }));
-
-    if (value === "All") {
+  
+    if (value === "All" || value === "") {
       setFilteredEvents(events);
       setSelectedDateInterviewers([]);
       return;
     }
-
+  
     const predefinedSpecializations = ["Cloud", "AI", "Language", "Domain"];
     const filterValue = value.trim().toLowerCase();
-
+  
     console.log("Selected Filter Value:", value);
     console.log("Events Data:", events);
-
+  
     const filtered = events
       .map((event) => {
         if (!event.users || event.users.length === 0) return null; // Ensure users exist
-
+  
         console.log(
           "Checking Event Users:",
           event.users.map((u) => u.specialization || "No Specialization")
         );
-
+  
         const filteredUsers = event.users.filter((user) => {
           // Convert user.specialization to an array of strings
           let userSpecs = [];
@@ -414,7 +429,7 @@ const CustomBigCalendar = () => {
           } else {
             return false;
           }
-
+  
           if (value === "Others") {
             // Consider user as "Others" if none of their specs match the predefined ones
             return userSpecs.every(
@@ -424,13 +439,13 @@ const CustomBigCalendar = () => {
                   .includes(spec)
             );
           }
-
+  
           // Otherwise, return true if any of the user's specializations match the filter
           return userSpecs.includes(filterValue);
         });
-
+  
         console.log(`Users matching "${value}":`, filteredUsers);
-
+  
         return filteredUsers.length > 0
           ? {
               ...event,
@@ -440,7 +455,7 @@ const CustomBigCalendar = () => {
           : null;
       })
       .filter(Boolean); // Remove null values
-
+  
     console.log("Final Filtered Events:", filtered);
     setFilteredEvents(filtered);
   };
@@ -661,7 +676,7 @@ const CustomBigCalendar = () => {
             >
               <CalendarDays size={28} color="#ffffff" />
             </Box>
-            
+
             <Box>
               <Typography
                 variant="h5"
@@ -688,10 +703,8 @@ const CustomBigCalendar = () => {
               </Typography>
             </Box>
           </Box>
-          
-         
         </Box>
-  
+
         {/* Filter Section - Enhanced with Multiple Filters */}
         <Box
           sx={{
@@ -702,14 +715,16 @@ const CustomBigCalendar = () => {
         >
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl 
-                variant="outlined" 
-                size="small" 
-                sx={{ 
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{
                   width: "100%",
                 }}
               >
-                <InputLabel id="specialization-label">Specialization</InputLabel>
+                <InputLabel id="specialization-label">
+                  Specialization
+                </InputLabel>
                 <Select
                   labelId="specialization-label"
                   name="specialization"
@@ -738,23 +753,19 @@ const CustomBigCalendar = () => {
                 </Select>
               </FormControl>
             </Grid>
-            
+
             <Grid item xs={12} sm={6} md={3}>
-              <FormControl 
-                variant="outlined" 
-                size="small" 
-                sx={{ 
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{
                   width: "100%",
                 }}
-              >
-              
-             
-              </FormControl>
+              ></FormControl>
             </Grid>
-        
           </Grid>
         </Box>
-  
+
         {/* Calendar Section - Enhanced Styling */}
         <Box sx={{ px: { xs: 2, sm: 2.5, md: 3 }, py: 3 }}>
           <Paper
@@ -826,9 +837,9 @@ const CustomBigCalendar = () => {
                   fontWeight: 500,
                   fontSize: "0.875rem",
                   color: "#475569",
-                  "&.rbc-now": { 
-                    color: "#1e293b", 
-                    fontWeight: 700 
+                  "&.rbc-now": {
+                    color: "#1e293b",
+                    fontWeight: 700,
                   },
                 },
                 "& .rbc-event": {
@@ -879,11 +890,18 @@ const CustomBigCalendar = () => {
             </Box>
           </Paper>
         </Box>
-  
+
         {/* Selected Date Section - Enhanced Cards */}
         {selectedDate && (
           <Box sx={{ px: { xs: 2, sm: 2.5, md: 3 }, pt: 1, pb: 4 }}>
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 3,
+              }}
+            >
               <Typography
                 variant="h6"
                 sx={{
@@ -896,13 +914,10 @@ const CustomBigCalendar = () => {
               >
                 Available on {moment(selectedDate).format("MMMM D, YYYY")}
               </Typography>
-              
-              <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1.5 }}>
-              
-                
-              </Box>
+
+              <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1.5 }}></Box>
             </Box>
-  
+
             {selectedDateInterviewers.length === 0 ? (
               <Paper
                 elevation={0}
@@ -939,7 +954,9 @@ const CustomBigCalendar = () => {
                     lineHeight: 1.6,
                   }}
                 >
-                  There are currently no interviewers available for this date. Please select a different date from the calendar to view available interviewers.
+                  There are currently no interviewers available for this date.
+                  Please select a different date from the calendar to view
+                  available interviewers.
                 </Typography>
                 <Button
                   variant="contained"
@@ -962,9 +979,9 @@ const CustomBigCalendar = () => {
                 </Button>
               </Paper>
             ) : (
-              <Grid 
-                container 
-                spacing={{ xs: 2, sm: 2.5, md: 3 }} 
+              <Grid
+                container
+                spacing={{ xs: 2, sm: 2.5, md: 3 }}
                 ref={interviewersListRef}
               >
                 {selectedDateInterviewers.map((interviewer, index) => (
@@ -985,16 +1002,18 @@ const CustomBigCalendar = () => {
                       }}
                     >
                       {/* Card Header with Gradient */}
-                      <Box 
+                      <Box
                         sx={{
                           bgcolor: "#f8fafc",
                           p: 2.5,
                           borderBottom: "1px solid #e2e8f0",
                         }}
                       >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
                           <Avatar
-                            sx={{ 
+                            sx={{
                               bgcolor: "#e2e8f0",
                               color: "#1e293b",
                               width: 48,
@@ -1003,9 +1022,12 @@ const CustomBigCalendar = () => {
                               fontWeight: 600,
                             }}
                           >
-                            {interviewer.name.split(' ').map(n => n[0]).join('')}
+                            {interviewer.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
                           </Avatar>
-                          
+
                           <Box>
                             <Typography
                               variant="subtitle1"
@@ -1017,8 +1039,15 @@ const CustomBigCalendar = () => {
                             >
                               {interviewer.name}
                             </Typography>
-                            
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                mt: 0.5,
+                              }}
+                            >
                               <Clock size={14} color="#64748b" />
                               <Typography
                                 variant="body2"
@@ -1033,9 +1062,10 @@ const CustomBigCalendar = () => {
                           </Box>
                         </Box>
                       </Box>
-                      
+
                       {/* Card Content */}
                       <Box sx={{ p: 2.5 }}>
+                        {/* Specialization Tags */}
                         {/* Specialization Tags */}
                         <Typography
                           variant="body2"
@@ -1047,32 +1077,48 @@ const CustomBigCalendar = () => {
                         >
                           Specialization
                         </Typography>
-                        
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2.5 }}>
-                          {(Array.isArray(interviewer.specialization) 
-                            ? interviewer.specialization 
-                            : [interviewer.specialization]
-                          ).map((spec, idx) => (
-                            <Box
-                              key={idx}
-                              component="span"
-                              sx={{
-                                bgcolor: "#f1f5f9",
-                                color: "#1e293b",
-                                fontSize: "0.75rem",
-                                fontWeight: 600,
-                                px: 1.5,
-                                py: 0.6,
-                                borderRadius: "6px",
-                                letterSpacing: "0.02em",
-                                border: "1px solid #e2e8f0",
-                              }}
-                            >
-                              {spec}
-                            </Box>
-                          ))}
-                        </Box>
-                        
+
+                        <Box
+  sx={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 1,
+    mt: 1,
+  }}
+>
+  {Array.isArray(interviewer.specialization)
+    ? interviewer.specialization.map((spec, i) => (
+        <Chip
+          key={i}
+          label={spec.trim()} // Trim whitespace
+          sx={{
+            bgcolor: "#f1f5f9",
+            color: "#1e293b",
+            fontWeight: 500,
+            fontSize: "0.75rem",
+            px: 1.5,
+            borderRadius: "6px",
+          }}
+        />
+      ))
+    : typeof interviewer.specialization === "string"
+    ? interviewer.specialization.split(",").map((spec, i) => (
+        <Chip
+          key={i}
+          label={spec.trim()} // Trim whitespace
+          sx={{
+            bgcolor: "#f1f5f9",
+            color: "#1e293b",
+            fontWeight: 500,
+            fontSize: "0.75rem",
+            px: 1.5,
+            borderRadius: "6px",
+          }}
+        />
+      ))
+    : null}
+</Box>
+
                         {/* Availability */}
                         <Typography
                           variant="body2"
@@ -1084,22 +1130,29 @@ const CustomBigCalendar = () => {
                         >
                           Availability
                         </Typography>
-                        
-                        <Box 
-                          sx={{ 
-                            p: 1.5, 
-                            bgcolor: "#f8fafc", 
+
+                        <Box
+                          sx={{
+                            p: 1.5,
+                            bgcolor: "#f8fafc",
                             borderRadius: "8px",
                             border: "1px solid #e2e8f0",
                             mb: 3,
                           }}
                         >
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
-                            <Box 
-                              sx={{ 
-                                width: 6, 
-                                height: 6, 
-                                borderRadius: "50%", 
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1.5,
+                              mb: 1,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: "50%",
                                 bgcolor: "#10b981",
                               }}
                             />
@@ -1113,13 +1166,19 @@ const CustomBigCalendar = () => {
                               {interviewer.availableTime}
                             </Typography>
                           </Box>
-                          
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                            <Box 
-                              sx={{ 
-                                width: 6, 
-                                height: 6, 
-                                borderRadius: "50%", 
+
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1.5,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: "50%",
                                 bgcolor: "#transparent",
                               }}
                             />
@@ -1134,7 +1193,7 @@ const CustomBigCalendar = () => {
                             </Typography>
                           </Box>
                         </Box>
-      
+
                         <Button
                           variant="contained"
                           fullWidth
@@ -1167,56 +1226,19 @@ const CustomBigCalendar = () => {
                 ))}
               </Grid>
             )}
-            
+
             {/* Mobile Action Buttons */}
-            <Box 
-              sx={{ 
+            <Box
+              sx={{
                 display: { xs: "flex", sm: "none" },
                 gap: 2,
                 mt: 3,
                 justifyContent: "center",
               }}
-            >
-              <Button
-                variant="outlined"
-                startIcon={<Download size={16} />}
-                sx={{
-                  textTransform: "none",
-                  borderRadius: "8px",
-                  borderColor: "#cbd5e1",
-                  color: "#64748b",
-                  fontWeight: 500,
-                  flex: 1,
-                  "&:hover": {
-                    borderColor: "#64748b",
-                    bgcolor: "rgba(100, 116, 139, 0.04)",
-                  },
-                }}
-              >
-                Export
-              </Button>
-              
-              <Button
-                variant="contained"
-                startIcon={<CalendarPlus size={16} />}
-                sx={{
-                  textTransform: "none",
-                  borderRadius: "8px",
-                  bgcolor: "#1e293b",
-                  color: "#ffffff",
-                  fontWeight: 500,
-                  flex: 1,
-                  "&:hover": {
-                    bgcolor: "#0f172a",
-                  },
-                }}
-              >
-                Add Interviewer
-              </Button>
-            </Box>
+            ></Box>
           </Box>
         )}
-    
+
         {/* Interviewer Details Modal - Keeping the same functionality */}
         <InterviewerDetails
           selectedCandidate={selectedCandidate}

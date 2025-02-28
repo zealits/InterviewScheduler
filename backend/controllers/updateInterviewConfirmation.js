@@ -26,7 +26,6 @@ exports.updateInterviewConfirmation = async (req, res) => {
 
     res.status(200).json({
       message: "Interview confirmation updated successfully.",
-      interview,
     });
   } catch (err) {
     console.error(err);
