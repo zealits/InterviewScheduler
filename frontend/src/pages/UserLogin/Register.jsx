@@ -99,7 +99,7 @@ const RegisterUser = () => {
         className="max-w-4xl w-full"
       >
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-gray-700 to-gray-900 py-8 px-6 relative overflow-hidden">
+          <div className="bg-gradient-to-r from-gray-800 to-gray-900 py-8 px-6 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full opacity-10">
               <svg
                 viewBox="0 0 100 100"

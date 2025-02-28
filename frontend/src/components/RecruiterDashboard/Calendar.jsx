@@ -176,7 +176,6 @@ const CustomBigCalendar = () => {
         const response = await axios.get("/api/user/availability", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Fetched Availability Data:", response.data);
 
         const data = Array.isArray(response.data?.data)
           ? response.data.data
@@ -426,8 +425,6 @@ const CustomBigCalendar = () => {
     }
 
     const filterValue = value.trim().toLowerCase();
-    console.log("Selected Filter Value:", value);
-    console.log("Events Data:", events);
 
     const filtered = events
       .map((event) => {
@@ -468,8 +465,6 @@ const CustomBigCalendar = () => {
           // Otherwise, return true if any of the user's specializations match the filter
           return userSpecs.includes(filterValue);
         });
-
-        console.log(`Users matching "${value}":`, filteredUsers);
 
         return filteredUsers.length > 0
           ? {
@@ -562,9 +557,6 @@ const CustomBigCalendar = () => {
         return;
       }
 
-      console.log("Fetched Admin Email:", fetchedAdminEmail);
-      console.log("Candidate Email:", candidateEmail);
-
       // Step 2: Prepare Form Data
       const formDataWithFile = new FormData();
       const interviewObj = {
@@ -643,14 +635,12 @@ const CustomBigCalendar = () => {
       });
 
       setPopup({ show: true, message: "Interview scheduled successfully!" });
-      setShowPopup(true);
     } catch (error) {
       console.error(
         "Error submitting details:",
         error.response?.data || error.message
       );
       setPopup({ show: true, message: "Failed to schedule interview." });
-      setShowPopup(false);
     }
   };
 
@@ -868,12 +858,11 @@ const CustomBigCalendar = () => {
                 },
                 "& .rbc-event": {
                   backgroundColor: "#1e293b",
-                  borderRadius: "6px",
+                  borderRadius: "40px",
                   color: "#ffffff",
                   fontWeight: 500,
                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                   border: "none",
-                  padding: "3px 8px",
                   "&:hover": {
                     backgroundColor: "#0f172a",
                     transform: "translateY(-1px)",
@@ -1249,6 +1238,13 @@ const CustomBigCalendar = () => {
               }}
             ></Box>
           </Box>
+        )}
+
+        {popup.show && (
+          <Popup
+            message={popup.message}
+            onClose={() => setPopup({ show: false, message: "" })}
+          />
         )}
 
         {/* Interviewer Details Modal - Keeping the same functionality */}

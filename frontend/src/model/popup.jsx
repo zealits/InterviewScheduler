@@ -12,7 +12,7 @@ function Popup({ message, onClose }) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-md animate-fadeIn z-50">
+    <div className="fixed top-0 left-0 w-full h-screen m-auto flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-md animate-fadeIn z-50">
       <div
         className="bg-white rounded-2xl p-8 shadow-2xl transform scale-100 transition-all duration-300 ease-out w-fit max-w-md border border-indigo-100"
         style={{

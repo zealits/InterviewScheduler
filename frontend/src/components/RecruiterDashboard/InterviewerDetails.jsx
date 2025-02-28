@@ -15,6 +15,7 @@ import {
   CalendarHeartIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Popup from "../../model/popup";
 
 const InterviewerDetails = ({
   selectedCandidate,
@@ -25,6 +26,7 @@ const InterviewerDetails = ({
   specialization = [], // dynamic list passed as prop
 }) => {
   const [showSuccess, setShowSuccess] = useState(false);
+  const [popup, setPopup] = useState({ show: false, message: "" });
   const [formErrors, setFormErrors] = useState({});
   const [error, setError] = useState(""); // error is now a string
   const [resumeFile, setResumeFile] = useState(null);
@@ -42,6 +44,12 @@ const InterviewerDetails = ({
     if (!formData.jobTitle) errors.jobTitle = "Job Title is required.";
     if (!formData.jobDescription)
       errors.jobDescription = "Job Description is required.";
+    if (!formData.specialization)
+      errors.specialization = "Specialization is required.";
+    if (!formData.interviewStartTime)
+      errors.interviewStartTime = "Interview Start Time is required.";
+    if (!formData.interviewEndTime)
+      errors.interviewEndTime = "Interview End Time is required.";
     return errors;
   };
 
@@ -320,7 +328,7 @@ const InterviewerDetails = ({
                             name="interviewEndTime"
                             value={formData.interviewEndTime}
                             onChange={handleChange}
-                            min={formData.interviewStartTime}
+                            min={formData.interviewEndTime}
                             className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
                               formErrors.interviewEndTime
                                 ? "border-red-500 ring-1 ring-red-500"
@@ -431,7 +439,7 @@ const InterviewerDetails = ({
       )}
 
       {/* Success Popup */}
-      {showSuccess && (
+     {/* {showSuccess && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
@@ -509,7 +517,7 @@ const InterviewerDetails = ({
             </button>
           </div>
         </div>
-      )}
+      )}  */}
     </>
   );
 };

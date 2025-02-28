@@ -278,6 +278,7 @@ const UpdateProfile = () => {
                           <span>{spec}</span>
                           <button
                             type="button"
+                            value={userData.specialization || ""}
                             onClick={() => handleRemoveSpecialization(index)}
                             className="ml-1 text-red-600 hover:text-red-800"
                           >
