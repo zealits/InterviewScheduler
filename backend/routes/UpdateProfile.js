@@ -33,24 +33,33 @@ router.put("/profile", async (req, res) => {
   try {
     const { email, password, specialization, ...otherFields } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Build the update object
+    const updateData = { ...otherFields };
 
-    // Ensure specialization is an array
-    const formattedSpecialization = Array.isArray(specialization)
-      ? specialization
-      : [specialization]; // Convert single value to array
+    // Only hash and update the password if it's provided
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateData.password = hashedPassword;
+    }
 
-    console.log("Updating profile with specialization:", formattedSpecialization); // ✅ Debugging step
+    // Ensure specialization is an array if provided
+    if (specialization) {
+      updateData.specialization = Array.isArray(specialization)
+        ? specialization
+        : [specialization];
+    }
+
+    console.log("Updating profile with data:", updateData);
 
     const updatedUser = await User.findOneAndUpdate(
       { email },
-      { ...otherFields, password: hashedPassword, specialization: formattedSpecialization },
+      updateData,
       { new: true }
-    ).select("-password"); // Exclude password from response
+    ).select("-password");
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -58,11 +67,33 @@ router.put("/profile", async (req, res) => {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.error("❌ Error updating profile:", error); // ✅ Debugging step
+    console.error("❌ Error updating profile:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
 
+router.get("/specializations", async (req, res) => {
+  try {
+    // Fetch all users and extract their specializations
+    const users = await User.find({}, { specialization: 1, _id: 0 });
+
+    // Collect all specializations into a single array
+    const allSpecializations = users.reduce((acc, user) => {
+      if (Array.isArray(user.specialization)) {
+        return [...acc, ...user.specialization];
+      }
+      return acc;
+    }, []);
+
+    // Remove duplicates
+    const uniqueSpecializations = [...new Set(allSpecializations)];
+
+    res.status(200).json(uniqueSpecializations);
+  } catch (error) {
+    console.error("❌ Error fetching specializations:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
 module.exports = router;
