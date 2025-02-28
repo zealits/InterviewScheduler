@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { registerUsers } from "../../utils/api";
 import Modal from "../../model/PopupForLogin";
 import { motion } from "framer-motion";
+import axios from "axios"; // Import axios for API calls
 
 const RegisterUser = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -13,23 +14,33 @@ const RegisterUser = () => {
   // Specialization state
   const [specializations, setSpecializations] = useState([]);
   const [specializationInput, setSpecializationInput] = useState("");
+  const [showManualInput, setShowManualInput] = useState(false);
+  const [allSpecializations, setAllSpecializations] = useState([]); // State to store fetched specializations
 
-  // Suggested specialization options
-  const suggestedSpecializations = [
-    "Cloud",
-    "AI",
-    "Data Science",
-    "Cybersecurity",
-    "DevOps",
-    "Web Development",
-    "Mobile Development",
-    "UI/UX Design",
-  ];
+  // Fetch specializations from the API
+  useEffect(() => {
+    const fetchSpecializations = async () => {
+      try {
+        const response = await axios.get("/api/specializations");
+        setAllSpecializations(response.data); // Store fetched specializations
+      } catch (error) {
+        console.error("Error fetching specializations:", error);
+        setModalData({
+          title: "Error",
+          message: "Failed to fetch specializations.",
+        });
+        setModalOpen(true);
+      }
+    };
+
+    fetchSpecializations();
+  }, []);
 
   const handleAddSpecialization = () => {
     if (specializationInput && !specializations.includes(specializationInput)) {
       setSpecializations([...specializations, specializationInput]);
       setSpecializationInput("");
+      setShowManualInput(false); // Hide manual input after adding
     }
   };
 
@@ -37,8 +48,11 @@ const RegisterUser = () => {
     setSpecializations(specializations.filter((_, i) => i !== index));
   };
 
-  const handleAddFromSuggestions = (specialization) => {
-    if (!specializations.includes(specialization)) {
+  const handleAddFromDropdown = (specialization) => {
+    if (specialization === "other") {
+      setShowManualInput(true); // Show manual input if "Other" is selected
+      setSpecializationInput("");
+    } else if (specialization && !specializations.includes(specialization)) {
       setSpecializations([...specializations, specialization]);
     }
   };
@@ -57,7 +71,7 @@ const RegisterUser = () => {
         e.target.experienceAsInterviewer.value,
         10
       ),
-      specialization: specializations, // Convert array to string
+      specialization: specializations,
       candidatesInterviewed: parseInt(e.target.candidatesInterviewed.value, 10),
     };
 
@@ -323,7 +337,7 @@ const RegisterUser = () => {
                 </div>
               </div>
 
-              {/* Specialization Section - Enhanced with Bubbles */}
+              {/* Specialization Section */}
               <div className="space-y-3 col-span-2">
                 <label className="text-sm font-medium text-gray-700">
                   Areas of Specialization
@@ -362,82 +376,41 @@ const RegisterUser = () => {
                   ))}
                 </div>
 
-                {/* Input Field for Custom Specialization */}
+                {/* Dropdown for Specializations */}
                 <div className="flex items-center space-x-2">
-                  <div className="relative flex-grow">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                  <select
+                    onChange={(e) => handleAddFromDropdown(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                  >
+                    <option value="">Select a specialization</option>
+                    {allSpecializations.map((spec, index) => (
+                      <option key={index} value={spec}>
+                        {spec}
+                      </option>
+                    ))}
+                    <option value="other">Other (Add manually)</option>
+                  </select>
+                </div>
+
+                {/* Manual Input Field (Conditional) */}
+                {showManualInput && (
+                  <div className="mt-3 flex items-center space-x-2">
                     <input
                       type="text"
                       value={specializationInput}
                       onChange={(e) => setSpecializationInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddSpecialization();
-                        }
-                      }}
-                      placeholder="Type a skill and press enter to add"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                      placeholder="Enter specialization manually"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
                     />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleAddSpecialization}
-                    className="bg-gray-700 text-white px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-1"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
+                    <button
+                      type="button"
+                      onClick={handleAddSpecialization}
+                      className="bg-gray-700 text-white px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Add
-                  </button>
-                </div>
-
-                {/* Suggested Specializations - Enhanced with Bubbles */}
-                <div>
-                  <p className="text-xs text-gray-500 mb-2">
-                    Suggested specializations:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestedSpecializations.map((suggested) => (
-                      <button
-                        key={suggested}
-                        type="button"
-                        onClick={() => handleAddFromSuggestions(suggested)}
-                        className={`px-3 py-1.5 rounded-full text-sm transition-all ${
-                          specializations.includes(suggested)
-                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-sm"
-                        }`}
-                        disabled={specializations.includes(suggested)}
-                      >
-                        {suggested}
-                      </button>
-                    ))}
+                      Add
+                    </button>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
