@@ -332,6 +332,12 @@ const UpcomingInterviews = () => {
                         </span>
                       </div>
                       <div className="flex items-center text-gray-700">
+                        <User className="mr-3 text-rose-500" size={18} />
+                        <span className="text-sm font-medium">
+                          {interview.specialization}
+                        </span>
+                      </div>
+                      <div className="flex items-center text-gray-700">
                         <Calendar className="mr-3 text-amber-500" size={18} />
                         <span className="text-sm">
                           {new Date(interview.scheduledDate).toLocaleDateString(
