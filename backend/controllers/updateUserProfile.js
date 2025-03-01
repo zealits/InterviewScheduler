@@ -11,6 +11,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     availabilityRange,
     customAvailability,
     upcomingInterviews,
+    
   } = req.body;
 
   const user = await User.findById(userId);

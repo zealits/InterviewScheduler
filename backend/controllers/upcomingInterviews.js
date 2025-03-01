@@ -28,9 +28,9 @@ exports.getAllPending = async (req, res) => {
       interviewStartTime: interview.interviewStartTime,
       interviewEndTime: interview.interviewEndTime,
       confirmation: interview.confirmation,
-      specialization: Array.isArray(interview.specialization) 
-      ? interview.specialization 
-      : [interview.specialization], // Ensure it's always an array
+      specialization: Array.isArray(interview.specialization)
+        ? interview.specialization
+        : [interview.specialization], // Ensure it's always an array
     }));
 
     res.status(200).json({ upcomingInterviews: updatedInterviews });
@@ -42,10 +42,6 @@ exports.getAllPending = async (req, res) => {
 // Add new upcoming interviews for a specific user
 exports.postAllUpcoming = async (req, res) => {
   try {
-    console.log("Body:", req.body);
-    console.log("File:", req.file);
-    console.log("Params:", req.params);
-
     const { email } = req.params;
     let { upcomingInterviews } = req.body;
 

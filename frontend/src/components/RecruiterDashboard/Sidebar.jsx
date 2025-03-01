@@ -6,8 +6,10 @@ import {
   User as ProfileIcon,
   LogOut as LogoutIcon,
   X as CloseIcon,
+  XCircle as DeclineIcon,
   Clock as PendingIcon,
   Settings as SettingsIcon,
+  XCircle,
 } from "lucide-react";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
@@ -21,12 +23,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
   const navigationItems = [
     {
-      to: "/admin/decline",
-      icon: CalendarIcon,
-      label: "Availability",
-      iconColor: "#4CAF50" // Green
+      to: "/decline",
+      icon: XCircle,
+      label: "Declined Interviews",
+      iconColor: "#4CAF50", // Green
     },
-  
   ];
 
   return (
@@ -51,10 +52,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             <div className="flex items-center space-x-3 ">
               <Link to="/user/dashboard/home">
                 <div className="rounded-full">
-                  <DashboardIcon
-                    size={28}
-                    className="text-gray-700"
-                  />
+                  <DashboardIcon size={28} className="text-gray-700" />
                 </div>
               </Link>
               <h2 className="text-2xl font-bold text-gray-800 tracking-wide">
@@ -83,7 +81,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         style={{ color: item.iconColor }}
                         className="transition-colors duration-200"
                       />
-                      <span className={`font-medium ${isActiveRoute(item.to) ? "text-gray-800" : "text-gray-700"}`}>
+                      <span
+                        className={`font-medium ${
+                          isActiveRoute(item.to)
+                            ? "text-gray-800"
+                            : "text-gray-700"
+                        }`}
+                      >
                         {item.label}
                       </span>
                     </div>
