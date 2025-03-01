@@ -41,9 +41,6 @@ const userSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Scheduled Date is required"],
       },
-      // scheduledTime: {
-      //   type: String,
-      // },
       interviewStartTime: {
         type: String,
       },
@@ -67,6 +64,43 @@ const userSchema = new mongoose.Schema({
         filename: { type: String }, // Original file name
         contentType: { type: String }, // MIME type (e.g., "application/pdf")
         file: { type: Buffer }, // Binary data of the file
+      },
+      jobTitle: { type: String },
+      details: { type: String },
+      confirmation: { type: Boolean, default: false },
+    },
+  ],
+  declinedInterviews: [
+    {
+      email: {
+        type: String,
+        required: [true, "Email is required"],
+      },
+      scheduledDate: {
+        type: Date,
+      },
+      interviewStartTime: {
+        type: String,
+      },
+      interviewEndTime: {
+        type: String,
+      },
+      specialization: [
+        {
+          type: String,
+          required: [true, "Specialization is required"],
+        },
+      ],
+      name: {
+        type: String,
+      },
+      linkedin: {
+        type: String,
+      },
+      resume: {
+        filename: { type: String },
+        contentType: { type: String },
+        file: { type: Buffer },
       },
       jobTitle: { type: String },
       details: { type: String },

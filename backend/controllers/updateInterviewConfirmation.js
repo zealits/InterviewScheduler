@@ -38,6 +38,7 @@ exports.updateInterviewConfirmation = async (req, res) => {
 };
 
 // Controller to delete an interview
+
 // exports.deleteInterview = async (req, res) => {
 //   const { email, interviewId } = req.body;
 
@@ -69,3 +70,5 @@ exports.updateInterviewConfirmation = async (req, res) => {
 //     res.status(500).json({ message: "An error occurred while deleting the interview." });
 //   }
 // };
+
+

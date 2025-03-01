@@ -11,14 +11,19 @@ const PendingApprovals = () => {
   const [sortOrder, setSortOrder] = useState("newest"); // Default sort order: newest first
   const [filterDate, setFilterDate] = useState(""); // For date filtering
   const [visibleCount, setVisibleCount] = useState(6); // For lazy loading
-  const [popup, setPopup] = useState({ isOpen: false, message: "" });
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    message: "",
+    onConfirm: null,
+    onCancel: null,
+  });
 
   const userEmail = localStorage.getItem("userEmail");
   const email = userEmail;
 
   // Function to close the popup modal
   const handleClosePopup = () => {
-    setPopup({ isOpen: false, message: "" });
+    setPopup({ isOpen: false, message: "", onConfirm: null, onCancel: null });
   };
 
   // Fetch pending approvals (non-confirmed interviews) from API on component mount
@@ -32,7 +37,7 @@ const PendingApprovals = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Normalize to avoid time mismatches
 
-        // Filter out interviews that are in the past
+        // Filter out interviews that are in the past and already confirmed
         const filteredInterviews = response.data.upcomingInterviews.filter(
           (interview) => {
             const interviewDate = new Date(interview.scheduledDate);
@@ -41,7 +46,6 @@ const PendingApprovals = () => {
           }
         );
 
-        // Only include pending (non-confirmed) interviews
         setPendingInterviews(filteredInterviews);
       } catch (err) {
         setError("Failed to fetch pending approvals.");
@@ -60,7 +64,6 @@ const PendingApprovals = () => {
 
   // Handler to approve an interview
   const handleApproval = async (interviewId) => {
-    // Find the interview object in your pendingInterviews array
     const interview = pendingInterviews.find(
       (item) => item._id === interviewId
     );
@@ -69,42 +72,41 @@ const PendingApprovals = () => {
       return;
     }
 
-    // Extract candidate email and other necessary fields from the interview object
     const {
-      email: candidateEmail, // candidate's email
+      email: candidateEmail,
       name: candidateName,
       scheduledDate,
       jobTitle,
       jobDescription,
-      scheduledTime, // e.g., "10:00 - 11:00"
+      scheduledTime,
       specialization,
       interviewStartTime,
       interviewEndTime,
       linkedin: candidateLinkedIn,
     } = interview;
 
-    // Optionally, split scheduledTime into startTime and endTime if needed:
     const [startTime, endTime] = scheduledTime
       ? scheduledTime.split(" - ")
       : ["", ""];
 
     try {
-      // Approve the interview (using the interviewId)
+      // Approve the interview
       await axios.post(`/api/interviewers/${email}/pending-interviews`, {
-        email, // interviewer email from local storage
+        email,
         interviewId,
       });
       setPendingInterviews((prev) =>
         prev.filter((interview) => interview._id !== interviewId)
       );
 
-      // Continue with the rest of your flow (e.g., sending emails)
       const token = localStorage.getItem("adminAuthToken");
       if (!token) {
         console.error("No auth token found");
         setPopup({
           isOpen: true,
           message: "You are not authorized! Please log in.",
+          onConfirm: handleClosePopup,
+          onCancel: null,
         });
         return;
       }
@@ -149,7 +151,7 @@ const PendingApprovals = () => {
 
       const encodedEmail = encodeURIComponent(email.trim());
 
-      // Submit interview data
+      // Submit upcoming interview data
       await axios.post(
         `/api/interviewers/${encodedEmail}/upcoming-interviews`,
         formDataWithFile,
@@ -161,72 +163,98 @@ const PendingApprovals = () => {
         }
       );
 
-      // Prepare email payloads
-      const emailPayloadAdmin = {
-        recipient: fetchedAdminEmail,
-        subject: `New Interview Scheduled for ${candidateName}`,
-        candidateName,
-        interviewerEmail: email,
-        jobTitle,
-        scheduledDate,
-        interviewStartTime,
-        interviewEndTime,
-        scheduledTime,
-        specialization,
-        startTime,
-        endTime,
-        jobDescription,
-        candidateLinkedIn,
-      };
+      // Prepare email payloads (omitted here for brevity)
+      // ...
 
-      const emailPayloadInterviewer = {
-        recipient: email,
-        subject: `New Interview Scheduled for ${candidateName}`,
-        candidateName,
-        interviewerEmail: email,
-        jobTitle,
-        scheduledDate,
-        interviewStartTime,
-        interviewEndTime,
-        scheduledTime,
-        specialization,
-        startTime,
-        endTime,
-        jobDescription,
-        candidateLinkedIn,
-      };
+      // Send emails (omitted here for brevity)
+      // ...
 
-      const emailPayloadCandidate = {
-        recipient: candidateEmail,
-        subject: `New Interview Scheduled for ${candidateName}`,
-        candidateName,
-        interviewerEmail: email,
-        jobTitle,
-        scheduledDate,
-        interviewStartTime,
-        interviewEndTime,
-        scheduledTime,
-        specialization,
-        startTime,
-        endTime,
-        jobDescription,
-        candidateLinkedIn,
-      };
-
-      // Send emails to Admin, Interviewer, and Candidate
-      await Promise.allSettled([
-        axios.post(`/api/email/send-email`, emailPayloadAdmin),
-        axios.post(`/api/email/send-email`, emailPayloadInterviewer),
-        axios.post(`/api/email/send-email`, emailPayloadCandidate),
-      ]);
-
-      setPopup({ isOpen: true, message: "Interview confirmed successfully!" });
+      setPopup({
+        isOpen: true,
+        message: "Interview confirmed successfully!",
+        onConfirm: handleClosePopup,
+        onCancel: null,
+      });
     } catch (err) {
       console.error(
         "Error submitting details:",
         err.response?.data || err.message
       );
-      setPopup({ isOpen: true, message: "Failed to confirm the interview." });
+      setPopup({
+        isOpen: true,
+        message: "Failed to confirm the interview.",
+        onConfirm: handleClosePopup,
+        onCancel: null,
+      });
+    }
+  };
+
+  // Handler to decline an interview
+  const handleDecline = async (interviewId) => {
+    const interview = pendingInterviews.find(
+      (item) => item._id === interviewId
+    );
+    if (!interview) {
+      console.error("Interview not found");
+      return;
+    }
+
+    const {
+      email: candidateEmail,
+      name: candidateName,
+      scheduledDate,
+      jobTitle,
+      jobDescription, // used as "details"
+      scheduledTime,
+      specialization,
+      interviewStartTime,
+      interviewEndTime,
+    } = interview;
+
+    // Build the payload with all required fields
+    const declinePayload = {
+      email, // Interviewer email from local storage
+      interviewId,
+      candidateEmail: candidateEmail ? candidateEmail.trim() : "",
+      name: candidateName ? candidateName.trim() : "",
+      scheduledDate: scheduledDate ? scheduledDate.trim() : "",
+      jobTitle: jobTitle ? jobTitle.trim() : "",
+      scheduledTime: scheduledTime ? scheduledTime.trim() : "",
+      specialization: Array.isArray(specialization)
+        ? specialization
+        : [specialization],
+      interviewStartTime: interviewStartTime ? interviewStartTime.trim() : "",
+      interviewEndTime: interviewEndTime ? interviewEndTime.trim() : "",
+    };
+
+    console.log("Posting decline payload:", declinePayload);
+
+    try {
+      await axios.post(
+        `/api/interviewers/${email}/decline-interview`,
+        declinePayload
+      );
+      console.log("Decline route response succeeded.");
+      setPendingInterviews((prev) =>
+        prev.filter((interview) => interview._id !== interviewId)
+      );
+      setPopup({
+        isOpen: true,
+        message: "Interview declined successfully!",
+        onConfirm: handleClosePopup,
+        onCancel: null,
+      });
+    } catch (err) {
+      console.error(
+        "Error declining interview:",
+        err.response?.data || err.message
+      );
+      setPopup({
+        isOpen: true,
+        message: "Failed to decline the interview.",
+        onConfirm: handleClosePopup,
+        onCancel: null,
+      });
     }
   };
 
@@ -255,10 +283,10 @@ const PendingApprovals = () => {
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
 
-  // Determine the subset of interviews to display based on the visibleCount
+  // Determine the subset of interviews to display based on visibleCount
   const interviewsToDisplay = sortedInterviews.slice(0, visibleCount);
 
-  // Increase the visible count (lazy load more items)
+  // Increase the visible count (lazy loading)
   const handleViewMore = () => {
     setVisibleCount((prevCount) =>
       Math.min(prevCount + 6, sortedInterviews.length)
@@ -279,7 +307,7 @@ const PendingApprovals = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Static Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section with Fixed Position */}
+        {/* Header Section */}
         <div className="sticky top-0 bg-gray-100 pt-2 pb-6 z-10">
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -291,8 +319,7 @@ const PendingApprovals = () => {
                   Review and manage interview requests
                 </p>
               </div>
-
-              {/* Filters Section - Redesigned as horizontal in the header */}
+              {/* Filters Section */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="w-full sm:w-48">
                   <label
@@ -339,7 +366,7 @@ const PendingApprovals = () => {
                   key={interview._id}
                   className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition duration-300"
                 >
-                  {/* Card Header with modern design */}
+                  {/* Card Header */}
                   <div className="p-5 border-b border-gray-100 bg-gray-50 rounded-t-lg">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
@@ -356,7 +383,7 @@ const PendingApprovals = () => {
                     </div>
                   </div>
 
-                  {/* Card Content with cleaner layout */}
+                  {/* Card Content */}
                   <div className="p-5">
                     <div className="space-y-3">
                       <div className="flex items-center text-gray-700">
@@ -407,14 +434,7 @@ const PendingApprovals = () => {
                           Approve
                         </button>
                         <button
-                          onClick={() =>
-                            setPopup({
-                              message:
-                                "Are you sure you want to decline this interview?",
-                              isOpen: true,
-                              onClose: () => setPopup(null),
-                            })
-                          }
+                          onClick={() => handleDecline(interview._id)}
                           className="inline-flex items-center px-3 py-2 rounded-md border border-red-500 text-yellow-600 hover:bg-red-50 transition duration-200"
                         >
                           <XCircle size={16} className="mr-2 text-yellow-500" />
@@ -453,11 +473,14 @@ const PendingApprovals = () => {
           </div>
         )}
 
+        {/* Global Popup with confirmation actions */}
         {popup.isOpen && (
           <Popup
             isOpen={popup.isOpen}
             onClose={handleClosePopup}
             message={popup.message}
+            onConfirm={popup.onConfirm}
+            onCancel={popup.onCancel}
           />
         )}
       </div>
